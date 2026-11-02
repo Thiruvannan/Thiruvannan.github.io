@@ -12,7 +12,7 @@
     h1 { font-size: 20px; color: #f0f6fc; margin-bottom: 4px; }
     p.bio { font-size: 13px; color: #8b949e; margin-bottom: 22px; }
     .btn-group { display: flex; flex-direction: column; gap: 12px; }
-    .btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px 16px; border-radius: 10px; background: #21262d; border: 1px solid #30363d; color: #f0f6fc; text-decoration: none; font-weight: 500; font-size: 14px; transition: 0.2s ease; }
+    .btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px 16px; border-radius: 10px; background: #21262d; border: 1px solid #30363d; color: #f0f6fc; text-decoration: none; font-weight: 500; font-size: 14px; cursor: pointer; transition: 0.2s ease; }
     .btn:hover { background: #30363d; border-color: #8b949e; }
     .btn-vcard { background: #1f6feb; border-color: #388bfd; }
     .btn-vcard:hover { background: #388bfd; }
@@ -27,11 +27,25 @@
     <p class="bio">Developer & Tech Enthusiast</p>
 
     <div class="btn-group">
-      <!-- Direct Static vCard Link -->
-      <a class="btn btn-vcard" href="contact.vcf" download="Thiruvannan.vcf">📇 Save Contact to Phone</a>
+      <!-- Direct Contact Insertion (No Download) -->
+      <button class="btn btn-vcard" onclick="addContact()">📇 Save Contact to Phone</button>
       <a class="btn btn-github" href="https://github.com/Thiruvannan" target="_blank">🐙 View GitHub Profile</a>
       <a class="btn" href="https://wa.me/919080792117?text=Hey!" target="_blank">💬 Chat on WhatsApp</a>
     </div>
   </div>
+
+  <script>
+    function addContact() {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+      if (isIOS) {
+        // iOS Safari automatically prompts to save contacts without saving a loose file
+        window.location.href = 'contact.vcf';
+      } else {
+        // Android intent: opens native contact creation screen directly
+        window.location.href = 'intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/contact;S.name=Thiruvannan;S.phone=%2B919080792117;S.company=SRMIST;end';
+      }
+    }
+  </script>
 </body>
 </html>
