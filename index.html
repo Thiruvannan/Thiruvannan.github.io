@@ -3,52 +3,216 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thiruvannan | Dev Profile</title>
+  <title>Thiruvannan | SRM Hub</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #0d1117; color: #c9d1d9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-    .card { background: #161b22; border: 1px solid #30363d; border-radius: 16px; width: 100%; max-width: 380px; padding: 28px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
-    .avatar { width: 84px; height: 84px; border-radius: 50%; border: 2px solid #58a6ff; margin-bottom: 14px; }
-    h1 { font-size: 20px; color: #f0f6fc; margin-bottom: 4px; }
-    p.bio { font-size: 13px; color: #8b949e; margin-bottom: 22px; }
-    .btn-group { display: flex; flex-direction: column; gap: 12px; }
-    .btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px 16px; border-radius: 10px; background: #21262d; border: 1px solid #30363d; color: #f0f6fc; text-decoration: none; font-weight: 500; font-size: 14px; transition: 0.2s ease; }
-    .btn:hover { background: #30363d; border-color: #8b949e; }
+    body { background-color: #0d1117; color: #c9d1d9; padding: 20px 14px; min-height: 100vh; }
     
-    .btn-github { background: #238636; border-color: #2ea043; }
-    .btn-github:hover { background: #2ea043; }
-    .btn-whatsapp { background: #1f6feb; border-color: #388bfd; }
-    .btn-whatsapp:hover { background: #388bfd; }
-    .btn-upi { background: #000000; border-color: #333333; }
-    .btn-upi:hover { background: #1a1a1a; }
+    /* Header / Profile */
+    .profile-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; }
+    .avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #58a6ff; }
+    .profile-info h1 { font-size: 16px; color: #f0f6fc; }
+    .profile-info p { font-size: 12px; color: #8b949e; }
+
+    /* Section Titles */
+    .section-title { font-size: 14px; color: #58a6ff; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;}
+    
+    /* Today's Classes List */
+    .class-card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 14px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
+    .class-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .class-time { font-size: 11px; background: #21262d; padding: 3px 8px; border-radius: 12px; color: #8b949e; font-weight: 600; }
+    .class-name { font-size: 14px; font-weight: 600; color: #f0f6fc; margin-top: 6px; }
+    .class-code { font-size: 11px; color: #8b949e; }
+    
+    /* Quick Action Buttons */
+    .btn-row { display: flex; gap: 8px; }
+    .btn-log { flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid transparent; text-align: center; }
+    .btn-attend { background: rgba(46, 160, 67, 0.15); color: #3fb950; border-color: rgba(46, 160, 67, 0.4); }
+    .btn-attend:active { background: #238636; color: white; }
+    .btn-miss { background: rgba(248, 81, 73, 0.15); color: #f85149; border-color: rgba(248, 81, 73, 0.4); }
+    .btn-miss:active { background: #da3633; color: white; }
+
+    /* Overall Attendance Matrix */
+    .matrix-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+    .matrix-row { background: #161b22; border: 1px solid #30363d; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .matrix-info { display: flex; flex-direction: column; }
+    .matrix-name { font-size: 12px; font-weight: 600; color: #c9d1d9; }
+    .matrix-stats { font-size: 11px; color: #8b949e; margin-top: 4px; }
+    .matrix-perc { font-size: 14px; font-weight: 700; }
+    .safe { color: #3fb950; }
+    .danger { color: #f85149; }
+    
+    /* Day Selector Dropdown */
+    select { background: #0d1117; color: #c9d1d9; border: 1px solid #30363d; padding: 4px 8px; border-radius: 6px; font-size: 12px; outline: none; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <img class="avatar" src="https://github.com/Thiruvannan.png" alt="Profile Avatar">
-    <h1>Thiruvannan</h1>
-    <p class="bio">Developer & Tech Enthusiast</p>
 
-    <div class="btn-group">
-      <!-- 1. GitHub -->
-      <a class="btn btn-github" href="https://github.com/Thiruvannan" target="_blank">🐙 View GitHub Profile</a>
-
-      <!-- 2. WhatsApp -->
-      <a class="btn btn-whatsapp" href="https://wa.me/919080792117?text=Hey!" target="_blank">💬 Chat on WhatsApp</a>
-
-      <!-- 3. Save Contact -->
-      <a class="btn" href="contact.vcf">📇 Save Contact to Phone</a>
-
-      <!-- 4. Phone Number -->
-      <a class="btn" href="tel:+919080792117">📞 Call +91 90807 92117</a>
-
-      <!-- 5. UPI Payment (TEST THIS ON YOUR PHONE, NOT PC) -->
-      <a class="btn btn-upi" href="upi://pay?pa=YOUR_UPI_ID_HERE@bank&pn=Thiruvannan&cu=INR">💸 Pay via UPI</a>
-
-      <!-- Bunk Matrix App -->
-      <a class="btn" href="attendance.html" style="background: #238636; border-color: #2ea043;">📊 Launch Bunk Matrix</a>
-      
+  <!-- Profile Banner -->
+  <div class="profile-card">
+    <img class="avatar" src="https://github.com/Thiruvannan.png" alt="Avatar">
+    <div class="profile-info">
+      <h1>Thiruvannan</h1>
+      <p>B.Tech CSE | Batch 2</p>
     </div>
   </div>
+
+  <!-- Dynamic Schedule -->
+  <div class="section-title">
+    <span>Today's Classes</span>
+    <select id="daySelector" onchange="forceDayOrder()">
+      <option value="auto">Auto (Today)</option>
+      <option value="1">Day 1</option>
+      <option value="2">Day 2</option>
+      <option value="3">Day 3</option>
+      <option value="4">Day 4</option>
+      <option value="5">Day 5</option>
+    </select>
+  </div>
+  <div id="schedule-container"></div>
+
+  <!-- Bunk Matrix -->
+  <div class="section-title" style="margin-top: 24px;">Overall Attendance</div>
+  <div class="matrix-grid" id="matrix-container"></div>
+
+  <script>
+    // 1. Core Data (Extracted directly from your Academia screenshots)
+    const baselineAttendance = {
+      "26CYB1002J": { name: "CHEMISTRY FOR CS", attended: 49, conducted: 49 },
+      "26BTB1001T": { name: "COMPUTATIONAL BIOLOGY", attended: 17, conducted: 17 },
+      "26MEE1001L": { name: "WORKSHOP PRACTICE", attended: 44, conducted: 44 },
+      "26CSE1002J": { name: "PROGRAMMING", attended: 45, conducted: 45 },
+      "26MAB1001T": { name: "CALCULUS & ALGEBRA", attended: 37, conducted: 37 },
+      "26LCA1006J": { name: "KOREAN", attended: 30, conducted: 33 },
+      "26GNN1007J": { name: "YOGA", attended: 18, conducted: 18 }
+    };
+
+    const slots = {
+      1: "08:00 - 08:50", 2: "08:50 - 09:40", 3: "09:45 - 10:35", 4: "10:40 - 11:30",
+      5: "11:35 - 12:25", 6: "12:30 - 13:20", 7: "13:25 - 14:15", 8: "14:20 - 15:10",
+      9: "15:10 - 16:00", 10: "16:00 - 16:50", 11: "16:50 - 17:30", 12: "17:30 - 18:10"
+    };
+
+    const timetable = {
+      1: { 1: "26CYB1002J", 2: "26CYB1002J", 8: "26LCA1006J", 9: "26LCA1006J" },
+      2: { 1: "26CYB1002J", 2: "26CYB1002J", 3: "26BTB1001T", 4: "26BTB1001T", 7: "26CSE1002J", 8: "26CSE1002J" },
+      3: { 1: "26MEE1001L", 2: "26MEE1001L", 3: "26MEE1001L", 4: "26MEE1001L", 9: "26MAB1001T", 10: "26CYB1002J" },
+      4: { 1: "26MAB1001T", 2: "26MAB1001T", 3: "26CYB1002J", 4: "26CSE1002J", 7: "26GNN1007J", 8: "26GNN1007J", 9: "26GNN1007J", 12: "26LCA1006J" },
+      5: { 6: "26CSE1002J", 7: "26CSE1002J", 9: "26LCA1006J", 10: "26MAB1001T" }
+    };
+
+    const academicPlanner = {
+      "2026-11-02": 3, "2026-11-03": 4, "2026-11-04": 5, "2026-11-05": 1, "2026-11-06": 2,
+      "2026-11-10": 4, "2026-11-11": 5, "2026-11-12": 1, "2026-11-13": 2, "2026-11-16": 3,
+      "2026-11-17": 4, "2026-11-18": 5, "2026-11-19": 1, "2026-11-20": 2, "2026-11-23": 3,
+      "2026-11-24": 4, "2026-11-25": 5, "2026-11-26": 1, "2026-11-27": 2, "2026-11-30": 3,
+      "2026-12-01": 4, "2026-12-02": 5, "2026-12-03": 1, "2026-12-04": 2, "2026-12-07": 3
+    };
+
+    // 2. Initialize Local Storage (Preserves your daily taps)
+    let myData = JSON.parse(localStorage.getItem('srm_tracker_v1'));
+    if (!myData) {
+      myData = baselineAttendance;
+      localStorage.setItem('srm_tracker_v1', JSON.stringify(myData));
+    }
+
+    let activeDayOrder = null;
+
+    // 3. Logic to Determine Today's Day Order
+    function getTodayDayOrder() {
+      // Get IST date safely
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const istTime = new Date(utc + (3600000 * 5.5));
+      const dateString = istTime.toISOString().split('T')[0];
+      
+      return academicPlanner[dateString] || null;
+    }
+
+    function forceDayOrder() {
+      const val = document.getElementById("daySelector").value;
+      activeDayOrder = (val === "auto") ? getTodayDayOrder() : parseInt(val);
+      renderUI();
+    }
+
+    // 4. Logging Engine
+    function logClass(code, status, elementId) {
+      if (status === 'attended') {
+        myData[code].attended++;
+        myData[code].conducted++;
+      } else {
+        myData[code].conducted++;
+      }
+      
+      localStorage.setItem('srm_tracker_v1', JSON.stringify(myData));
+      
+      // Visual feedback on the button tapped
+      const btnGroup = document.getElementById(elementId);
+      btnGroup.innerHTML = `<div style="color: #8b949e; font-size: 12px; font-weight: 600; padding: 10px; text-align: center;">Logged successfully ✓</div>`;
+      
+      renderMatrix();
+    }
+
+    // 5. Render Functions
+    function renderUI() {
+      if (activeDayOrder === null) activeDayOrder = getTodayDayOrder();
+      
+      const container = document.getElementById("schedule-container");
+      container.innerHTML = "";
+
+      if (!activeDayOrder) {
+        container.innerHTML = `<div class="class-card"><p style="text-align:center; color:#8b949e; font-size: 13px;">No classes scheduled today (Holiday/Weekend).</p></div>`;
+        renderMatrix();
+        return;
+      }
+
+      const dayClasses = timetable[activeDayOrder];
+      for (const [slotNum, code] of Object.entries(dayClasses)) {
+        const sub = myData[code];
+        const uniqueId = `action-${slotNum}-${code}`;
+        
+        container.innerHTML += `
+          <div class="class-card">
+            <div class="class-header">
+              <div>
+                <div class="class-code">${code} (Slot ${slotNum})</div>
+                <div class="class-name">${sub.name}</div>
+              </div>
+              <div class="class-time">${slots[slotNum]}</div>
+            </div>
+            <div class="btn-row" id="${uniqueId}">
+              <div class="btn-log btn-attend" onclick="logClass('${code}', 'attended', '${uniqueId}')">✔ Attended</div>
+              <div class="btn-log btn-miss" onclick="logClass('${code}', 'missed', '${uniqueId}')">✖ Missed</div>
+            </div>
+          </div>
+        `;
+      }
+      renderMatrix();
+    }
+
+    function renderMatrix() {
+      const container = document.getElementById("matrix-container");
+      container.innerHTML = "";
+
+      for (const [code, data] of Object.entries(myData)) {
+        const perc = data.conducted === 0 ? 100 : ((data.attended / data.conducted) * 100).toFixed(1);
+        const isSafe = perc >= 75;
+        const colorClass = isSafe ? "safe" : "danger";
+        
+        container.innerHTML += `
+          <div class="matrix-row">
+            <div class="matrix-info">
+              <span class="matrix-name">${data.name}</span>
+              <span class="matrix-stats">${data.attended} / ${data.conducted} classes</span>
+            </div>
+            <div class="matrix-perc ${colorClass}">${perc}%</div>
+          </div>
+        `;
+      }
+    }
+
+    // Boot Up
+    forceDayOrder();
+  </script>
 </body>
 </html>
