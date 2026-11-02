@@ -22,9 +22,9 @@
     .id-card p { font-size: 13px; color: #8b949e; margin-bottom: 20px; }
     
     .btn-group { display: flex; flex-direction: column; gap: 10px; }
-    .btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 16px; border-radius: 10px; background: #21262d; border: 1px solid #30363d; color: #f0f6fc; text-decoration: none; font-weight: 500; font-size: 14px; cursor: pointer; transition: 0.15s ease; }
-    .btn:hover { background: #30363d; border-color: #8b949e; }
-    .btn-tracker { background: #238636; border-color: #2ea043; color: white; }
+    .btn-link { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 16px; border-radius: 10px; background: #21262d; border: 1px solid #30363d; color: #f0f6fc; text-decoration: none; font-weight: 500; font-size: 14px; cursor: pointer; transition: 0.15s ease; }
+    .btn-link:hover { background: #30363d; border-color: #8b949e; }
+    .btn-tracker { background: #238636; border-color: #2ea043; color: white; border: none; font-family: inherit;}
     .btn-tracker:hover { background: #2ea043; }
 
     .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -41,7 +41,7 @@
     .class-code { font-size: 11px; color: #8b949e; }
     
     .btn-row { display: flex; gap: 8px; }
-    .btn-log { flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid transparent; text-align: center; user-select: none; }
+    .btn-log { flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid transparent; text-align: center; font-family: inherit; }
     .btn-attend { background: rgba(46, 160, 67, 0.15); color: #3fb950; border-color: rgba(46, 160, 67, 0.4); }
     .btn-miss { background: rgba(248, 81, 73, 0.15); color: #f85149; border-color: rgba(248, 81, 73, 0.4); }
     .logged-status { font-size: 12px; font-weight: 600; padding: 8px; border-radius: 6px; text-align: center; width: 100%; }
@@ -68,11 +68,11 @@
       <p>Developer | SRMIST B.Tech CSE</p>
       
       <div class="btn-group">
-        <button class="btn btn-tracker" onclick="toggleView('tracker-view')">📊 View Attendance & Schedule</button>
-        <a class="btn" href="contact.vcf">📇 Save Contact to Phone</a>
-        <a class="btn" href="https://wa.me/919080792117?text=Hey!" target="_blank">💬 WhatsApp</a>
-        <a class="btn" href="https://github.com/Thiruvannan" target="_blank">🐙 GitHub Profile</a>
-        <a class="btn" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR">💸 Pay via UPI</a>
+        <button class="btn-link btn-tracker" onclick="toggleView('tracker-view')">📊 View Attendance & Schedule</button>
+        <a class="btn-link" href="contact.vcf">📇 Save Contact to Phone</a>
+        <a class="btn-link" href="https://wa.me/919080792117?text=Hey!" target="_blank">💬 WhatsApp</a>
+        <a class="btn-link" href="https://github.com/Thiruvannan" target="_blank">🐙 GitHub Profile</a>
+        <a class="btn-link" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR">💸 Pay via UPI</a>
       </div>
     </div>
   </div>
@@ -105,7 +105,7 @@
   </div>
 
   <script>
-    // --- 1. FIREBASE CONFIGURATION ---
+    // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
       apiKey: "AIzaSyDFM_WnGNOjUNIAC6ck6eGRjAeTDvjdzJQ",
       authDomain: "srm-hub-4dc4b.firebaseapp.com",
@@ -126,12 +126,10 @@
     function toggleView(viewId) {
       document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
       document.getElementById('tracker-view').style.display = viewId === 'tracker-view' ? 'block' : 'none';
-      if(viewId === 'tracker-view') {
-        forceDayOrder();
-      }
+      if(viewId === 'tracker-view') forceDayOrder();
     }
 
-    // Default Baseline
+    // Default Baseline Data
     const baselineAttendance = {
       "26CYB1002J": { name: "CHEMISTRY FOR CS", attended: 49, conducted: 49 },
       "26BTB1001T": { name: "COMPUTATIONAL BIOLOGY", attended: 17, conducted: 17 },
@@ -164,21 +162,19 @@
       "2026-12-01": 4, "2026-12-02": 5, "2026-12-03": 1, "2026-12-04": 2, "2026-12-07": 3
     };
 
-    // Deep clone baseline so we don't accidentally mutate the reference
     let myData = JSON.parse(JSON.stringify(baselineAttendance));
     let loggedDailyActions = {};
     let activeDayOrder = null;
 
-    // --- 2. CLOUD LISTENERS ---
+    // 2. CLOUD LISTENERS
     countsRef.on('value', (snapshot) => {
       if (snapshot.exists()) {
         myData = snapshot.val();
       } else {
-        // If DB is totally empty, seed it with the baseline
         countsRef.set(baselineAttendance);
         myData = JSON.parse(JSON.stringify(baselineAttendance));
       }
-      renderMatrix(); // Always keep bottom numbers up to date
+      renderMatrix();
     });
 
     logsRef.on('value', (snapshot) => {
@@ -187,7 +183,6 @@
       } else {
         loggedDailyActions = {};
       }
-      // Re-render schedule to reflect cloud state if you opened it on another device
       if(document.getElementById('tracker-view').style.display === 'block') {
          renderUI();
       }
@@ -210,27 +205,37 @@
       renderUI();
     }
 
-    // --- 3. INSTANT LOGGING ENGINE (Fix applied here) ---
+    // 3. LOGGING ENGINE (Failsafe added)
     function logClass(code, slotNum, status) {
-      const today = getTodayDateStr();
-      const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
+      try {
+        const today = getTodayDateStr();
+        const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
 
-      // 1. INSTANT LOCAL MATH (Do not wait for Firebase)
-      if (status === 'attended') {
-        myData[code].attended++;
-        myData[code].conducted++;
-      } else {
-        myData[code].conducted++;
+        // Failsafe: Initialize subject if missing from DB
+        if (!myData[code]) {
+          myData[code] = { name: code, attended: 0, conducted: 0 };
+        }
+
+        // Local Math
+        if (status === 'attended') {
+          myData[code].attended++;
+          myData[code].conducted++;
+        } else {
+          myData[code].conducted++;
+        }
+        loggedDailyActions[logKey] = status;
+
+        // Instant Render
+        renderUI();
+        renderMatrix();
+
+        // Push to Firebase
+        countsRef.set(myData).catch(err => console.error("Firebase Sync Error:", err));
+        logsRef.child(logKey).set(status).catch(err => console.error("Firebase Sync Error:", err));
+        
+      } catch (err) {
+        console.error("Local Math Error:", err);
       }
-      loggedDailyActions[logKey] = status;
-
-      // 2. INSTANT VISUAL UPDATE
-      renderUI();
-      renderMatrix();
-
-      // 3. BACKGROUND CLOUD SYNC (Silently handles failures)
-      countsRef.set(myData).catch(err => console.error("Sync Error:", err));
-      logsRef.child(logKey).set(status).catch(err => console.error("Sync Error:", err));
     }
 
     function renderUI() {
@@ -260,11 +265,47 @@
         } else {
           actionUI = `
             <div class="btn-row">
-              <div class="btn-log btn-attend" onclick="logClass('${code}', '${slotNum}', 'attended')">✔ Attended</div>
-              <div class="btn-log btn-miss" onclick="logClass('${code}', '${slotNum}', 'missed')">✖ Missed</div>
+              <button class="btn-log btn-attend" type="button" onclick="logClass('${code}', '${slotNum}', 'attended')">✔ Attended</button>
+              <button class="btn-log btn-miss" type="button" onclick="logClass('${code}', '${slotNum}', 'missed')">✖ Missed</button>
             </div>
           `;
         }
         
         container.innerHTML += `
-          <div class="class-card
+          <div class="class-card">
+            <div class="class-header">
+              <div>
+                <div class="class-code">${code} (Slot ${slotNum})</div>
+                <div class="class-name">${sub.name}</div>
+              </div>
+              <div class="class-time">${slots[slotNum]}</div>
+            </div>
+            ${actionUI}
+          </div>
+        `;
+      }
+    }
+
+    function renderMatrix() {
+      const container = document.getElementById("matrix-container");
+      container.innerHTML = "";
+
+      for (const [code, data] of Object.entries(myData)) {
+        const perc = data.conducted === 0 ? 100 : ((data.attended / data.conducted) * 100).toFixed(1);
+        const isSafe = perc >= 75;
+        const colorClass = isSafe ? "safe" : "danger";
+        
+        container.innerHTML += `
+          <div class="matrix-row">
+            <div class="matrix-info">
+              <span class="matrix-name">${data.name}</span>
+              <span class="matrix-stats">${data.attended} / ${data.conducted} classes</span>
+            </div>
+            <div class="matrix-perc ${colorClass}">${perc}%</div>
+          </div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
