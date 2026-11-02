@@ -14,10 +14,10 @@
     .btn-group { display: flex; flex-direction: column; gap: 12px; }
     .btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px 16px; border-radius: 10px; background: #21262d; border: 1px solid #30363d; color: #f0f6fc; text-decoration: none; font-weight: 500; font-size: 14px; transition: 0.2s ease; }
     .btn:hover { background: #30363d; border-color: #8b949e; }
-    .btn-vcard { background: #1f6feb; border-color: #388bfd; }
-    .btn-vcard:hover { background: #388bfd; }
     .btn-github { background: #238636; border-color: #2ea043; }
     .btn-github:hover { background: #2ea043; }
+    .btn-whatsapp { background: #1f6feb; border-color: #388bfd; }
+    .btn-whatsapp:hover { background: #388bfd; }
   </style>
 </head>
 <body>
@@ -27,10 +27,14 @@
     <p class="bio">Developer & Tech Enthusiast</p>
 
     <div class="btn-group">
-      <!-- Reliable Universal Contact Link -->
-      <a class="btn btn-vcard" href="contact.vcf">📇 Save Contact to Phone</a>
+      <!-- 1. GitHub -->
       <a class="btn btn-github" href="https://github.com/Thiruvannan" target="_blank">🐙 View GitHub Profile</a>
-      <a class="btn" href="https://wa.me/919080792117?text=Hey!" target="_blank">💬 Chat on WhatsApp</a>
+
+      <!-- 2. WhatsApp -->
+      <a class="btn btn-whatsapp" href="https://wa.me/919080792117?text=Hey!" target="_blank">💬 Chat on WhatsApp</a>
+
+      <!-- 3. Phone Number -->
+      <a class="btn" href="tel:+919080792117">📞 Call +91 90807 92117</a>
     </div>
   </div>
 </body>
