@@ -24,7 +24,7 @@
     .btn-group { display: flex; flex-direction: column; gap: 10px; }
     .btn-link { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 16px; border-radius: 10px; background: #21262d; border: 1px solid #30363d; color: #f0f6fc; text-decoration: none; font-weight: 500; font-size: 14px; cursor: pointer; transition: 0.15s ease; }
     .btn-link:hover { background: #30363d; border-color: #8b949e; }
-    .btn-tracker { background: #238636; border-color: #2ea043; color: white; border: none; font-family: inherit;}
+    .btn-tracker { background: #238636; border-color: #2ea043; color: white; border: none; font-family: inherit; }
     .btn-tracker:hover { background: #2ea043; }
 
     .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -48,12 +48,24 @@
     .logged-att { background: rgba(46, 160, 67, 0.1); color: #3fb950; border: 1px solid rgba(46, 160, 67, 0.3); }
     .logged-mis { background: rgba(248, 81, 73, 0.1); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.3); }
 
-    .matrix-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
-    .matrix-row { background: #161b22; border: 1px solid #30363d; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-    .matrix-info { display: flex; flex-direction: column; }
-    .matrix-name { font-size: 12px; font-weight: 600; color: #c9d1d9; }
-    .matrix-stats { font-size: 11px; color: #8b949e; margin-top: 4px; }
-    .matrix-perc { font-size: 14px; font-weight: 700; }
+    /* Matrix & Bunk Margins */
+    .matrix-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
+    .matrix-card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .matrix-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .matrix-name { font-size: 13px; font-weight: 600; color: #c9d1d9; }
+    .matrix-perc { font-size: 16px; font-weight: 700; }
+    .matrix-mid { display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+    .matrix-stats { color: #8b949e; }
+    .matrix-margin { font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+    .margin-safe { color: #3fb950; background: rgba(46, 160, 67, 0.1); }
+    .margin-danger { color: #f85149; background: rgba(248, 81, 73, 0.1); }
+    
+    .extra-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #21262d; padding-top: 8px; margin-top: 2px; }
+    .extra-label { font-size: 10px; color: #8b949e; text-transform: uppercase; font-weight: 600; }
+    .extra-btns { display: flex; gap: 6px; }
+    .btn-extra { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 1px solid #30363d; background: #21262d; color: #c9d1d9; cursor: pointer; }
+    .btn-extra:active { background: #30363d; }
+    
     .safe { color: #3fb950; }
     .danger { color: #f85149; }
     select { background: #0d1117; color: #c9d1d9; border: 1px solid #30363d; padding: 4px 8px; border-radius: 6px; font-size: 12px; outline: none; }
@@ -61,6 +73,7 @@
 </head>
 <body>
 
+  <!-- VIEW 1: Main ID Card -->
   <div id="id-view">
     <div class="id-card">
       <img class="avatar" src="https://github.com/Thiruvannan.png" alt="Avatar">
@@ -77,6 +90,7 @@
     </div>
   </div>
 
+  <!-- VIEW 2: Attendance Tracker -->
   <div id="tracker-view">
     <div class="top-nav">
       <button class="back-btn" onclick="toggleView('id-view')">← Back to Card</button>
@@ -100,12 +114,11 @@
     
     <div id="schedule-container"></div>
 
-    <div class="section-title" style="margin-top: 28px;">Overall Attendance</div>
+    <div class="section-title" style="margin-top: 28px;">Overall Attendance & Margins</div>
     <div class="matrix-grid" id="matrix-container"></div>
   </div>
 
   <script>
-    // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
       apiKey: "AIzaSyDFM_WnGNOjUNIAC6ck6eGRjAeTDvjdzJQ",
       authDomain: "srm-hub-4dc4b.firebaseapp.com",
@@ -122,14 +135,12 @@
     const countsRef = db.ref('attendance_counts');
     const logsRef = db.ref('daily_logs');
 
-    // UI View Switcher
     function toggleView(viewId) {
       document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
       document.getElementById('tracker-view').style.display = viewId === 'tracker-view' ? 'block' : 'none';
-      if(viewId === 'tracker-view') forceDayOrder();
+      if (viewId === 'tracker-view') forceDayOrder();
     }
 
-    // Default Baseline Data
     const baselineAttendance = {
       "26CYB1002J": { name: "CHEMISTRY FOR CS", attended: 49, conducted: 49 },
       "26BTB1001T": { name: "COMPUTATIONAL BIOLOGY", attended: 17, conducted: 17 },
@@ -166,7 +177,6 @@
     let loggedDailyActions = {};
     let activeDayOrder = null;
 
-    // 2. CLOUD LISTENERS
     countsRef.on('value', (snapshot) => {
       if (snapshot.exists()) {
         myData = snapshot.val();
@@ -183,8 +193,8 @@
       } else {
         loggedDailyActions = {};
       }
-      if(document.getElementById('tracker-view').style.display === 'block') {
-         renderUI();
+      if (document.getElementById('tracker-view').style.display === 'block') {
+        renderUI();
       }
     });
 
@@ -205,36 +215,62 @@
       renderUI();
     }
 
-    // 3. LOGGING ENGINE (Failsafe added)
+    // Daily Schedule Slot Logging
     function logClass(code, slotNum, status) {
-      try {
-        const today = getTodayDateStr();
-        const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
+      const today = getTodayDateStr();
+      const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
 
-        // Failsafe: Initialize subject if missing from DB
-        if (!myData[code]) {
-          myData[code] = { name: code, attended: 0, conducted: 0 };
-        }
+      if (!myData[code]) myData[code] = { name: code, attended: 0, conducted: 0 };
 
-        // Local Math
-        if (status === 'attended') {
-          myData[code].attended++;
-          myData[code].conducted++;
-        } else {
-          myData[code].conducted++;
-        }
-        loggedDailyActions[logKey] = status;
+      if (status === 'attended') {
+        myData[code].attended++;
+        myData[code].conducted++;
+      } else {
+        myData[code].conducted++;
+      }
+      loggedDailyActions[logKey] = status;
 
-        // Instant Render
-        renderUI();
-        renderMatrix();
+      renderUI();
+      renderMatrix();
 
-        // Push to Firebase
-        countsRef.set(myData).catch(err => console.error("Firebase Sync Error:", err));
-        logsRef.child(logKey).set(status).catch(err => console.error("Firebase Sync Error:", err));
-        
-      } catch (err) {
-        console.error("Local Math Error:", err);
+      countsRef.set(myData).catch(err => console.error(err));
+      logsRef.child(logKey).set(status).catch(err => console.error(err));
+    }
+
+    // Surprise / Extra Class Override Logging
+    function logSurprise(code, status) {
+      if (!myData[code]) return;
+
+      if (status === 'attended') {
+        myData[code].attended++;
+        myData[code].conducted++;
+      } else {
+        myData[code].conducted++;
+      }
+
+      renderMatrix();
+      countsRef.set(myData).catch(err => console.error(err));
+    }
+
+    // 75% Bunk Margin Math Engine
+    function calculateMargin(attended, conducted) {
+      if (conducted === 0) return { text: "No classes yet", safe: true };
+      const perc = (attended / conducted) * 100;
+      
+      if (perc >= 75) {
+        // Can bunk: floor((Attended - 0.75 * Conducted) / 0.75)
+        const canBunk = Math.floor((attended - (0.75 * conducted)) / 0.75);
+        return {
+          text: canBunk > 0 ? `Can bunk ${canBunk} class${canBunk > 1 ? 'es' : ''}` : `On the edge (0 bunks)`,
+          safe: true
+        };
+      } else {
+        // Must attend: ceil((0.75 * Conducted - Attended) / 0.25)
+        const mustAttend = Math.ceil(((0.75 * conducted) - attended) / 0.25);
+        return {
+          text: `Must attend ${mustAttend} class${mustAttend > 1 ? 'es' : ''}`,
+          safe: false
+        };
       }
     }
 
@@ -292,16 +328,27 @@
 
       for (const [code, data] of Object.entries(myData)) {
         const perc = data.conducted === 0 ? 100 : ((data.attended / data.conducted) * 100).toFixed(1);
-        const isSafe = perc >= 75;
-        const colorClass = isSafe ? "safe" : "danger";
-        
+        const margin = calculateMargin(data.attended, data.conducted);
+        const colorClass = perc >= 75 ? "safe" : "danger";
+        const marginClass = margin.safe ? "margin-safe" : "margin-danger";
+
         container.innerHTML += `
-          <div class="matrix-row">
-            <div class="matrix-info">
+          <div class="matrix-card">
+            <div class="matrix-top">
               <span class="matrix-name">${data.name}</span>
-              <span class="matrix-stats">${data.attended} / ${data.conducted} classes</span>
+              <span class="matrix-perc ${colorClass}">${perc}%</span>
             </div>
-            <div class="matrix-perc ${colorClass}">${perc}%</div>
+            <div class="matrix-mid">
+              <span class="matrix-stats">${data.attended} / ${data.conducted} classes</span>
+              <span class="matrix-margin ${marginClass}">${margin.text}</span>
+            </div>
+            <div class="extra-row">
+              <span class="extra-label">Surprise Class</span>
+              <div class="extra-btns">
+                <button class="btn-extra" onclick="logSurprise('${code}', 'attended')">+ Attended</button>
+                <button class="btn-extra" onclick="logSurprise('${code}', 'missed')">+ Missed</button>
+              </div>
+            </div>
           </div>
         `;
       }
