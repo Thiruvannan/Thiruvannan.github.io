@@ -38,8 +38,16 @@
 
     ::-webkit-scrollbar { width: 0px; background: transparent; }
 
-    /* 2. RESPONSIVE BENTO ARCHITECTURE */
-    #app-wrapper { width: 100%; max-width: 420px; transition: 0.3s ease; }
+    /* FLUID VIEW TRANSITIONS API (The Morphing Magic) */
+    #app-wrapper { 
+      width: 100%; max-width: 420px; 
+      view-transition-name: app-morph;
+    }
+    ::view-transition-old(app-morph),
+    ::view-transition-new(app-morph) {
+      animation-duration: 0.4s;
+      animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
     #tracker-view { display: none; }
 
     @media (min-width: 1024px) {
@@ -50,7 +58,7 @@
       .tracker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
     }
 
-    /* 3. HEAVY FROSTED GLASS (VISION OS / APPLE MUSIC STYLE) */
+    /* 3. HEAVY FROSTED GLASS */
     .glass-panel {
       background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(48px) saturate(200%);
@@ -84,6 +92,16 @@
     /* Section Titles */
     .section-title { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; justify-content: space-between; align-items: center; padding: 0 8px;}
     select { background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; backdrop-filter: blur(20px); }
+
+    /* CASCADE ANIMATION FOR CARDS */
+    @keyframes slideUpFade {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animated-card {
+      animation: slideUpFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    }
 
     /* Inner Glass Cards */
     .class-card { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px; transition: transform 0.2s; }
@@ -200,12 +218,32 @@
     const countsRef = db.ref('attendance_counts');
     const logsRef = db.ref('daily_logs');
 
-    // UI View Switcher
+    // HAPTIC FEEDBACK ENGINE
+    function triggerHaptic(type = 'light') {
+      if (!navigator.vibrate) return;
+      if (type === 'light') navigator.vibrate(40);
+      if (type === 'success') navigator.vibrate([30, 40, 30]); // Double tap for saving data
+    }
+
+    // FLUID MORPHING VIEW SWITCHER (View Transitions API)
     function toggleView(viewId) {
       if (window.innerWidth >= 1024) return;
-      document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
-      document.getElementById('tracker-view').style.display = viewId === 'tracker-view' ? 'block' : 'none';
-      if (viewId === 'tracker-view') forceDayOrder();
+      
+      triggerHaptic('light');
+
+      // Native Morphing for Supported Browsers (Chrome/Safari 18+)
+      if (document.startViewTransition) {
+        document.startViewTransition(() => {
+          document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
+          document.getElementById('tracker-view').style.display = viewId === 'tracker-view' ? 'block' : 'none';
+          if (viewId === 'tracker-view') forceDayOrder();
+        });
+      } else {
+        // Fallback for older browsers
+        document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
+        document.getElementById('tracker-view').style.display = viewId === 'tracker-view' ? 'block' : 'none';
+        if (viewId === 'tracker-view') forceDayOrder();
+      }
     }
 
     const baselineAttendance = {
@@ -283,8 +321,10 @@
     }
 
     function logClass(code, slotNum, status) {
+      triggerHaptic('success'); // Physical double-tap feedback
       const today = getTodayDateStr();
       const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
+      
       if (!myData[code]) myData[code] = { name: code, attended: 0, conducted: 0 };
 
       if (status === 'attended') {
@@ -302,7 +342,9 @@
     }
 
     function logSurprise(code, status) {
+      triggerHaptic('success'); // Physical double-tap feedback
       if (!myData[code]) return;
+      
       if (status === 'attended') {
         myData[code].attended++;
         myData[code].conducted++;
@@ -331,12 +373,13 @@
       container.innerHTML = "";
 
       if (!activeDayOrder) {
-        container.innerHTML = `<div class="class-card"><p style="text-align:center; color:rgba(255,255,255,0.6); font-size: 14px; font-weight:600;">No classes scheduled today.</p></div>`;
+        container.innerHTML = `<div class="class-card animated-card"><p style="text-align:center; color:rgba(255,255,255,0.6); font-size: 14px; font-weight:600;">No classes scheduled today.</p></div>`;
         return;
       }
 
       const today = getTodayDateStr();
       const dayClasses = timetable[activeDayOrder];
+      let delayCounter = 0;
 
       for (const [slotNum, code] of Object.entries(dayClasses)) {
         const sub = myData[code] || { name: code };
@@ -358,7 +401,7 @@
         }
         
         container.innerHTML += `
-          <div class="class-card">
+          <div class="class-card animated-card" style="animation-delay: ${delayCounter * 0.05}s">
             <div class="class-header">
               <div>
                 <div class="class-code">${code} (Slot ${slotNum})</div>
@@ -369,12 +412,14 @@
             ${actionUI}
           </div>
         `;
+        delayCounter++;
       }
     }
 
     function renderMatrix() {
       const container = document.getElementById("matrix-container");
       container.innerHTML = "";
+      let delayCounter = 0;
 
       for (const [code, data] of Object.entries(myData)) {
         const perc = data.conducted === 0 ? 100 : ((data.attended / data.conducted) * 100).toFixed(1);
@@ -383,7 +428,7 @@
         const marginClass = margin.safe ? "margin-safe" : "margin-danger";
 
         container.innerHTML += `
-          <div class="matrix-card">
+          <div class="matrix-card animated-card" style="animation-delay: ${delayCounter * 0.05}s">
             <div class="matrix-top">
               <span class="matrix-name">${data.name}</span>
               <span class="matrix-perc ${colorClass}">${perc}%</span>
@@ -401,6 +446,7 @@
             </div>
           </div>
         `;
+        delayCounter++;
       }
     }
   </script>
