@@ -10,29 +10,38 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <style>
-    /* 1. SHINKAI TWILIGHT ATMOSPHERE */
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; }
+    /* 1. APPLE MUSIC "LIQUID AURORA" BACKGROUND */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif; }
+    
+    @keyframes slowDrift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     body { 
       background: 
-        radial-gradient(circle at 85% -10%, rgba(109, 40, 217, 0.4), transparent 45%),
-        radial-gradient(circle at 10% 110%, rgba(225, 29, 72, 0.25), transparent 45%),
-        linear-gradient(135deg, #06070a 0%, #130f24 50%, #080710 100%);
+        radial-gradient(circle at 15% 20%, rgba(255, 42, 95, 0.4), transparent 50%),
+        radial-gradient(circle at 85% 80%, rgba(74, 0, 224, 0.4), transparent 50%),
+        radial-gradient(circle at 50% 120%, rgba(0, 210, 255, 0.3), transparent 50%),
+        linear-gradient(-45deg, #09090b, #120c18, #09090b);
+      background-size: 200% 200%;
+      animation: slowDrift 20s ease infinite;
       background-attachment: fixed;
-      color: #f8fafc;
+      color: #ffffff;
       min-height: 100vh; 
       padding: 24px 16px; 
       display: flex; 
       justify-content: center;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Hide Webkit Scrollbars for cleaner glass look */
     ::-webkit-scrollbar { width: 0px; background: transparent; }
 
     /* 2. RESPONSIVE BENTO ARCHITECTURE */
     #app-wrapper { width: 100%; max-width: 420px; transition: 0.3s ease; }
     #tracker-view { display: none; }
 
-    /* Desktop/Tablet Override */
     @media (min-width: 1024px) {
       #app-wrapper { max-width: 1200px; display: grid; grid-template-columns: 340px 1fr; gap: 32px; align-items: start; }
       #id-view { position: sticky; top: 24px; }
@@ -41,80 +50,80 @@
       .tracker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
     }
 
-    /* 3. VISION-OS LIQUID GLASS PANELS */
+    /* 3. HEAVY FROSTED GLASS (VISION OS / APPLE MUSIC STYLE) */
     .glass-panel {
-      background: rgba(20, 25, 35, 0.4);
-      backdrop-filter: blur(32px) saturate(180%);
-      -webkit-backdrop-filter: blur(32px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(48px) saturate(200%);
+      -webkit-backdrop-filter: blur(48px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 32px 64px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border-radius: 32px;
     }
 
     /* Profile Card */
-    .id-card { padding: 32px 24px; text-align: center; }
-    .avatar { width: 96px; height: 96px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); margin-bottom: 16px; box-shadow: 0 8px 16px rgba(0,0,0,0.4); }
-    .id-card h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-    .id-card p { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 28px; font-weight: 500; }
+    .id-card { padding: 40px 24px; text-align: center; }
+    .avatar { width: 100px; height: 100px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); margin-bottom: 20px; box-shadow: 0 12px 24px rgba(0,0,0,0.5); }
+    .id-card h1 { font-size: 24px; font-weight: 800; letter-spacing: 0.2px; margin-bottom: 6px; }
+    .id-card p { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 32px; font-weight: 500; }
     
     /* Interactive Links */
     .btn-group { display: flex; flex-direction: column; gap: 12px; }
-    .btn-link { display: flex; align-items: center; justify-content: center; padding: 14px 16px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); color: #f8fafc; text-decoration: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1); }
-    .btn-link:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-1px); border-color: rgba(255, 255, 255, 0.15); }
-    .btn-link:active { transform: scale(0.97); }
-    .btn-tracker { background: rgba(52, 211, 153, 0.15); border-color: rgba(52, 211, 153, 0.3); color: #34d399; }
-    .btn-tracker:hover { background: rgba(52, 211, 153, 0.25); }
+    .btn-link { display: flex; align-items: center; justify-content: center; padding: 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .btn-link:hover { background: rgba(255, 255, 255, 0.12); transform: scale(1.02); border-color: rgba(255, 255, 255, 0.2); }
+    .btn-link:active { transform: scale(0.96); }
+    .btn-tracker { background: rgba(255, 255, 255, 0.9); color: #000; border: none; }
+    .btn-tracker:hover { background: #ffffff; border-color: transparent; }
 
     /* Tracker Header Nav */
-    .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 4px; }
-    .back-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(10px); }
-    .sync-status { font-size: 12px; color: #34d399; font-weight: 600; display: flex; align-items: center; gap: 8px; background: rgba(52, 211, 153, 0.1); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(52, 211, 153, 0.2); }
-    .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #34d399; box-shadow: 0 0 8px #34d399; }
+    .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding: 0 4px; }
+    .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 16px; border-radius: 14px; font-size: 14px; font-weight: 600; cursor: pointer; backdrop-filter: blur(20px); transition: 0.2s; }
+    .back-btn:active { transform: scale(0.95); }
+    .sync-status { font-size: 12px; color: #fff; font-weight: 600; display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.1); padding: 8px 14px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); }
+    .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 10px #34d399; }
 
     /* Section Titles */
-    .section-title { font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; padding: 0 4px;}
-    select { background: rgba(0,0,0,0.3); color: #f8fafc; border: 1px solid rgba(255,255,255,0.1); padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; cursor: pointer; backdrop-filter: blur(10px); }
+    .section-title { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; justify-content: space-between; align-items: center; padding: 0 8px;}
+    select { background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; backdrop-filter: blur(20px); }
 
-    /* Subject/Class Cards */
-    .class-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 18px; padding: 16px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 14px; transition: transform 0.2s; }
-    .class-card:hover { border-color: rgba(255,255,255,0.1); background: rgba(255, 255, 255, 0.04); }
+    /* Inner Glass Cards */
+    .class-card { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px; transition: transform 0.2s; }
     .class-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .class-code { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 600; letter-spacing: 0.5px; }
-    .class-name { font-size: 15px; font-weight: 700; color: #f8fafc; margin-top: 4px; }
-    .class-time { font-size: 11px; background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 12px; color: rgba(255,255,255,0.7); font-weight: 600; border: 1px solid rgba(255,255,255,0.05); }
+    .class-code { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 600; letter-spacing: 0.5px; }
+    .class-name { font-size: 16px; font-weight: 800; margin-top: 6px; letter-spacing: 0.2px; }
+    .class-time { font-size: 12px; background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 12px; color: #fff; font-weight: 600; backdrop-filter: blur(10px); }
     
-    /* Logging Actions */
-    .btn-row { display: flex; gap: 10px; }
-    .btn-log { flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1); }
-    .btn-log:active { transform: scale(0.95); }
-    .btn-attend { background: rgba(52, 211, 153, 0.1); color: #34d399; border-color: rgba(52, 211, 153, 0.25); }
-    .btn-miss { background: rgba(244, 63, 94, 0.1); color: #f43f5e; border-color: rgba(244, 63, 94, 0.25); }
+    /* Smooth Logging Buttons */
+    .btn-row { display: flex; gap: 12px; }
+    .btn-log { flex: 1; padding: 14px; border-radius: 16px; font-weight: 700; font-size: 14px; cursor: pointer; border: 1px solid transparent; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .btn-log:active { transform: scale(0.94); }
+    .btn-attend { background: rgba(52, 211, 153, 0.15); color: #4ade80; border-color: rgba(52, 211, 153, 0.3); }
+    .btn-miss { background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.3); }
     
-    .logged-status { font-size: 13px; font-weight: 700; padding: 10px; border-radius: 12px; text-align: center; width: 100%; backdrop-filter: blur(10px); }
-    .logged-att { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
-    .logged-mis { background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); }
+    .logged-status { font-size: 14px; font-weight: 700; padding: 14px; border-radius: 16px; text-align: center; width: 100%; backdrop-filter: blur(10px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.1); }
+    .logged-att { background: rgba(52, 211, 153, 0.2); color: #4ade80; border: 1px solid rgba(52, 211, 153, 0.4); }
+    .logged-mis { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
 
-    /* Matrix Design */
-    .matrix-grid { display: flex; flex-direction: column; gap: 14px; }
-    .matrix-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    /* Matrix Cards */
+    .matrix-grid { display: flex; flex-direction: column; gap: 16px; }
+    .matrix-card { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
     .matrix-top { display: flex; justify-content: space-between; align-items: flex-start; }
-    .matrix-name { font-size: 14px; font-weight: 700; color: #f8fafc; }
-    .matrix-perc { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
-    .matrix-mid { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
-    .matrix-stats { color: rgba(255,255,255,0.5); font-weight: 500; }
+    .matrix-name { font-size: 15px; font-weight: 800; letter-spacing: 0.2px; }
+    .matrix-perc { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+    .matrix-mid { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+    .matrix-stats { color: rgba(255,255,255,0.6); font-weight: 600; }
     
-    .matrix-margin { font-weight: 700; padding: 4px 8px; border-radius: 8px; font-size: 11px; }
-    .margin-safe { color: #34d399; background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52,211,153,0.2); }
-    .margin-danger { color: #f43f5e; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244,63,94,0.2); }
+    .matrix-margin { font-weight: 700; padding: 6px 10px; border-radius: 10px; font-size: 12px; }
+    .margin-safe { color: #4ade80; background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52,211,153,0.3); }
+    .margin-danger { color: #fb7185; background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244,63,94,0.3); }
     
-    .extra-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; margin-top: 4px; }
-    .extra-label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
-    .extra-btns { display: flex; gap: 8px; }
-    .btn-extra { padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #e2e8f0; cursor: pointer; transition: 0.2s; }
-    .btn-extra:active { transform: scale(0.92); }
+    .extra-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; margin-top: 4px; }
+    .extra-label { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+    .extra-btns { display: flex; gap: 10px; }
+    .btn-extra { padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; transition: 0.2s; backdrop-filter: blur(10px); }
+    .btn-extra:active { transform: scale(0.92); background: rgba(255,255,255,0.15); }
     
-    .safe { color: #34d399; text-shadow: 0 0 12px rgba(52,211,153,0.4); }
-    .danger { color: #f43f5e; text-shadow: 0 0 12px rgba(244,63,94,0.4); }
+    .safe { color: #4ade80; text-shadow: 0 0 16px rgba(52,211,153,0.4); }
+    .danger { color: #fb7185; text-shadow: 0 0 16px rgba(244,63,94,0.4); }
   </style>
 </head>
 <body>
@@ -129,29 +138,27 @@
       <p>Developer | SRMIST CSE</p>
       
       <div class="btn-group">
-        <button class="btn-link btn-tracker desktop-hide" onclick="toggleView('tracker-view')">📊 Dashboard</button>
-        <a class="btn-link" href="https://github.com/Thiruvannan" target="_blank">🐙 GitHub Profile</a>
-        <a class="btn-link" href="contact.vcf">📇 Save Contact</a>
-        <a class="btn-link" href="https://wa.me/919080792117?text=Hey!" target="_blank">💬 WhatsApp</a>
-        <a class="btn-link" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR">💸 Pay via UPI</a>
+        <button class="btn-link btn-tracker desktop-hide" onclick="toggleView('tracker-view')">View Attendance</button>
+        <a class="btn-link" href="https://github.com/Thiruvannan" target="_blank">GitHub Profile</a>
+        <a class="btn-link" href="contact.vcf">Save Contact</a>
+        <a class="btn-link" href="https://wa.me/919080792117?text=Hey!" target="_blank">WhatsApp</a>
+        <a class="btn-link" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR">Pay via UPI</a>
       </div>
     </div>
 
     <!-- TRACKER PANEL -->
     <div id="tracker-view">
       <div class="top-nav">
-        <button class="back-btn desktop-hide" onclick="toggleView('id-view')">← Profile</button>
+        <button class="back-btn desktop-hide" onclick="toggleView('id-view')">Done</button>
         <div class="sync-status">
           <span class="sync-dot"></span>
-          <span id="syncLabel">Cloud Active</span>
+          <span id="syncLabel">Live</span>
         </div>
       </div>
 
       <!-- DESKTOP GRID SPLIT -->
       <div class="tracker-grid">
-        
-        <!-- LEFT COL: TODAY -->
-        <div class="glass-panel" style="padding: 20px;">
+        <div class="glass-panel" style="padding: 24px;">
           <div class="section-title">
             <span>Today's Classes</span>
             <select id="daySelector" onchange="forceDayOrder()">
@@ -166,19 +173,17 @@
           <div id="schedule-container"></div>
         </div>
 
-        <!-- RIGHT COL: OVERALL -->
-        <div class="glass-panel" style="padding: 20px;">
+        <div class="glass-panel" style="padding: 24px;">
           <div class="section-title"><span>Overall Attendance</span></div>
           <div class="matrix-grid" id="matrix-container"></div>
         </div>
-
       </div>
     </div>
 
   </div>
 
   <script>
-    // FIREBASE CORE (Untouched logic, flawless operation)
+    // FIREBASE CORE 
     const firebaseConfig = {
       apiKey: "AIzaSyDFM_WnGNOjUNIAC6ck6eGRjAeTDvjdzJQ",
       authDomain: "srm-hub-4dc4b.firebaseapp.com",
@@ -195,9 +200,9 @@
     const countsRef = db.ref('attendance_counts');
     const logsRef = db.ref('daily_logs');
 
-    // UI View Switcher (Mobile Only)
+    // UI View Switcher
     function toggleView(viewId) {
-      if (window.innerWidth >= 1024) return; // Ignore on desktop
+      if (window.innerWidth >= 1024) return;
       document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
       document.getElementById('tracker-view').style.display = viewId === 'tracker-view' ? 'block' : 'none';
       if (viewId === 'tracker-view') forceDayOrder();
@@ -260,7 +265,6 @@
       }
     });
 
-    // Boot-up for desktop width
     if (window.innerWidth >= 1024) forceDayOrder();
 
     function getTodayDateStr() {
@@ -327,7 +331,7 @@
       container.innerHTML = "";
 
       if (!activeDayOrder) {
-        container.innerHTML = `<div class="class-card"><p style="text-align:center; color:rgba(255,255,255,0.5); font-size: 13px;">No classes scheduled today.</p></div>`;
+        container.innerHTML = `<div class="class-card"><p style="text-align:center; color:rgba(255,255,255,0.6); font-size: 14px; font-weight:600;">No classes scheduled today.</p></div>`;
         return;
       }
 
