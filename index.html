@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Thiruvannan | SRM Hub</title>
+  
+  <!-- Firebase App & Realtime Database SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: #0d1117; color: #c9d1d9; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 20px 14px; }
@@ -24,6 +29,9 @@
 
     .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .back-btn { background: #161b22; border: 1px solid #30363d; color: #58a6ff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .sync-status { font-size: 11px; color: #3fb950; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #3fb950; }
+
     .section-title { font-size: 14px; color: #58a6ff; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; }
     
     .class-card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 14px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
@@ -74,6 +82,10 @@
   <div id="tracker-view">
     <div class="top-nav">
       <button class="back-btn" onclick="toggleView('id-view')">← Back to Card</button>
+      <div class="sync-status">
+        <span class="sync-dot"></span>
+        <span id="syncLabel">Cloud Synced</span>
+      </div>
     </div>
 
     <div class="section-title">
@@ -95,12 +107,31 @@
   </div>
 
   <script>
+    // --- 1. FIREBASE CONFIGURATION ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDFM_WnGNOjUNIAC6ck6eGRjAeTDvjdzJQ",
+      authDomain: "srm-hub-4dc4b.firebaseapp.com",
+      databaseURL: "https://srm-hub-4dc4b-default-rtdb.firebaseio.com",
+      projectId: "srm-hub-4dc4b",
+      storageBucket: "srm-hub-4dc4b.firebasestorage.app",
+      messagingSenderId: "39200598376",
+      appId: "1:39200598376:web:3e4bacf3419f92728b0edd",
+      measurementId: "G-PJCGLCEP03"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const countsRef = db.ref('attendance_counts');
+    const logsRef = db.ref('daily_logs');
+
+    // UI View Switcher
     function toggleView(viewId) {
       document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
       document.getElementById('tracker-view').style.display = viewId === 'tracker-view' ? 'block' : 'none';
       if(viewId === 'tracker-view') forceDayOrder();
     }
 
+    // Default Starting Counts
     const baselineAttendance = {
       "26CYB1002J": { name: "CHEMISTRY FOR CS", attended: 49, conducted: 49 },
       "26BTB1001T": { name: "COMPUTATIONAL BIOLOGY", attended: 17, conducted: 17 },
@@ -126,133 +157,4 @@
     };
 
     const academicPlanner = {
-      "2026-11-02": 3, "2026-11-03": 4, "2026-11-04": 5, "2026-11-05": 1, "2026-11-06": 2,
-      "2026-11-10": 4, "2026-11-11": 5, "2026-11-12": 1, "2026-11-13": 2, "2026-11-16": 3,
-      "2026-11-17": 4, "2026-11-18": 5, "2026-11-19": 1, "2026-11-20": 2, "2026-11-23": 3,
-      "2026-11-24": 4, "2026-11-25": 5, "2026-11-26": 1, "2026-11-27": 2, "2026-11-30": 3,
-      "2026-12-01": 4, "2026-12-02": 5, "2026-12-03": 1, "2026-12-04": 2, "2026-12-07": 3
-    };
-
-    // Load permanent counts
-    let myData = JSON.parse(localStorage.getItem('srm_tracker_counts'));
-    if (!myData) {
-      myData = baselineAttendance;
-      localStorage.setItem('srm_tracker_counts', JSON.stringify(myData));
-    }
-
-    // Load daily button-click states
-    let loggedDailyActions = JSON.parse(localStorage.getItem('srm_daily_logs')) || {};
-
-    let activeDayOrder = null;
-
-    function getTodayDateStr() {
-      const now = new Date();
-      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-      const istTime = new Date(utc + (3600000 * 5.5));
-      return istTime.toISOString().split('T')[0];
-    }
-
-    function getTodayDayOrder() {
-      return academicPlanner[getTodayDateStr()] || null;
-    }
-
-    function forceDayOrder() {
-      const val = document.getElementById("daySelector").value;
-      activeDayOrder = (val === "auto") ? getTodayDayOrder() : parseInt(val);
-      renderUI();
-    }
-
-    function logClass(code, slotNum, status) {
-      const today = getTodayDateStr();
-      const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
-
-      if (status === 'attended') {
-        myData[code].attended++;
-        myData[code].conducted++;
-      } else {
-        myData[code].conducted++;
-      }
-      
-      // Save updated total numbers
-      localStorage.setItem('srm_tracker_counts', JSON.stringify(myData));
-
-      // Save button lock state for today
-      loggedDailyActions[logKey] = status;
-      localStorage.setItem('srm_daily_logs', JSON.stringify(loggedDailyActions));
-      
-      renderUI();
-    }
-
-    function renderUI() {
-      if (activeDayOrder === null) activeDayOrder = getTodayDayOrder();
-      
-      const container = document.getElementById("schedule-container");
-      container.innerHTML = "";
-
-      if (!activeDayOrder) {
-        container.innerHTML = `<div class="class-card"><p style="text-align:center; color:#8b949e; font-size: 13px;">No classes scheduled today.</p></div>`;
-        renderMatrix();
-        return;
-      }
-
-      const today = getTodayDateStr();
-      const dayClasses = timetable[activeDayOrder];
-
-      for (const [slotNum, code] of Object.entries(dayClasses)) {
-        const sub = myData[code];
-        const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
-        const previousAction = loggedDailyActions[logKey];
-
-        let actionUI = '';
-        if (previousAction === 'attended') {
-          actionUI = `<div class="logged-status logged-att">Logged: Attended ✓</div>`;
-        } else if (previousAction === 'missed') {
-          actionUI = `<div class="logged-status logged-mis">Logged: Missed ✖</div>`;
-        } else {
-          actionUI = `
-            <div class="btn-row">
-              <div class="btn-log btn-attend" onclick="logClass('${code}', '${slotNum}', 'attended')">✔ Attended</div>
-              <div class="btn-log btn-miss" onclick="logClass('${code}', '${slotNum}', 'missed')">✖ Missed</div>
-            </div>
-          `;
-        }
-        
-        container.innerHTML += `
-          <div class="class-card">
-            <div class="class-header">
-              <div>
-                <div class="class-code">${code} (Slot ${slotNum})</div>
-                <div class="class-name">${sub.name}</div>
-              </div>
-              <div class="class-time">${slots[slotNum]}</div>
-            </div>
-            ${actionUI}
-          </div>
-        `;
-      }
-      renderMatrix();
-    }
-
-    function renderMatrix() {
-      const container = document.getElementById("matrix-container");
-      container.innerHTML = "";
-
-      for (const [code, data] of Object.entries(myData)) {
-        const perc = data.conducted === 0 ? 100 : ((data.attended / data.conducted) * 100).toFixed(1);
-        const isSafe = perc >= 75;
-        const colorClass = isSafe ? "safe" : "danger";
-        
-        container.innerHTML += `
-          <div class="matrix-row">
-            <div class="matrix-info">
-              <span class="matrix-name">${data.name}</span>
-              <span class="matrix-stats">${data.attended} / ${data.conducted} classes</span>
-            </div>
-            <div class="matrix-perc ${colorClass}">${perc}%</div>
-          </div>
-        `;
-      }
-    }
-  </script>
-</body>
-</html>
+      "2026-11-02": 3, "2026-11-03": 4, "2026-11-
