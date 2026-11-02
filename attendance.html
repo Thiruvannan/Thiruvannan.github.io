@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SRM Bunk Matrix</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0d1117; color: #c9d1d9; padding: 20px 14px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    .container { width: 100%; max-width: 420px; }
+    
+    /* Header */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .header h1 { font-size: 20px; color: #f0f6fc; }
+    .back-btn { color: #58a6ff; text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 12px; border: 1px solid #21262d; border-radius: 6px; background: #161b22; }
+    
+    /* Input Form */
+    .add-box { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 16px; margin-bottom: 24px; display: flex; gap: 10px; }
+    .add-box input { flex: 1; background: #0d1117; border: 1px solid #30363d; color: #f0f6fc; padding: 10px 12px; border-radius: 6px; font-size: 14px; outline: none; }
+    .add-box input:focus { border-color: #58a6ff; }
+    .add-box button { background: #238636; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+    
+    /* Subject Cards */
+    #subject-list { display: flex; flex-direction: column; gap: 14px; }
+    .subject-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 16px; position: relative; }
+    .subject-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .subject-name { font-size: 16px; font-weight: 600; color: #f0f6fc; }
+    .delete-btn { background: none; border: none; color: #8b949e; cursor: pointer; font-size: 16px; }
+    
+    /* Status Badge */
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-bottom: 12px; border: 1px solid transparent; }
+    .status-safe { background: rgba(46, 160, 67, 0.1); color: #3fb950; border-color: rgba(46, 160, 67, 0.4); }
+    .status-warning { background: rgba(210, 153, 34, 0.1); color: #d29922; border-color: rgba(210, 153, 34, 0.4); }
+    .status-danger { background: rgba(248, 81, 73, 0.1); color: #f85149; border-color: rgba(248, 81, 73, 0.4); }
+    
+    /* Stats Grid */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; text-align: center; background: #0d1117; padding: 10px; border-radius: 8px; border: 1px solid #21262d; }
+    .stat-box { display: flex; flex-direction: column; }
+    .stat-val { font-size: 16px; font-weight: 700; color: #f0f6fc; }
+    .stat-label { font-size: 10px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    /* Action Buttons */
+    .actions { display: flex; gap: 8px; }
+    .action-btn { flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid transparent; }
+    .btn-attend { background: #238636; color: white; }
+    .btn-bunk { background: #21262d; border-color: #30363d; color: #f85149; }
+    .btn-bunk:hover { background: #30363d; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Bunk Matrix</h1>
+      <a href="index.html" class="back-btn">← Back to ID</a>
+    </div>
+
+    <div class="add-box">
+      <input type="text" id="subjName" placeholder="e.g., Compiler Design..." autocomplete="off">
+      <button onclick="addSubject()">Add</button>
+    </div>
+
+    <div id="subject-list"></div>
+  </div>
+
+  <script>
+    let subjects = JSON.parse(localStorage.getItem('srm_attendance')) || [];
+
+    function save() {
+      localStorage.setItem('srm_attendance', JSON.stringify(subjects));
+      render();
+    }
+
+    function addSubject() {
+      const nameInput = document.getElementById('subjName');
+      const name = nameInput.value.trim();
+      if (name) {
+        subjects.push({ name, attended: 0, conducted: 0 });
+        nameInput.value = '';
+        save();
+      }
+    }
+
+    function update(index, action) {
+      if (action === 'attend') {
+        subjects[index].attended++;
+        subjects[index].conducted++;
+      } else if (action === 'bunk') {
+        subjects[index].conducted++;
+      } else if (action === 'delete') {
+        if(confirm('Remove this subject?')) {
+          subjects.splice(index, 1);
+        }
+      }
+      save();
+    }
+
+    function getInsights(attended, conducted) {
+      if (conducted === 0) return { text: "No classes yet", class: "status-safe", perc: 0 };
+      
+      const perc = (attended / conducted) * 100;
+      let text, cssClass;
+
+      if (perc >= 75) {
+        // Safe: How many can I bunk and still stay >= 75%?
+        // Logic: attended / (conducted + bunks) = 0.75 -> bunks = (attended / 0.75) - conducted
+        const safeBunks = Math.floor((attended / 0.75) - conducted);
+        text = safeBunks === 0 ? "On the edge (Don't bunk)" : `Safe to bunk ${safeBunks} classes`;
+        cssClass = safeBunks === 0 ? "status-warning" : "status-safe";
+      } else {
+        // Deficit: How many must I attend straight to reach 75%?
+        // Logic: (attended + req) / (conducted + req) = 0.75 -> req = (0.75 * conducted - attended) / 0.25
+        const reqClasses = Math.ceil((0.75 * conducted - attended) / 0.25);
+        text = `Deficit: Attend next ${reqClasses} straight`;
+        cssClass = "status-danger";
+      }
+
+      return { text, class: cssClass, perc: perc.toFixed(1) };
+    }
+
+    function render() {
+      const list = document.getElementById('subject-list');
+      list.innerHTML = '';
+
+      subjects.forEach((subj, index) => {
+        const insight = getInsights(subj.attended, subj.conducted);
+        
+        list.innerHTML += `
+          <div class="subject-card">
+            <div class="subject-header">
+              <div class="subject-name">${subj.name}</div>
+              <button class="delete-btn" onclick="update(${index}, 'delete')">🗑</button>
+            </div>
+            
+            <div class="status-badge ${insight.class}">${insight.text}</div>
+            
+            <div class="stats">
+              <div class="stat-box">
+                <span class="stat-val">${subj.attended}</span>
+                <span class="stat-label">Attended</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-val">${subj.conducted}</span>
+                <span class="stat-label">Total</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-val" style="color: ${insight.perc >= 75 ? '#3fb950' : '#f85149'}">${insight.perc}%</span>
+                <span class="stat-label">Percentage</span>
+              </div>
+            </div>
+            
+            <div class="actions">
+              <button class="action-btn btn-attend" onclick="update(${index}, 'attend')">+ Attended</button>
+              <button class="action-btn btn-bunk" onclick="update(${index}, 'bunk')">+ Bunked</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>
