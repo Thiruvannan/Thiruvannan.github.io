@@ -8,11 +8,9 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: #0d1117; color: #c9d1d9; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 20px 14px; }
     
-    /* View Containers */
-    #id-view, #tracker-view { width: 100%; max-width: 400px; transition: 0.2s ease; }
-    #tracker-view { display: none; } /* Hidden by default */
+    #id-view, #tracker-view { width: 100%; max-width: 400px; }
+    #tracker-view { display: none; }
     
-    /* --- ID CARD STYLES --- */
     .id-card { background: #161b22; border: 1px solid #30363d; border-radius: 16px; padding: 28px 20px; text-align: center; box-shadow: 0 12px 32px rgba(0,0,0,0.6); }
     .avatar { width: 84px; height: 84px; border-radius: 50%; border: 2px solid #58a6ff; margin-bottom: 12px; }
     .id-card h1 { font-size: 20px; color: #f0f6fc; margin-bottom: 4px; }
@@ -24,10 +22,9 @@
     .btn-tracker { background: #238636; border-color: #2ea043; color: white; }
     .btn-tracker:hover { background: #2ea043; }
 
-    /* --- TRACKER STYLES --- */
     .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .back-btn { background: #161b22; border: 1px solid #30363d; color: #58a6ff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .section-title { font-size: 14px; color: #58a6ff; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;}
+    .section-title { font-size: 14px; color: #58a6ff; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; }
     
     .class-card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 14px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
     .class-header { display: flex; justify-content: space-between; align-items: flex-start; }
@@ -39,6 +36,9 @@
     .btn-log { flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid transparent; text-align: center; }
     .btn-attend { background: rgba(46, 160, 67, 0.15); color: #3fb950; border-color: rgba(46, 160, 67, 0.4); }
     .btn-miss { background: rgba(248, 81, 73, 0.15); color: #f85149; border-color: rgba(248, 81, 73, 0.4); }
+    .logged-status { font-size: 12px; font-weight: 600; padding: 8px; border-radius: 6px; text-align: center; width: 100%; }
+    .logged-att { background: rgba(46, 160, 67, 0.1); color: #3fb950; border: 1px solid rgba(46, 160, 67, 0.3); }
+    .logged-mis { background: rgba(248, 81, 73, 0.1); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.3); }
 
     .matrix-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
     .matrix-row { background: #161b22; border: 1px solid #30363d; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
@@ -61,9 +61,7 @@
       <p>Developer | SRMIST B.Tech CSE</p>
       
       <div class="btn-group">
-        <!-- Opens the nested tracker -->
         <button class="btn btn-tracker" onclick="toggleView('tracker-view')">📊 View Attendance & Schedule</button>
-        
         <a class="btn" href="contact.vcf">📇 Save Contact to Phone</a>
         <a class="btn" href="https://wa.me/919080792117?text=Hey!" target="_blank">💬 WhatsApp</a>
         <a class="btn" href="https://github.com/Thiruvannan" target="_blank">🐙 GitHub Profile</a>
@@ -97,14 +95,12 @@
   </div>
 
   <script>
-    // --- UI Navigation ---
     function toggleView(viewId) {
       document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
       document.getElementById('tracker-view').style.display = viewId === 'tracker-view' ? 'block' : 'none';
       if(viewId === 'tracker-view') forceDayOrder();
     }
 
-    // --- Data Engine ---
     const baselineAttendance = {
       "26CYB1002J": { name: "CHEMISTRY FOR CS", attended: 49, conducted: 49 },
       "26BTB1001T": { name: "COMPUTATIONAL BIOLOGY", attended: 17, conducted: 17 },
@@ -115,15 +111,12 @@
       "26GNN1007J": { name: "YOGA", attended: 18, conducted: 18 }
     };
 
-    // Slot 12 removed completely
     const slots = {
       1: "08:00 - 08:50", 2: "08:50 - 09:40", 3: "09:45 - 10:35", 4: "10:40 - 11:30",
       5: "11:35 - 12:25", 6: "12:30 - 13:20", 7: "13:25 - 14:15", 8: "14:20 - 15:10",
       9: "15:10 - 16:00", 10: "16:00 - 16:50", 11: "16:50 - 17:30"
     };
 
-    // Applied Tweaks: 
-    // D2 Slot 3 is Korean, D3 Slot 10 removed, D4 Slot 12 removed.
     const timetable = {
       1: { 1: "26CYB1002J", 2: "26CYB1002J", 8: "26LCA1006J", 9: "26LCA1006J" },
       2: { 1: "26CYB1002J", 2: "26CYB1002J", 3: "26LCA1006J", 4: "26BTB1001T", 7: "26CSE1002J", 8: "26CSE1002J" },
@@ -140,25 +133,58 @@
       "2026-12-01": 4, "2026-12-02": 5, "2026-12-03": 1, "2026-12-04": 2, "2026-12-07": 3
     };
 
-    let myData = JSON.parse(localStorage.getItem('srm_tracker_v1'));
+    // Load permanent counts
+    let myData = JSON.parse(localStorage.getItem('srm_tracker_counts'));
     if (!myData) {
       myData = baselineAttendance;
-      localStorage.setItem('srm_tracker_v1', JSON.stringify(myData));
+      localStorage.setItem('srm_tracker_counts', JSON.stringify(myData));
     }
+
+    // Load daily button-click states
+    let loggedDailyActions = JSON.parse(localStorage.getItem('srm_daily_logs')) || {};
 
     let activeDayOrder = null;
 
-    function getTodayDayOrder() {
+    function getTodayDateStr() {
       const now = new Date();
       const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
       const istTime = new Date(utc + (3600000 * 5.5));
-      const dateString = istTime.toISOString().split('T')[0];
-      return academicPlanner[dateString] || null;
+      return istTime.toISOString().split('T')[0];
+    }
+
+    function getTodayDayOrder() {
+      return academicPlanner[getTodayDateStr()] || null;
     }
 
     function forceDayOrder() {
       const val = document.getElementById("daySelector").value;
       activeDayOrder = (val === "auto") ? getTodayDayOrder() : parseInt(val);
+      renderUI();
+    }
+
+    function logClass(code, slotNum, status) {
+      const today = getTodayDateStr();
+      const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
+
+      if (status === 'attended') {
+        myData[code].attended++;
+        myData[code].conducted++;
+      } else {
+        myData[code].conducted++;
+      }
+      
+      // Save updated total numbers
+      localStorage.setItem('srm_tracker_counts', JSON.stringify(myData));
+
+      // Save button lock state for today
+      loggedDailyActions[logKey] = status;
+      localStorage.setItem('srm_daily_logs', JSON.stringify(loggedDailyActions));
+      
+      renderUI();
+    }
+
+    function renderUI() {
+      if (activeDayOrder === null) activeDayOrder = getTodayDayOrder();
       
       const container = document.getElementById("schedule-container");
       container.innerHTML = "";
@@ -169,10 +195,27 @@
         return;
       }
 
+      const today = getTodayDateStr();
       const dayClasses = timetable[activeDayOrder];
+
       for (const [slotNum, code] of Object.entries(dayClasses)) {
         const sub = myData[code];
-        const uniqueId = `action-${slotNum}-${code}`;
+        const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
+        const previousAction = loggedDailyActions[logKey];
+
+        let actionUI = '';
+        if (previousAction === 'attended') {
+          actionUI = `<div class="logged-status logged-att">Logged: Attended ✓</div>`;
+        } else if (previousAction === 'missed') {
+          actionUI = `<div class="logged-status logged-mis">Logged: Missed ✖</div>`;
+        } else {
+          actionUI = `
+            <div class="btn-row">
+              <div class="btn-log btn-attend" onclick="logClass('${code}', '${slotNum}', 'attended')">✔ Attended</div>
+              <div class="btn-log btn-miss" onclick="logClass('${code}', '${slotNum}', 'missed')">✖ Missed</div>
+            </div>
+          `;
+        }
         
         container.innerHTML += `
           <div class="class-card">
@@ -183,29 +226,10 @@
               </div>
               <div class="class-time">${slots[slotNum]}</div>
             </div>
-            <div class="btn-row" id="${uniqueId}">
-              <div class="btn-log btn-attend" onclick="logClass('${code}', 'attended', '${uniqueId}')">✔ Attended</div>
-              <div class="btn-log btn-miss" onclick="log,Class('${code}', 'missed', '${uniqueId}')">✖ Missed</div>
-            </div>
+            ${actionUI}
           </div>
         `;
       }
-      renderMatrix();
-    }
-
-    function logClass(code, status, elementId) {
-      if (status === 'attended') {
-        myData[code].attended++;
-        myData[code].conducted++;
-      } else {
-        myData[code].conducted++;
-      }
-      
-      localStorage.setItem('srm_tracker_v1', JSON.stringify(myData));
-      
-      const btnGroup = document.getElementById(elementId);
-      btnGroup.innerHTML = `<div style="color: #8b949e; font-size: 12px; font-weight: 600; padding: 10px; text-align: center;">Logged successfully ✓</div>`;
-      
       renderMatrix();
     }
 
