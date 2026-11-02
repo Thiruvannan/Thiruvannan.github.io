@@ -41,7 +41,7 @@
     .class-code { font-size: 11px; color: #8b949e; }
     
     .btn-row { display: flex; gap: 8px; }
-    .btn-log { flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid transparent; text-align: center; }
+    .btn-log { flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid transparent; text-align: center; user-select: none; }
     .btn-attend { background: rgba(46, 160, 67, 0.15); color: #3fb950; border-color: rgba(46, 160, 67, 0.4); }
     .btn-miss { background: rgba(248, 81, 73, 0.15); color: #f85149; border-color: rgba(248, 81, 73, 0.4); }
     .logged-status { font-size: 12px; font-weight: 600; padding: 8px; border-radius: 6px; text-align: center; width: 100%; }
@@ -61,7 +61,6 @@
 </head>
 <body>
 
-  <!-- VIEW 1: Main ID Card -->
   <div id="id-view">
     <div class="id-card">
       <img class="avatar" src="https://github.com/Thiruvannan.png" alt="Avatar">
@@ -78,13 +77,12 @@
     </div>
   </div>
 
-  <!-- VIEW 2: Attendance Tracker -->
   <div id="tracker-view">
     <div class="top-nav">
       <button class="back-btn" onclick="toggleView('id-view')">← Back to Card</button>
       <div class="sync-status">
         <span class="sync-dot"></span>
-        <span id="syncLabel">Cloud Synced</span>
+        <span id="syncLabel">Cloud Active</span>
       </div>
     </div>
 
@@ -128,10 +126,12 @@
     function toggleView(viewId) {
       document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
       document.getElementById('tracker-view').style.display = viewId === 'tracker-view' ? 'block' : 'none';
-      if(viewId === 'tracker-view') forceDayOrder();
+      if(viewId === 'tracker-view') {
+        forceDayOrder();
+      }
     }
 
-    // Default Starting Counts
+    // Default Baseline
     const baselineAttendance = {
       "26CYB1002J": { name: "CHEMISTRY FOR CS", attended: 49, conducted: 49 },
       "26BTB1001T": { name: "COMPUTATIONAL BIOLOGY", attended: 17, conducted: 17 },
@@ -157,4 +157,114 @@
     };
 
     const academicPlanner = {
-      "2026-11-02": 3, "2026-11-03": 4, "2026-11-
+      "2026-11-02": 3, "2026-11-03": 4, "2026-11-04": 5, "2026-11-05": 1, "2026-11-06": 2,
+      "2026-11-10": 4, "2026-11-11": 5, "2026-11-12": 1, "2026-11-13": 2, "2026-11-16": 3,
+      "2026-11-17": 4, "2026-11-18": 5, "2026-11-19": 1, "2026-11-20": 2, "2026-11-23": 3,
+      "2026-11-24": 4, "2026-11-25": 5, "2026-11-26": 1, "2026-11-27": 2, "2026-11-30": 3,
+      "2026-12-01": 4, "2026-12-02": 5, "2026-12-03": 1, "2026-12-04": 2, "2026-12-07": 3
+    };
+
+    // Deep clone baseline so we don't accidentally mutate the reference
+    let myData = JSON.parse(JSON.stringify(baselineAttendance));
+    let loggedDailyActions = {};
+    let activeDayOrder = null;
+
+    // --- 2. CLOUD LISTENERS ---
+    countsRef.on('value', (snapshot) => {
+      if (snapshot.exists()) {
+        myData = snapshot.val();
+      } else {
+        // If DB is totally empty, seed it with the baseline
+        countsRef.set(baselineAttendance);
+        myData = JSON.parse(JSON.stringify(baselineAttendance));
+      }
+      renderMatrix(); // Always keep bottom numbers up to date
+    });
+
+    logsRef.on('value', (snapshot) => {
+      if (snapshot.exists()) {
+        loggedDailyActions = snapshot.val();
+      } else {
+        loggedDailyActions = {};
+      }
+      // Re-render schedule to reflect cloud state if you opened it on another device
+      if(document.getElementById('tracker-view').style.display === 'block') {
+         renderUI();
+      }
+    });
+
+    function getTodayDateStr() {
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const istTime = new Date(utc + (3600000 * 5.5));
+      return istTime.toISOString().split('T')[0];
+    }
+
+    function getTodayDayOrder() {
+      return academicPlanner[getTodayDateStr()] || null;
+    }
+
+    function forceDayOrder() {
+      const val = document.getElementById("daySelector").value;
+      activeDayOrder = (val === "auto") ? getTodayDayOrder() : parseInt(val);
+      renderUI();
+    }
+
+    // --- 3. INSTANT LOGGING ENGINE (Fix applied here) ---
+    function logClass(code, slotNum, status) {
+      const today = getTodayDateStr();
+      const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
+
+      // 1. INSTANT LOCAL MATH (Do not wait for Firebase)
+      if (status === 'attended') {
+        myData[code].attended++;
+        myData[code].conducted++;
+      } else {
+        myData[code].conducted++;
+      }
+      loggedDailyActions[logKey] = status;
+
+      // 2. INSTANT VISUAL UPDATE
+      renderUI();
+      renderMatrix();
+
+      // 3. BACKGROUND CLOUD SYNC (Silently handles failures)
+      countsRef.set(myData).catch(err => console.error("Sync Error:", err));
+      logsRef.child(logKey).set(status).catch(err => console.error("Sync Error:", err));
+    }
+
+    function renderUI() {
+      if (activeDayOrder === null) activeDayOrder = getTodayDayOrder();
+      
+      const container = document.getElementById("schedule-container");
+      container.innerHTML = "";
+
+      if (!activeDayOrder) {
+        container.innerHTML = `<div class="class-card"><p style="text-align:center; color:#8b949e; font-size: 13px;">No classes scheduled today.</p></div>`;
+        return;
+      }
+
+      const today = getTodayDateStr();
+      const dayClasses = timetable[activeDayOrder];
+
+      for (const [slotNum, code] of Object.entries(dayClasses)) {
+        const sub = myData[code] || { name: code };
+        const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
+        const previousAction = loggedDailyActions[logKey];
+
+        let actionUI = '';
+        if (previousAction === 'attended') {
+          actionUI = `<div class="logged-status logged-att">Logged: Attended ✓</div>`;
+        } else if (previousAction === 'missed') {
+          actionUI = `<div class="logged-status logged-mis">Logged: Missed ✖</div>`;
+        } else {
+          actionUI = `
+            <div class="btn-row">
+              <div class="btn-log btn-attend" onclick="logClass('${code}', '${slotNum}', 'attended')">✔ Attended</div>
+              <div class="btn-log btn-miss" onclick="logClass('${code}', '${slotNum}', 'missed')">✖ Missed</div>
+            </div>
+          `;
+        }
+        
+        container.innerHTML += `
+          <div class="class-card
