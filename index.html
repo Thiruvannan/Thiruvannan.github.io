@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Thiruvannan | SRM Hub</title>
   
-  <!-- Firebase & Icons -->
+  <!-- Firebase & Lucide Icons -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <!-- Steins;Gate Font -->
+  <!-- Steins;Gate Nixie Tube Font -->
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
     
     @keyframes slowDrift {
       0% { background-position: 0% 50%; }
@@ -24,26 +24,27 @@
 
     body { 
       background: 
-        radial-gradient(circle at 15% 20%, rgba(255, 42, 95, 0.4), transparent 50%),
-        radial-gradient(circle at 85% 80%, rgba(74, 0, 224, 0.4), transparent 50%),
-        radial-gradient(circle at 50% 120%, rgba(0, 210, 255, 0.3), transparent 50%),
+        radial-gradient(circle at 15% 20%, rgba(255, 42, 95, 0.35), transparent 50%),
+        radial-gradient(circle at 85% 80%, rgba(74, 0, 224, 0.35), transparent 50%),
+        radial-gradient(circle at 50% 120%, rgba(0, 210, 255, 0.25), transparent 50%),
         linear-gradient(-45deg, #09090b, #120c18, #09090b);
       background-size: 200% 200%;
       animation: slowDrift 20s ease infinite;
       background-attachment: fixed;
       color: #ffffff;
       min-height: 100vh; 
-      padding: 24px 16px 100px 16px; /* Extra bottom padding for music player */
+      padding: 24px 16px 120px 16px;
       display: flex; 
       justify-content: center;
       -webkit-font-smoothing: antialiased;
-      transition: background 0.8s ease, color 0.8s ease;
+      transition: background 0.6s ease, color 0.6s ease;
+      overflow-x: hidden;
     }
 
     ::-webkit-scrollbar { width: 0px; background: transparent; }
 
     #app-wrapper { width: 100%; max-width: 420px; view-transition-name: app-morph; z-index: 10; position: relative; }
-    ::view-transition-old(app-morph), ::view-transition-new(app-morph) { animation-duration: 0.4s; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
+    ::view-transition-old(app-morph), ::view-transition-new(app-morph) { animation-duration: 0.35s; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
     #tracker-view { display: none; }
 
     @media (min-width: 1024px) {
@@ -54,184 +55,335 @@
       .tracker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
     }
 
+    /* GPU-Optimized Glassmorphism (10px blur + deeper tint = zero video stutter) */
     .glass-panel {
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(48px) saturate(200%);
-      -webkit-backdrop-filter: blur(48px) saturate(200%);
+      background: rgba(18, 18, 26, 0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 32px 64px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18);
       border-radius: 32px;
-      transition: all 0.5s ease;
+      transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+      transform: translateZ(0);
     }
 
-    .id-card { padding: 40px 24px; text-align: center; }
-    .avatar { width: 100px; height: 100px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); margin-bottom: 20px; box-shadow: 0 12px 24px rgba(0,0,0,0.5); }
+    .id-card { padding: 40px 24px; text-align: center; position: relative; overflow: hidden; }
+    .avatar-wrap { position: relative; width: 104px; height: 104px; margin: 0 auto 20px; }
+    .avatar { width: 100px; height: 100px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.35); box-shadow: 0 12px 24px rgba(0,0,0,0.5); object-fit: cover; }
     .id-card h1 { font-size: 24px; font-weight: 800; letter-spacing: 0.2px; margin-bottom: 6px; }
     .id-card p { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 24px; font-weight: 500; }
     
-    .btn-group { display: flex; flex-direction: column; gap: 14px; }
-    .btn-link { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); }
-    .btn-link:hover { background: rgba(255, 255, 255, 0.12); transform: scale(1.02); border-color: rgba(255, 255, 255, 0.2); }
+    .btn-group { display: flex; flex-direction: column; gap: 15px; }
+    .btn-link { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.1); color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s ease, border-color 0.2s ease; }
+    .btn-link:hover { background: rgba(255, 255, 255, 0.13); transform: scale(1.02); border-color: rgba(255, 255, 255, 0.22); }
     .btn-link:active { transform: scale(0.96); }
-    .btn-link i { width: 18px; height: 18px; }
+    .btn-link svg { width: 18px; height: 18px; stroke-width: 2.2; }
     
-    .btn-tracker { background: rgba(255, 255, 255, 0.9); color: #000; border: none; font-size: 15px; font-weight: 700; box-shadow: 0 8px 16px rgba(255,255,255,0.1); }
-    .btn-tracker:hover { background: #ffffff; border-color: transparent; }
-    .btn-sos { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.3); color: #fb7185; }
+    .btn-tracker { background: rgba(255, 255, 255, 0.92); color: #000; border: none; font-size: 15px; font-weight: 700; box-shadow: 0 8px 20px rgba(255,255,255,0.12); }
+    .btn-tracker:hover { background: #ffffff; color: #000; }
+    .btn-sos { background: rgba(244, 63, 94, 0.14); border-color: rgba(244, 63, 94, 0.32); color: #fb7185; }
+    .btn-domain { background: rgba(139, 92, 246, 0.12); border-color: rgba(139, 92, 246, 0.3); color: #c4b5fd; font-size: 12px; padding: 11px; }
 
-    .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 4px; gap: 12px; flex-wrap: wrap; }
-    .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 16px; border-radius: 14px; font-size: 14px; font-weight: 600; cursor: pointer; backdrop-filter: blur(20px); }
+    .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px; gap: 10px; flex-wrap: wrap; }
+    .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 16px; border-radius: 14px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
     
-    .lock-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #94a3b8; padding: 10px 14px; border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(10px); transition: 0.2s; }
+    .lock-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #94a3b8; padding: 10px 14px; border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
     .lock-btn:active { transform: scale(0.94); }
-    .lock-btn.unlocked { color: #fbbf24; background: rgba(251, 191, 36, 0.15); border-color: rgba(251, 191, 36, 0.3); }
+    .lock-btn.unlocked { color: #fbbf24; background: rgba(251, 191, 36, 0.15); border-color: rgba(251, 191, 36, 0.35); box-shadow: 0 0 15px rgba(251, 191, 36, 0.15); }
 
-    .undo-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fbbf24; padding: 10px 14px; border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: none; }
-    .sync-status { font-size: 12px; color: #fff; font-weight: 600; display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.1); padding: 8px 14px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); }
+    .undo-btn { background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.3); color: #fbbf24; padding: 10px 14px; border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: none; align-items: center; gap: 6px; }
+    .sync-status { font-size: 12px; color: #fff; font-weight: 600; display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.08); padding: 8px 14px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.14); }
     .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 10px #34d399; }
 
-    .live-slot-banner { background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 18px; padding: 12px 16px; margin-bottom: 20px; font-size: 12px; font-weight: 600; color: #7dd3fc; display: flex; align-items: center; justify-content: space-between; }
+    .live-slot-banner { background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.28); border-radius: 18px; padding: 12px 16px; margin-bottom: 20px; font-size: 12px; font-weight: 600; color: #7dd3fc; display: flex; align-items: center; justify-content: space-between; }
 
-    .section-title { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; justify-content: space-between; align-items: center; }
-    select { background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; backdrop-filter: blur(20px); }
+    .section-title { font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; justify-content: space-between; align-items: center; }
+    select { background: rgba(15,15,20,0.85); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; }
 
-    @keyframes slideUpFade { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-    .animated-card { animation: slideUpFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+    @keyframes slideUpFade { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .animated-card { animation: slideUpFade 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
 
-    .class-card { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 18px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden; }
-    .class-card.current-active { border-color: rgba(56, 189, 248, 0.5); box-shadow: 0 0 20px rgba(56, 189, 248, 0.2); }
+    .class-card { background: rgba(0, 0, 0, 0.28); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 18px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden; }
+    .class-card.current-active { border-color: rgba(56, 189, 248, 0.55); box-shadow: 0 0 20px rgba(56, 189, 248, 0.18); }
     .class-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; position: relative; }
-    .class-code { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 600; }
+    .class-code { font-size: 11px; color: rgba(255,255,255,0.55); font-weight: 700; letter-spacing: 0.4px; }
     .class-name { font-size: 15px; font-weight: 800; margin-top: 4px; }
-    .class-time { font-size: 11px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; color: #fff; font-weight: 600; }
+    .class-time { font-size: 11px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; color: #fff; font-weight: 600; white-space: nowrap; }
     
-    .btn-row { display: flex; gap: 16px; z-index: 2; position: relative; }
-    .btn-log { flex: 1; padding: 12px; border-radius: 14px; font-weight: 700; font-size: 13px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .btn-log i { width: 14px; height: 14px; }
-    .btn-log:active { transform: scale(0.94); }
-    .btn-attend { background: rgba(52, 211, 153, 0.15); color: #4ade80; border-color: rgba(52, 211, 153, 0.3); }
-    .btn-miss { background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.3); }
+    .btn-row { display: flex; gap: 14px; z-index: 2; position: relative; }
+    .btn-log { flex: 1; padding: 12px; border-radius: 14px; font-weight: 700; font-size: 13px; cursor: pointer; border: 1px solid transparent; transition: transform 0.15s ease, background 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-log svg { width: 15px; height: 15px; }
+    .btn-log:active { transform: scale(0.95); }
+    .btn-attend { background: rgba(52, 211, 153, 0.15); color: #4ade80; border-color: rgba(52, 211, 153, 0.35); }
+    .btn-miss { background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.35); }
     
-    .logged-status { font-size: 13px; font-weight: 700; padding: 12px; border-radius: 14px; text-align: center; width: 100%; backdrop-filter: blur(10px); z-index: 2; position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .logged-att { background: rgba(52, 211, 153, 0.2); color: #4ade80; border: 1px solid rgba(52, 211, 153, 0.4); }
-    .logged-mis { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
-    .logged-locked { background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.5); border: 1px dashed rgba(255,255,255,0.2); font-weight: 600; }
+    .logged-status { font-size: 13px; font-weight: 700; padding: 12px; border-radius: 14px; text-align: center; width: 100%; z-index: 2; position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .logged-status svg { width: 16px; height: 16px; }
+    .logged-att { background: rgba(52, 211, 153, 0.18); color: #4ade80; border: 1px solid rgba(52, 211, 153, 0.38); }
+    .logged-mis { background: rgba(244, 63, 94, 0.18); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.38); }
+    .logged-locked { background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.45); border: 1px dashed rgba(255,255,255,0.18); font-weight: 600; }
 
     /* Steins;Gate Divergence Meter */
     .steins-gate-meter {
-      background: rgba(10, 10, 12, 0.8); border: 1px solid rgba(255, 140, 0, 0.3);
-      padding: 12px 20px; border-radius: 24px; text-align: center; margin-bottom: 20px;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 0 15px rgba(255, 140, 0, 0.1);
+      background: radial-gradient(circle at center, #1b1107 0%, #080604 100%);
+      border: 1px solid rgba(255, 145, 0, 0.38);
+      padding: 14px 16px; border-radius: 22px; text-align: center; margin-bottom: 20px;
+      box-shadow: inset 0 0 24px rgba(0,0,0,0.9), 0 0 18px rgba(255, 136, 0, 0.12);
       position: relative; overflow: hidden;
     }
-    .nixie-digit {
-      font-family: 'Share Tech Mono', monospace; font-size: 32px; color: #ff9d00;
-      text-shadow: 0 0 10px #ff9d00, 0 0 20px #ff5500; margin: 0 2px; font-weight: bold; transition: all 0.3s ease;
+    .nixie-row { display: flex; justify-content: center; align-items: baseline; gap: 3px; }
+    .nixie-tube {
+      background: rgba(255, 140, 0, 0.05);
+      border: 1px solid rgba(255, 140, 0, 0.18);
+      border-radius: 8px;
+      padding: 2px 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 29px;
+      color: #ff9d00;
+      text-shadow: 0 0 8px #ff9d00, 0 0 18px #ff5500;
+      font-weight: bold;
+      transition: all 0.3s ease;
     }
-    .meter-label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 2px; margin-top: 6px; font-weight: 700; }
-    .timeline-alpha .nixie-digit { color: #ff2a2a; text-shadow: 0 0 10px #ff2a2a, 0 0 20px #ff0000; animation: tubeGlitch 0.2s infinite; }
-    @keyframes tubeGlitch { 0% { transform: translate(0) } 20% { transform: translate(-2px, 1px) } 40% { transform: translate(-1px, -1px) } 60% { transform: translate(2px, 1px) } 80% { transform: translate(1px, -1px) } 100% { transform: translate(0) } }
+    .meter-label { font-size: 10px; color: rgba(255, 200, 150, 0.55); text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; font-weight: 700; }
+    .timeline-alpha { border-color: rgba(255, 42, 42, 0.5); box-shadow: inset 0 0 24px rgba(0,0,0,0.9), 0 0 22px rgba(255, 0, 0, 0.25); }
+    .timeline-alpha .nixie-tube { color: #ff2a2a; border-color: rgba(255, 42, 42, 0.3); text-shadow: 0 0 10px #ff2a2a, 0 0 22px #ff0000; animation: tubeGlitch 0.25s infinite; }
+    @keyframes tubeGlitch { 0% { transform: translate(0); } 25% { transform: translate(-1px, 1px); } 50% { transform: translate(1px, -1px); } 75% { transform: translate(-1px, -1px); } 100% { transform: translate(0); } }
 
+    /* Attendance Matrix & Authentic AoT Badges */
     .matrix-grid { display: flex; flex-direction: column; gap: 14px; }
-    .matrix-card { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; }
-    .watermark-icon { position: absolute; right: -10px; bottom: -10px; width: 80px; height: 80px; opacity: 0.05; color: #fff; z-index: 1; pointer-events: none; }
+    .matrix-card { background: rgba(0, 0, 0, 0.28); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 12px; position: relative; overflow: hidden; }
+    .watermark-icon { position: absolute; right: -8px; bottom: -8px; width: 76px; height: 76px; opacity: 0.045; color: #fff; z-index: 1; pointer-events: none; }
     
-    .matrix-top { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; position: relative; }
-    .matrix-name { font-size: 14px; font-weight: 800; max-width: 70%; }
+    .matrix-top { display: flex; justify-content: space-between; align-items: center; z-index: 2; position: relative; gap: 10px; }
+    .matrix-name { font-size: 14px; font-weight: 800; line-height: 1.3; }
     
-    /* AoT Badges */
-    .aot-badge { display: flex; align-items: center; gap: 6px; font-size: 18px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: rgba(255,255,255,0.05); }
-    .aot-badge i { width: 16px; height: 16px; }
-    .rank-scout { color: #34d399; text-shadow: 0 0 10px rgba(52,211,153,0.4); }
-    .rank-garrison { color: #fbbf24; }
-    .rank-fodder { color: #fb7185; animation: slightGlitch 2s infinite; }
-    @keyframes slightGlitch { 0%, 95% { transform: translateX(0); } 97% { transform: translateX(2px); } 99% { transform: translateX(-2px); } }
+    .aot-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 800; padding: 5px 11px; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
+    .aot-crest { width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+    .rank-scout { color: #34d399; border-color: rgba(52, 211, 153, 0.3); background: rgba(52, 211, 153, 0.1); }
+    .rank-garrison { color: #fbbf24; border-color: rgba(251, 191, 36, 0.3); background: rgba(251, 191, 36, 0.1); }
+    .rank-fodder { color: #fb7185; border-color: rgba(244, 63, 94, 0.4); background: rgba(244, 63, 94, 0.15); animation: slightGlitch 1.8s infinite; }
+    @keyframes slightGlitch { 0%, 92% { transform: translateX(0); } 94% { transform: translateX(2px); } 96% { transform: translateX(-2px); } 98% { transform: translateX(1px); } }
 
     .matrix-mid { display: flex; justify-content: space-between; align-items: center; font-size: 12px; z-index: 2; position: relative; }
-    .matrix-stats { color: rgba(255,255,255,0.6); font-weight: 600; }
-    .matrix-margin { font-weight: 700; padding: 4px 8px; border-radius: 8px; font-size: 11px; }
-    .margin-safe { color: #4ade80; background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52,211,153,0.3); }
-    .margin-danger { color: #fb7185; background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244,63,94,0.3); }
+    .matrix-stats { color: rgba(255,255,255,0.65); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .regiment-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; padding: 2px 7px; border-radius: 6px; background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.75); font-weight: 700; }
+    .matrix-margin { font-weight: 700; padding: 4px 9px; border-radius: 8px; font-size: 11px; }
+    .margin-safe { color: #4ade80; background: rgba(52, 211, 153, 0.14); border: 1px solid rgba(52,211,153,0.3); }
+    .margin-danger { color: #fb7185; background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244,63,94,0.35); }
     
-    .extra-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 2px; z-index: 2; position: relative; }
-    .extra-label { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; font-weight: 800; }
-    .extra-btns { display: flex; gap: 12px; }
-    .btn-extra { padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; }
+    .extra-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; margin-top: 2px; z-index: 2; position: relative; }
+    .extra-label { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; font-weight: 800; letter-spacing: 0.8px; }
+    .extra-btns { display: flex; gap: 10px; }
+    .btn-extra { padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; }
+    .btn-extra:active { transform: scale(0.94); }
 
-    #sos-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
-    .modal-box { background: #18121a; border: 1px solid rgba(244,63,94,0.4); border-radius: 28px; padding: 28px; width: 100%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-    .modal-box div { display: flex; flex-direction: column; gap: 16px; }
+    /* Emergency Modal (Lightweight 8px blur) */
+    #sos-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; justify-content: center; align-items: center; padding: 20px; }
+    .modal-box { background: #141018; border: 1px solid rgba(244,63,94,0.4); border-radius: 28px; padding: 28px; width: 100%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.85); }
+    .modal-box div { display: flex; flex-direction: column; gap: 14px; }
 
-    /* Domain Expansion Mode */
+    /* Jujutsu Kaisen: Malevolent Shrine Domain Expansion */
     body.domain-expansion {
-      background: linear-gradient(-45deg, #050000, #1a0000, #050000); background-size: 200% 200%; color: #ff4d4d;
+      background: 
+        radial-gradient(circle at 50% 15%, rgba(220, 38, 38, 0.35), transparent 55%),
+        radial-gradient(circle at 80% 85%, rgba(153, 27, 27, 0.3), transparent 50%),
+        linear-gradient(-45deg, #050000, #140202, #050000);
+      background-size: 200% 200%;
+      color: #fecaca;
     }
-    .domain-expansion .glass-panel { background: rgba(10, 0, 0, 0.8); border-color: rgba(255, 0, 0, 0.4); box-shadow: 0 32px 64px rgba(255, 0, 0, 0.1), inset 0 1px 0 rgba(255, 0, 0, 0.2); }
-    .domain-expansion .btn-link { background: rgba(255, 0, 0, 0.1); border-color: rgba(255, 0, 0, 0.3); color: #ff8080; }
-    .domain-expansion .aot-badge, .domain-expansion .nixie-digit { filter: hue-rotate(-45deg) saturate(200%); }
+    .domain-expansion .glass-panel {
+      background: rgba(14, 3, 3, 0.82);
+      border-color: rgba(239, 68, 68, 0.35);
+      box-shadow: 0 28px 56px rgba(220, 38, 38, 0.14), inset 0 1px 0 rgba(248, 113, 113, 0.22);
+    }
+    .domain-expansion .btn-link { background: rgba(220, 38, 38, 0.12); border-color: rgba(239, 68, 68, 0.3); color: #fca5a5; }
+    .domain-expansion .btn-tracker { background: #ef4444; color: #fff; }
+    .domain-expansion .live-slot-banner { background: rgba(220, 38, 38, 0.15); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; }
     
-    .domain-ring { position: fixed; top: 50%; left: 50%; width: 0; height: 0; background: #000; border-radius: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; transition: width 0.8s cubic-bezier(0.85, 0, 0.15, 1), height 0.8s cubic-bezier(0.85, 0, 0.15, 1); }
-    .domain-ring.expand { width: 300vw; height: 300vw; }
+    .domain-ring { position: fixed; top: 50%; left: 50%; width: 0; height: 0; background: radial-gradient(circle, #7f1d1d 0%, #000000 70%); border-radius: 50%; transform: translate(-50%, -50%); z-index: 9998; pointer-events: none; transition: width 0.65s cubic-bezier(0.85, 0, 0.15, 1), height 0.65s cubic-bezier(0.85, 0, 0.15, 1); }
+    .domain-ring.expand { width: 300vmax; height: 300vmax; }
+    #domain-toast { position: fixed; top: 28px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(15, 2, 2, 0.92); border: 1px solid #ef4444; color: #f87171; padding: 8px 18px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; z-index: 9999; opacity: 0; pointer-events: none; transition: all 0.35s ease; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+    #domain-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* Vision Player */
-    #vision-container { position: fixed; inset: 0; z-index: 10000; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
-    #vision-container.active { opacity: 1; pointer-events: all; }
-    #vision-video { width: 100%; max-height: 100vh; object-fit: contain; mix-blend-mode: screen; }
-    .trans-focus { animation: deepFocus 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
-    @keyframes deepFocus { from { filter: blur(20px); transform: scale(1.1); } to { filter: blur(0); transform: scale(1); } }
-    .trans-glitch { animation: neuralGlitch 0.4s steps(5); }
-    @keyframes neuralGlitch { 0% { filter: hue-rotate(90deg) contrast(200%); } 50% { filter: invert(1); } 100% { filter: none; } }
-
-    /* Apple Music Floating Player */
-    #floating-music-player {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-      background: rgba(255,255,255,0.08); backdrop-filter: blur(30px);
-      border: 1px solid rgba(255,255,255,0.15); border-radius: 40px; padding: 8px 16px;
-      display: flex; align-items: center; gap: 12px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 50; width: 280px;
+    /* Hardware-Isolated Eren's Vision Player (Zero Blur/Blend Lag) */
+    #vision-container {
+      position: fixed; inset: 0; z-index: 10000;
+      display: flex; justify-content: center; align-items: center;
+      background: #000000;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+      transform: translateZ(0);
+      will-change: opacity;
     }
+    #vision-container.active { opacity: 1; visibility: visible; pointer-events: all; }
+    #vision-video {
+      width: 100vw; height: 100vh;
+      object-fit: contain;
+      background: #000;
+      transform: translateZ(0);
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    /* High-FPS GPU-Only Entrance Transitions */
+    .trans-zoom { animation: visionZoom 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes visionZoom { from { transform: scale(1.12) translateZ(0); opacity: 0; } to { transform: scale(1) translateZ(0); opacity: 1; } }
+    
+    .trans-flash { animation: visionFlash 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+    @keyframes visionFlash { 0% { opacity: 0; transform: scale(0.94) translateZ(0); } 40% { opacity: 1; transform: scale(1.02) translateZ(0); } 100% { opacity: 1; transform: scale(1) translateZ(0); } }
+    
+    .trans-iris { animation: visionIris 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes visionIris { from { clip-path: circle(0% at var(-- click-x, 50%) var(--click-y, 50%)); } to { clip-path: circle(150% at var(--click-x, 50%) var(--click-y, 50%)); } }
+
+    .vision-hud {
+      position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+      background: rgba(15, 15, 20, 0.75); border: 1px solid rgba(255,255,255,0.18);
+      padding: 6px 14px; border-radius: 20px; font-size: 11px; color: rgba(255,255,255,0.7);
+      font-weight: 600; letter-spacing: 0.8px; pointer-events: none;
+    }
+
+    /* Hold Progress Ring Indicator */
+    #hold-indicator {
+      position: fixed; width: 54px; height: 54px; border-radius: 50%;
+      border: 2px solid rgba(56, 189, 248, 0.25);
+      border-top-color: #38bdf8;
+      pointer-events: none; z-index: 9990;
+      opacity: 0; transform: translate(-50%, -50%) scale(0.5);
+      transition: opacity 0.2s ease, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    #hold-indicator.holding { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(360deg); }
+
+    /* Interactive Ryuk (visionOS Spatial Companion) */
+    #ryuk-widget {
+      position: fixed; top: 18px; right: 18px; z-index: 90;
+      width: 82px; height: 82px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transform: translateZ(0);
+    }
+    #ryuk-img {
+      width: 100%; height: 100%; object-fit: contain;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.75));
+      transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.35s ease;
+    }
+    /* Ryuk Non-Generic State Machine Classes */
+    .ryuk-state-float { animation: ryukFloat 4.2s ease-in-out infinite; }
+    .ryuk-state-look { animation: ryukLookAround 3.6s ease-in-out infinite; }
+    .ryuk-state-stare { transform: scale(1.18) translateY(4px); filter: drop-shadow(0 0 16px rgba(244, 63, 94, 0.65)) !important; }
+    .ryuk-state-laugh { animation: ryukLaugh 0.45s ease-in-out 4; }
+    .ryuk-state-catch { animation: ryukCatch 0.85s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+    @keyframes ryukFloat { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-9px) rotate(2deg); } }
+    @keyframes ryukLookAround { 0%, 100% { transform: rotate(0deg) scaleX(1); } 30% { transform: rotate(-6deg) translateY(-4px); } 70% { transform: rotate(6deg) translateY(-2px); } }
+    @keyframes ryukLaugh { 0%, 100% { transform: translateY(0) scale(1.05); } 50% { transform: translateY(-5px) scale(1.1); } }
+    @keyframes ryukCatch { 0% { transform: scale(1); } 30% { transform: translateY(6px) scale(0.92); } 65% { transform: translateY(-10px) scale(1.12); } 100% { transform: scale(1); } }
+
+    #ryuk-bubble {
+      position: absolute; top: 12px; right: 88px;
+      background: rgba(18, 18, 24, 0.88); border: 1px solid rgba(255,255,255,0.18);
+      color: #fca5a5; font-size: 11px; font-weight: 700; padding: 6px 11px;
+      border-radius: 12px; white-space: nowrap; pointer-events: none;
+      opacity: 0; transform: translateX(8px); transition: all 0.25s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+    #ryuk-bubble.show { opacity: 1; transform: translateX(0); }
+
+    /* Parabolic Thrown Apple */
+    .shinigami-apple {
+      position: absolute; width: 22px; height: 22px; pointer-events: none; z-index: 95;
+      left: 30px; top: 28px;
+      animation: appleArc 0.85s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    @keyframes appleArc {
+      0% { transform: translate(0, 10px) scale(0.5) rotate(0deg); opacity: 1; }
+      45% { transform: translate(-22px, -68px) scale(1.15) rotate(190deg); opacity: 1; }
+      85% { transform: translate(-4px, 4px) scale(0.9) rotate(340deg); opacity: 1; }
+      100% { transform: translate(0, 8px) scale(0) rotate(360deg); opacity: 0; }
+    }
+
+    /* Apple Music Floating Pill */
+    #floating-music-player {
+      position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateZ(0);
+      background: rgba(20, 20, 28, 0.82);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.16); border-radius: 40px; padding: 8px 14px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+      z-index: 80; width: 310px; max-width: calc(100vw - 32px);
+      transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    #floating-music-player.playing {
+      border-color: rgba(52, 211, 153, 0.4);
+      box-shadow: 0 16px 36px rgba(0,0,0,0.65), 0 0 20px rgba(52, 211, 153, 0.18);
+    }
+    .art-disc {
+      width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
+      border: 1px solid rgba(255,255,255,0.25); flex-shrink: 0;
+      animation: spinDisc 8s linear infinite; animation-play-state: paused;
+    }
+    #floating-music-player.playing .art-disc { animation-play-state: running; }
+    @keyframes spinDisc { 100% { transform: rotate(360deg); } }
+
     .marquee-container { flex: 1; overflow: hidden; white-space: nowrap; font-size: 12px; font-weight: 600; color: #fff; }
-    #track-name { display: inline-block; animation: marquee 10s linear infinite; }
-    @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-    #play-pause-btn { background: #fff; color: #000; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    #play-pause-btn i { width: 16px; height: 16px; fill: #000; }
-    .waveform { display: flex; gap: 2px; align-items: center; height: 16px; opacity: 0; transition: opacity 0.3s; }
+    #track-name { display: inline-block; padding-left: 100%; animation: marquee 11s linear infinite; }
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+    
+    .music-ctrl-btn { background: rgba(255,255,255,0.1); color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.2s; }
+    .music-ctrl-btn:hover { background: rgba(255,255,255,0.2); }
+    .music-ctrl-btn:active { transform: scale(0.9); }
+    #play-pause-btn { background: #ffffff; color: #000000; }
+    .music-ctrl-btn svg { width: 14px; height: 14px; }
+
+    .waveform { display: flex; gap: 2.5px; align-items: center; height: 16px; opacity: 0.35; transition: opacity 0.3s; flex-shrink: 0; }
     .waveform.active { opacity: 1; }
-    .waveform span { width: 3px; background: #34d399; border-radius: 2px; animation: bounce 1s ease-in-out infinite; }
-    .waveform span:nth-child(2) { animation-delay: 0.2s; }
-    .waveform span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes bounce { 0%, 100% { height: 4px; } 50% { height: 14px; } }
+    .waveform span { width: 3px; height: 4px; background: #34d399; border-radius: 2px; }
+    .waveform.active span { animation: bounceWave 0.8s ease-in-out infinite; }
+    .waveform.active span:nth-child(2) { animation-delay: 0.2s; }
+    .waveform.active span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounceWave { 0%, 100% { height: 4px; } 50% { height: 15px; } }
   </style>
 </head>
 <body>
 
-  <!-- JJK Domain Expansion Element -->
+  <!-- JJK Domain Expansion Overlay & Toast -->
   <div class="domain-ring" id="domainRing"></div>
+  <div id="domain-toast">Domain Expansion: Malevolent Shrine</div>
+
+  <!-- Long-Press Visual Ring -->
+  <div id="hold-indicator"></div>
+
+  <!-- Interactive Ryuk Companion (Top Right) -->
+  <div id="ryuk-widget" onclick="tossApple(event)" title="Tap to feed Ryuk an apple">
+    <div id="ryuk-bubble">Heh... Got any apples?</div>
+    <img id="ryuk-img" class="ryuk-state-float" src="Assets/ryuk.png" alt="Ryuk">
+  </div>
 
   <div id="app-wrapper">
 
     <!-- PROFILE PANEL -->
     <div id="id-view" class="glass-panel id-card">
-      <img class="avatar" src="https://github.com/Thiruvannan.png" alt="Avatar">
+      <div class="avatar-wrap">
+        <img class="avatar" src="https://github.com/Thiruvannan.png" alt="Avatar">
+      </div>
       <h1>Thiruvannan</h1>
       <p>Developer | SRMIST CSE</p>
       
       <div class="btn-group">
-        <button class="btn-link btn-sos" onclick="toggleSOS(true)"><i data-lucide="shield-alert"></i> Emergency Contacts</button>
+        <button class="btn-link btn-sos" onclick="toggleSOS(true)"><i data-lucide="shield-alert"></i> SRM Emergency Contacts</button>
         <a class="btn-link" href="https://github.com/Thiruvannan" target="_blank"><i data-lucide="github"></i> GitHub Profile</a>
         <a class="btn-link" href="contact.vcf"><i data-lucide="user-plus"></i> Save Contact</a>
         <a class="btn-link" href="https://wa.me/919080792117?text=Hey!" target="_blank"><i data-lucide="message-circle"></i> WhatsApp</a>
-        <a class="btn-link" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR"><i data-lucide="credit-card"></i> Pay via UPI</a>
-        <button class="btn-link btn-tracker desktop-hide" onclick="toggleView('tracker-view')"><i data-lucide="layout-dashboard"></i> View Attendance</button>
+        <a class="btn-link" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR"><i data-lucide="wallet"></i> Pay via UPI</a>
+        <button class="btn-link btn-domain" onclick="triggerDomainExpansion()"><i data-lucide="flame"></i> Domain Expansion (or 2-Finger Swipe)</button>
+        <button class="btn-link btn-tracker desktop-hide" onclick="toggleView('tracker-view')"><i data-lucide="swords"></i> View Survival Matrix</button>
       </div>
     </div>
 
     <!-- TRACKER PANEL -->
     <div id="tracker-view">
       <div class="top-nav">
-        <button class="back-btn desktop-hide" onclick="toggleView('id-view')">Done</button>
+        <button class="back-btn desktop-hide" onclick="toggleView('id-view')"><i data-lucide="arrow-left" style="width:15px;"></i> ID Card</button>
         <button class="lock-btn" id="lockToggleBtn" onclick="toggleEditMode()"><i data-lucide="lock" style="width:14px;"></i> View Only</button>
-        <button class="undo-btn" id="undoBtn" onclick="undoLastAction()"><i data-lucide="rotate-ccw" style="width:14px; display:inline-block; vertical-align:middle;"></i> Undo</button>
+        <button class="undo-btn" id="undoBtn" onclick="undoLastAction()"><i data-lucide="rotate-ccw" style="width:14px;"></i> Undo</button>
         <div class="sync-status"><span class="sync-dot"></span><span id="syncLabel">Live</span></div>
       </div>
 
@@ -257,12 +409,24 @@
         </div>
 
         <div class="glass-panel" style="padding: 24px;">
-          <div class="section-title"><span>Global Matrix</span></div>
+          <div class="section-title">
+            <span>Overall Attendance</span>
+            <span style="font-size:10px; color:rgba(255,255,255,0.45);">Hold Blank Space for Vision</span>
+          </div>
           
           <!-- Steins;Gate Divergence Meter -->
           <div class="steins-gate-meter" id="globalDivergence">
-            <span class="nixie-digit">0</span>.<span class="nixie-digit">0</span><span class="nixie-digit">0</span><span class="nixie-digit">0</span><span class="nixie-digit">0</span><span class="nixie-digit">0</span><span class="nixie-digit" id="div-perc">00</span>
-            <div class="meter-label">Divergence / Overall %</div>
+            <div class="nixie-row" id="nixie-tubes">
+              <span class="nixie-tube">1</span>
+              <span class="nixie-tube">.</span>
+              <span class="nixie-tube">0</span>
+              <span class="nixie-tube">4</span>
+              <span class="nixie-tube">8</span>
+              <span class="nixie-tube">5</span>
+              <span class="nixie-tube">9</span>
+              <span class="nixie-tube">6</span>
+            </div>
+            <div class="meter-label" id="divergence-label">Worldline Divergence • 100.0%</div>
           </div>
 
           <div class="matrix-grid" id="matrix-container"></div>
@@ -275,36 +439,40 @@
   <!-- EMERGENCY POPUP -->
   <div id="sos-modal">
     <div class="modal-box">
-      <h2 style="font-size: 18px; color: #fb7185; margin-bottom: 8px;">SRM Campus SOS</h2>
+      <h2 style="font-size: 18px; color: #fb7185; margin-bottom: 8px; display:flex; align-items:center; gap:8px;"><i data-lucide="siren"></i> SRM Campus SOS</h2>
       <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 20px;">Tap any number to call immediately:</p>
       <div>
-        <a class="btn-link" href="tel:105786" style="background: rgba(244,63,94,0.2); border-color: rgba(244,63,94,0.4); color: #fff;">🚑 Ambulance: 105786</a>
-        <a class="btn-link" href="tel:04427478000" style="font-size: 14px;">🏥 Casualty: 044-27478000</a>
-        <a class="btn-link" href="tel:04427417000" style="font-size: 14px;">🛡️ Security: 044-27417000</a>
-        <a class="btn-link" href="tel:917026452645" style="font-size: 14px;">📞 Student Help: 70 2645 2645</a>
-        <button class="btn-link" onclick="toggleSOS(false)" style="margin-top: 10px; background: rgba(255,255,255,0.05);">Dismiss</button>
+        <a class="btn-link" href="tel:105786" style="background: rgba(244,63,94,0.2); border-color: rgba(244,63,94,0.4); color: #fff;"><i data-lucide="phone-call"></i> Ambulance: 105786</a>
+        <a class="btn-link" href="tel:04427478000"><i data-lucide="heart-pulse"></i> Casualty: 044-27478000</a>
+        <a class="btn-link" href="tel:04427417000"><i data-lucide="shield"></i> Security: 044-27417000</a>
+        <a class="btn-link" href="tel:917026452645"><i data-lucide="headphones"></i> Student Help: 70 2645 2645</a>
+        <button class="btn-link" onclick="toggleSOS(false)" style="margin-top: 6px; background: rgba(255,255,255,0.05);">Dismiss</button>
       </div>
     </div>
   </div>
 
-  <!-- VISION VIDEO PLAYER -->
+  <!-- EREN'S VISION VIDEO PLAYER (Hardware Composited) -->
   <div id="vision-container">
-    <video id="vision-video" playsinline preload="auto"></video>
+    <video id="vision-video" playsinline preload="metadata"></video>
+    <div class="vision-hud" id="vision-hud">Tap anywhere to sever the connection</div>
   </div>
 
-  <!-- APPLE MUSIC PLAYER -->
+  <!-- APPLE MUSIC FLOATING PLAYER -->
   <div id="floating-music-player">
+    <img class="art-disc" src="https://github.com/Thiruvannan.png" alt="Disc">
     <div class="waveform" id="wave"><span></span><span></span><span></span></div>
-    <div class="marquee-container"><span id="track-name">No track playing</span></div>
-    <button id="play-pause-btn" onclick="toggleMusic()"><i data-lucide="play"></i></button>
-    <audio id="bg-audio" preload="none"></audio>
+    <div class="marquee-container"><span id="track-name">Tap Play • Shuffled OST Deck</span></div>
+    <button class="music-ctrl-btn" id="play-pause-btn" onclick="toggleMusic()" title="Play/Pause"><i data-lucide="play"></i></button>
+    <button class="music-ctrl-btn" onclick="playNextRandomTrack()" title="Next Random Track"><i data-lucide="skip-forward"></i></button>
+    <audio id="bg-audio" preload="metadata"></audio>
   </div>
 
   <script>
-    // Initialize Lucide Icons initially
     lucide.createIcons();
 
-    // Firebase Config
+    // ==========================================
+    // 1. FIREBASE & ATTENDANCE MATRIX ENGINE
+    // ==========================================
     const firebaseConfig = {
       apiKey: "AIzaSyDFM_WnGNOjUNIAC6ck6eGRjAeTDvjdzJQ",
       authDomain: "srm-hub-4dc4b.firebaseapp.com",
@@ -325,12 +493,66 @@
     let isEditMode = false;
     let historyStack = [];
 
+    const subjectIcons = {
+      "26CYB1002J": "atom",
+      "26BTB1001T": "dna",
+      "26MEE1001L": "wrench",
+      "26CSE1002J": "terminal",
+      "26MAB1001T": "sigma",
+      "26LCA1006J": "languages",
+      "26GNN1007J": "flame"
+    };
+
+    const baselineAttendance = {
+      "26CYB1002J": { name: "CHEMISTRY FOR CS", attended: 49, conducted: 49 },
+      "26BTB1001T": { name: "COMPUTATIONAL BIOLOGY", attended: 17, conducted: 17 },
+      "26MEE1001L": { name: "WORKSHOP PRACTICE", attended: 44, conducted: 44 },
+      "26CSE1002J": { name: "PROGRAMMING", attended: 45, conducted: 45 },
+      "26MAB1001T": { name: "CALCULUS & ALGEBRA", attended: 37, conducted: 37 },
+      "26LCA1006J": { name: "KOREAN", attended: 30, conducted: 33 },
+      "26GNN1007J": { name: "YOGA", attended: 18, conducted: 18 }
+    };
+
+    const slots = {
+      1: { str: "08:00 - 08:50", start: 480, end: 530 },
+      2: { str: "08:50 - 09:40", start: 530, end: 580 },
+      3: { str: "09:45 - 10:35", start: 585, end: 635 },
+      4: { str: "10:40 - 11:30", start: 640, end: 690 },
+      5: { str: "11:35 - 12:25", start: 695, end: 745 },
+      6: { str: "12:30 - 13:20", start: 750, end: 800 },
+      7: { str: "13:25 - 14:15", start: 805, end: 855 },
+      8: { str: "14:20 - 15:10", start: 860, end: 910 },
+      9: { str: "15:10 - 16:00", start: 910, end: 960 },
+      10: { str: "16:00 - 16:50", start: 960, end: 1010 },
+      11: { str: "16:50 - 17:30", start: 1010, end: 1050 }
+    };
+
+    const timetable = {
+      1: { 1: "26CYB1002J", 2: "26CYB1002J", 8: "26LCA1006J", 9: "26LCA1006J" },
+      2: { 1: "26CYB1002J", 2: "26CYB1002J", 3: "26LCA1006J", 4: "26BTB1001T", 7: "26CSE1002J", 8: "26CSE1002J" },
+      3: { 1: "26MEE1001L", 2: "26MEE1001L", 3: "26MEE1001L", 4: "26MEE1001L", 9: "26MAB1001T" },
+      4: { 1: "26MAB1001T", 2: "26MAB1001T", 3: "26CYB1002J", 4: "26CSE1002J", 7: "26GNN1007J", 8: "26GNN1007J", 9: "26GNN1007J" },
+      5: { 6: "26CSE1002J", 7: "26CSE1002J", 9: "26LCA1006J", 10: "26MAB1001T" }
+    };
+
+    const academicPlanner = {
+      "2026-11-02": 3, "2026-11-03": 4, "2026-11-04": 5, "2026-11-05": 1, "2026-11-06": 2,
+      "2026-11-10": 4, "2026-11-11": 5, "2026-11-12": 1, "2026-11-13": 2, "2026-11-16": 3,
+      "2026-11-17": 4, "2026-11-18": 5, "2026-11-19": 1, "2026-11-20": 2, "2026-11-23": 3,
+      "2026-11-24": 4, "2026-11-25": 5, "2026-11-26": 1, "2026-11-27": 2, "2026-11-30": 3,
+      "2026-12-01": 4, "2026-12-02": 5, "2026-12-03": 1, "2026-12-04": 2, "2026-12-07": 3
+    };
+
+    let myData = JSON.parse(JSON.stringify(baselineAttendance));
+    let loggedDailyActions = {};
+    let activeDayOrder = null;
+
     function triggerHaptic(type = 'light') {
       if (!navigator.vibrate) return;
-      if (type === 'light') navigator.vibrate(40);
+      if (type === 'light') navigator.vibrate(35);
       if (type === 'success') navigator.vibrate([30, 40, 30]);
       if (type === 'undo') navigator.vibrate([60, 50]);
-      if (type === 'error') navigator.vibrate([50, 100, 50, 100, 50]);
+      if (type === 'error') navigator.vibrate([50, 100, 50]);
     }
 
     function toggleEditMode() {
@@ -359,40 +581,17 @@
     }
 
     function toggleSOS(show) { triggerHaptic('light'); document.getElementById('sos-modal').style.display = show ? 'flex' : 'none'; }
+
     function toggleView(viewId) {
       if (window.innerWidth >= 1024) return;
       triggerHaptic('light');
-      if (document.startViewTransition) {
-        document.startViewTransition(() => {
-          document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
-          document.getElementById('tracker-view').style.display = viewId === 'tracker-view' ? 'block' : 'none';
-          if (viewId === 'tracker-view') forceDayOrder();
-        });
-      } else {
+      const switchFn = () => {
         document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
         document.getElementById('tracker-view').style.display = viewId === 'tracker-view' ? 'block' : 'none';
         if (viewId === 'tracker-view') forceDayOrder();
-      }
+      };
+      document.startViewTransition ? document.startViewTransition(switchFn) : switchFn();
     }
-
-    // Baseline Data
-    const baselineAttendance = {
-      "26CYB1002J": { name: "CHEMISTRY FOR CS", attended: 49, conducted: 49, icon: "flask-conical" },
-      "26BTB1001T": { name: "COMPUTATIONAL BIOLOGY", attended: 17, conducted: 17, icon: "dna" },
-      "26MEE1001L": { name: "WORKSHOP PRACTICE", attended: 44, conducted: 44, icon: "wrench" },
-      "26CSE1002J": { name: "PROGRAMMING", attended: 45, conducted: 45, icon: "terminal" },
-      "26MAB1001T": { name: "CALCULUS & ALGEBRA", attended: 37, conducted: 37, icon: "sigma" },
-      "26LCA1006J": { name: "KOREAN", attended: 30, conducted: 33, icon: "languages" },
-      "26GNN1007J": { name: "YOGA", attended: 18, conducted: 18, icon: "activity" }
-    };
-
-    const slots = { 1: { str: "08:00 - 08:50", start: 480, end: 530 }, 2: { str: "08:50 - 09:40", start: 530, end: 580 }, 3: { str: "09:45 - 10:35", start: 585, end: 635 }, 4: { str: "10:40 - 11:30", start: 640, end: 690 }, 5: { str: "11:35 - 12:25", start: 695, end: 745 }, 6: { str: "12:30 - 13:20", start: 750, end: 800 }, 7: { str: "13:25 - 14:15", start: 805, end: 855 }, 8: { str: "14:20 - 15:10", start: 860, end: 910 }, 9: { str: "15:10 - 16:00", start: 910, end: 960 }, 10: { str: "16:00 - 16:50", start: 960, end: 1010 }, 11: { str: "16:50 - 17:30", start: 1010, end: 1050 } };
-    const timetable = { 1: { 1: "26CYB1002J", 2: "26CYB1002J", 8: "26LCA1006J", 9: "26LCA1006J" }, 2: { 1: "26CYB1002J", 2: "26CYB1002J", 3: "26LCA1006J", 4: "26BTB1001T", 7: "26CSE1002J", 8: "26CSE1002J" }, 3: { 1: "26MEE1001L", 2: "26MEE1001L", 3: "26MEE1001L", 4: "26MEE1001L", 9: "26MAB1001T" }, 4: { 1: "26MAB1001T", 2: "26MAB1001T", 3: "26CYB1002J", 4: "26CSE1002J", 7: "26GNN1007J", 8: "26GNN1007J", 9: "26GNN1007J" }, 5: { 6: "26CSE1002J", 7: "26CSE1002J", 9: "26LCA1006J", 10: "26MAB1001T" } };
-    const academicPlanner = { "2026-11-02": 3, "2026-11-03": 4, "2026-11-04": 5, "2026-11-05": 1, "2026-11-06": 2, "2026-11-10": 4, "2026-11-11": 5, "2026-11-12": 1, "2026-11-13": 2, "2026-11-16": 3, "2026-11-17": 4, "2026-11-18": 5, "2026-11-19": 1, "2026-11-20": 2, "2026-11-23": 3, "2026-11-24": 4, "2026-11-25": 5, "2026-11-26": 1, "2026-11-27": 2, "2026-11-30": 3, "2026-12-01": 4, "2026-12-02": 5, "2026-12-03": 1, "2026-12-04": 2, "2026-12-07": 3 };
-
-    let myData = JSON.parse(JSON.stringify(baselineAttendance));
-    let loggedDailyActions = {};
-    let activeDayOrder = null;
 
     countsRef.on('value', (snapshot) => {
       if (snapshot.exists()) myData = snapshot.val();
@@ -401,14 +600,16 @@
     });
 
     logsRef.on('value', (snapshot) => {
-      if (snapshot.exists()) loggedDailyActions = snapshot.val();
-      else loggedDailyActions = {};
+      loggedDailyActions = snapshot.exists() ? snapshot.val() : {};
       if (window.innerWidth >= 1024 || document.getElementById('tracker-view').style.display === 'block') renderUI();
     });
 
-    if (window.innerWidth >= 1024) forceDayOrder();
+    function getTodayDateStr() {
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      return new Date(utc + (3600000 * 5.5)).toISOString().split('T')[0];
+    }
 
-    function getTodayDateStr() { const now = new Date(); const utc = now.getTime() + (now.getTimezoneOffset() * 60000); return new Date(utc + (3600000 * 5.5)).toISOString().split('T')[0]; }
     function getTodayDayOrder() { return academicPlanner[getTodayDateStr()] || null; }
 
     function forceDayOrder() {
@@ -417,11 +618,13 @@
       renderUI(); updateDynamicIsland();
     }
 
+    if (window.innerWidth >= 1024) forceDayOrder();
+
     function logClass(code, slotNum, status) {
       if (!isEditMode) return; triggerHaptic('success');
       const logKey = `${getTodayDateStr()}_D${activeDayOrder}_S${slotNum}_${code}`;
       historyStack.push({ type: 'slot', code, slotNum, logKey, previousData: JSON.parse(JSON.stringify(myData)) });
-      document.getElementById('undoBtn').style.display = 'block';
+      document.getElementById('undoBtn').style.display = 'inline-flex';
       if (!myData[code]) myData[code] = { name: code, attended: 0, conducted: 0 };
       status === 'attended' ? (myData[code].attended++, myData[code].conducted++) : myData[code].conducted++;
       loggedDailyActions[logKey] = status;
@@ -431,7 +634,7 @@
     function logSurprise(code, status) {
       if (!isEditMode || !myData[code]) return; triggerHaptic('success');
       historyStack.push({ type: 'surprise', code, previousData: JSON.parse(JSON.stringify(myData)) });
-      document.getElementById('undoBtn').style.display = 'block';
+      document.getElementById('undoBtn').style.display = 'inline-flex';
       status === 'attended' ? (myData[code].attended++, myData[code].conducted++) : myData[code].conducted++;
       renderMatrix(); countsRef.set(myData);
     }
@@ -450,10 +653,10 @@
       const perc = (attended / conducted) * 100;
       if (perc >= 75) {
         const canBunk = Math.floor((attended - (0.75 * conducted)) / 0.75);
-        return { text: canBunk > 0 ? `Can bunk ${canBunk}` : `0 bunks left`, safe: true };
+        return { text: canBunk > 0 ? `Can bunk ${canBunk}` : `On the edge (0 bunks)`, safe: true };
       } else {
         const mustAttend = Math.ceil(((0.75 * conducted) - attended) / 0.25);
-        return { text: `Attend ${mustAttend} to recover`, safe: false };
+        return { text: `Deficit: Attend ${mustAttend}`, safe: false };
       }
     }
 
@@ -465,7 +668,7 @@
       for (const [slotNum, slotData] of Object.entries(slots)) {
         if (currentMins >= slotData.start && currentMins < slotData.end) {
           const code = timetable[activeDayOrder][slotNum];
-          banner.textContent = `Live: ${myData[code]?.name || "Class"}`;
+          banner.textContent = `Live: ${myData[code]?.name || "Break"}`;
           timeRemaining.textContent = `${slotData.end - currentMins}m left`;
           activeFound = true; break;
         }
@@ -474,13 +677,24 @@
     }
     setInterval(updateDynamicIsland, 30000);
 
+    // Authentic Steins;Gate Nixie Tube Formatter
     function updateDivergenceMeter() {
       let totalAttended = 0, totalConducted = 0;
       for (const key in myData) { totalAttended += myData[key].attended; totalConducted += myData[key].conducted; }
       const globalPerc = totalConducted === 0 ? 100 : ((totalAttended / totalConducted) * 100);
-      const meter = document.getElementById('globalDivergence'), percText = document.getElementById('div-perc');
-      percText.innerText = (globalPerc).toFixed(2).replace('.', '');
-      globalPerc < 75 ? meter.classList.add('timeline-alpha') : meter.classList.remove('timeline-alpha');
+      const meter = document.getElementById('globalDivergence');
+      const tubesContainer = document.getElementById('nixie-tubes');
+      const label = document.getElementById('divergence-label');
+
+      // Format as Steins;Gate Worldline (1.04XXXX if safe >=75%, 0.XXXXXX if danger <75%)
+      const scaledDigits = Math.min(9999, Math.round(globalPerc * 98.8)).toString().padStart(4, '0');
+      const worldlineStr = globalPerc >= 75 ? `1.04${scaledDigits}` : `0.33${scaledDigits}`;
+
+      tubesContainer.innerHTML = worldlineStr.split('').map(ch => `<span class="nixie-tube">${ch}</span>`).join('');
+      label.textContent = `${globalPerc >= 75 ? 'Steins Gate Worldline' : 'Alpha Timeline Alert'} • ${globalPerc.toFixed(1)}% (${totalAttended}/${totalConducted})`;
+
+      if (globalPerc < 75) meter.classList.add('timeline-alpha');
+      else meter.classList.remove('timeline-alpha');
     }
 
     function renderUI() {
@@ -491,17 +705,18 @@
       const today = getTodayDateStr(), dayClasses = timetable[activeDayOrder]; let delayCounter = 0;
       for (const [slotNum, code] of Object.entries(dayClasses)) {
         const sub = myData[code] || { name: code }, logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`, previousAction = loggedDailyActions[logKey];
+        const iconName = subjectIcons[code] || "book-open";
         let actionUI = '';
-        if (previousAction === 'attended') actionUI = `<div class="logged-status logged-att"><i data-lucide="check-circle"></i> Logged: Attended</div>`;
+        if (previousAction === 'attended') actionUI = `<div class="logged-status logged-att"><i data-lucide="check-circle-2"></i> Logged: Attended</div>`;
         else if (previousAction === 'missed') actionUI = `<div class="logged-status logged-mis"><i data-lucide="x-circle"></i> Logged: Missed</div>`;
         else if (isEditMode) actionUI = `<div class="btn-row"><button class="btn-log btn-attend" onclick="logClass('${code}', '${slotNum}', 'attended')"><i data-lucide="check"></i> Attended</button><button class="btn-log btn-miss" onclick="logClass('${code}', '${slotNum}', 'missed')"><i data-lucide="x"></i> Missed</button></div>`;
-        else actionUI = `<div class="logged-status logged-locked"><i data-lucide="lock"></i> Action Required (Unlock)</div>`;
+        else actionUI = `<div class="logged-status logged-locked"><i data-lucide="lock"></i> View Only (Unlock to Log)</div>`;
         
         container.innerHTML += `
-          <div class="class-card animated-card" style="animation-delay: ${delayCounter * 0.05}s">
-            <i data-lucide="${sub.icon || 'book'}" class="watermark-icon"></i>
+          <div class="class-card animated-card" style="animation-delay: ${delayCounter * 0.04}s">
+            <i data-lucide="${iconName}" class="watermark-icon"></i>
             <div class="class-header">
-              <div><div class="class-code">${code} (Slot ${slotNum})</div><div class="class-name">${sub.name}</div></div>
+              <div><div class="class-code">${code} • SLOT ${slotNum}</div><div class="class-name">${sub.name}</div></div>
               <div class="class-time">${slots[slotNum].str}</div>
             </div>
             ${actionUI}
@@ -519,20 +734,32 @@
         const percFormatted = perc.toFixed(1);
         const margin = calculateMargin(data.attended, data.conducted);
         const marginClass = margin.safe ? "margin-safe" : "margin-danger";
+        const iconName = subjectIcons[code] || "book-open";
         
-        // AoT Badge Logic
+        // Authentic Attack on Titan Regiment Crests from Assets/
         let aotBadgeUI = '';
-        if (perc >= 90) aotBadgeUI = `<div class="aot-badge rank-scout"><i data-lucide="feather"></i> ${percFormatted}%</div>`;
-        else if (perc >= 75) aotBadgeUI = `<div class="aot-badge rank-garrison"><i data-lucide="shield"></i> ${percFormatted}%</div>`;
-        else aotBadgeUI = `<div class="aot-badge rank-fodder"><i data-lucide="shield-alert"></i> ${percFormatted}%</div>`;
+        let regimentTitle = '';
+        if (perc >= 90) {
+          aotBadgeUI = `<div class="aot-badge rank-scout"><img class="aot-crest" src="Assets/scout.webp" alt="Scout"> ${percFormatted}%</div>`;
+          regimentTitle = 'Scout Regiment';
+        } else if (perc >= 75) {
+          aotBadgeUI = `<div class="aot-badge rank-garrison"><img class="aot-crest" src="Assets/garrison.webp" alt="Garrison"> ${percFormatted}%</div>`;
+          regimentTitle = 'Garrison Wall';
+        } else {
+          aotBadgeUI = `<div class="aot-badge rank-fodder"><i data-lucide="skull" style="width:18px;height:18px;"></i> ${percFormatted}%</div>`;
+          regimentTitle = 'Titan Fodder';
+        }
 
-        let extraRowUI = isEditMode ? `<div class="extra-row"><span class="extra-label">Surprise Class</span><div class="extra-btns"><button class="btn-extra" onclick="logSurprise('${code}', 'attended')">+ Attend</button><button class="btn-extra" onclick="logSurprise('${code}', 'missed')">+ Miss</button></div></div>` : '';
+        let extraRowUI = isEditMode ? `<div class="extra-row"><span class="extra-label">Extra / Makeup Slot</span><div class="extra-btns"><button class="btn-extra" onclick="logSurprise('${code}', 'attended')">+ Attend</button><button class="btn-extra" onclick="logSurprise('${code}', 'missed')">+ Miss</button></div></div>` : '';
 
         container.innerHTML += `
-          <div class="matrix-card animated-card" style="animation-delay: ${delayCounter * 0.05}s">
-            <i data-lucide="${data.icon || 'book'}" class="watermark-icon"></i>
+          <div class="matrix-card animated-card" style="animation-delay: ${delayCounter * 0.04}s">
+            <i data-lucide="${iconName}" class="watermark-icon"></i>
             <div class="matrix-top"><span class="matrix-name">${data.name}</span>${aotBadgeUI}</div>
-            <div class="matrix-mid"><span class="matrix-stats">${data.attended} / ${data.conducted}</span><span class="matrix-margin ${marginClass}">${margin.text}</span></div>
+            <div class="matrix-mid">
+              <span class="matrix-stats"><span>${data.attended} / ${data.conducted}</span> <span class="regiment-tag">${regimentTitle}</span></span>
+              <span class="matrix-margin ${marginClass}">${margin.text}</span>
+            </div>
             ${extraRowUI}
           </div>`;
         delayCounter++;
@@ -541,91 +768,361 @@
       lucide.createIcons();
     }
 
-    // --- Domain Expansion Gesture Logic ---
+    // ==========================================
+    // 2. JUJUTSU KAISEN DOMAIN EXPANSION
+    // ==========================================
     let touchStartY = 0;
-    const ring = document.getElementById('domainRing');
-    document.addEventListener('touchstart', (e) => { if (e.touches.length === 2) touchStartY = e.touches[0].clientY; });
+    const domainRing = document.getElementById('domainRing');
+    const domainToast = document.getElementById('domain-toast');
+
+    function triggerDomainExpansion() {
+      triggerHaptic('success');
+      domainRing.classList.add('expand');
+      const isActivating = !document.body.classList.contains('domain-expansion');
+      domainToast.textContent = isActivating ? "Domain Expansion: Malevolent Shrine" : "Domain Collapsed";
+      domainToast.classList.add('show');
+
+      setTimeout(() => {
+        document.body.classList.toggle('domain-expansion');
+        domainRing.classList.remove('expand');
+      }, 380);
+      setTimeout(() => domainToast.classList.remove('show'), 2400);
+    }
+
+    document.addEventListener('touchstart', (e) => { if (e.touches.length === 2) touchStartY = e.touches[0].clientY; }, { passive: true });
     document.addEventListener('touchend', (e) => {
-      if (e.changedTouches.length === 2) {
-        if (e.changedTouches[0].clientY - touchStartY > 120) {
-          triggerHaptic('success'); ring.classList.add('expand');
-          setTimeout(() => { document.body.classList.toggle('domain-expansion'); ring.classList.remove('expand'); }, 400);
+      if (e.changedTouches.length === 2 && (e.changedTouches[0].clientY - touchStartY > 100)) {
+        triggerDomainExpansion();
+      }
+    }, { passive: true });
+
+    // ==========================================
+    // 3. INTERACTIVE RYUK STATE MACHINE & APPLE
+    // ==========================================
+    const ryukImg = document.getElementById('ryuk-img');
+    const ryukBubble = document.getElementById('ryuk-bubble');
+    const ryukWidget = document.getElementById('ryuk-widget');
+    let ryukBusy = false;
+
+    const ryukLines = [
+      "Humans are so interesting!",
+      "75% mandatory? Sounds like a Shinigami rule.",
+      "Hehehe... juicy red apples!",
+      "Don't drop into Titan Fodder..."
+    ];
+
+    function showRyukLine(text) {
+      ryukBubble.textContent = text;
+      ryukBubble.classList.add('show');
+      setTimeout(() => ryukBubble.classList.remove('show'), 2600);
+    }
+
+    // Non-generic randomized idle state machine every 5.5s
+    setInterval(() => {
+      if (ryukBusy) return;
+      const roll = Math.random();
+      ryukImg.className = '';
+      if (roll < 0.50) {
+        ryukImg.classList.add('ryuk-state-float');
+      } else if (roll < 0.78) {
+        ryukImg.classList.add('ryuk-state-look');
+      } else if (roll < 0.92) {
+        ryukImg.classList.add('ryuk-state-stare');
+        if (Math.random() < 0.4) showRyukLine(ryukLines[Math.floor(Math.random() * ryukLines.length)]);
+      } else {
+        ryukImg.classList.add('ryuk-state-laugh');
+      }
+    }, 5500);
+
+    function tossApple(e) {
+      e.stopPropagation();
+      if (ryukBusy) return;
+      ryukBusy = true;
+      triggerHaptic('success');
+
+      // Spawn SVG Shinigami Apple
+      const apple = document.createElement('div');
+      apple.className = 'shinigami-apple';
+      apple.innerHTML = `<svg viewBox="0 0 24 24" fill="#ef4444" stroke="#7f1d1d" stroke-width="1.5"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5" stroke="#4ade80" stroke-width="2" fill="none"/></svg>`;
+      ryukWidget.appendChild(apple);
+
+      ryukImg.className = 'ryuk-state-catch';
+      showRyukLine("Delicious! 🍎");
+
+      setTimeout(() => {
+        apple.remove();
+        ryukImg.className = 'ryuk-state-float';
+        ryukBusy = false;
+      }, 880);
+    }
+
+    // ==========================================
+    // 4. TRUE FISHER-YATES SHUFFLE DECK CLASS
+    // ==========================================
+    class ShuffleDeck {
+      constructor(items = []) {
+        this.source = [...items];
+        this.queue = [];
+        this.lastPlayed = null;
+        this.refill();
+      }
+      setItems(newItems) {
+        if (!newItems || newItems.length === 0) return;
+        this.source = [...newItems];
+        this.refill();
+      }
+      refill() {
+        this.queue = [...this.source];
+        for (let i = this.queue.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [this.queue[i], this.queue[j]] = [this.queue[j], this.queue[i]];
+        }
+        // Prevent immediate boundary repeat when reshuffling
+        if (this.queue.length > 1 && this.queue[0] === this.lastPlayed) {
+          const first = this.queue.shift();
+          this.queue.push(first);
         }
       }
-    });
-
-    // --- Eren's Vision Video Engine ---
-    const visionVideos = [
-      "Videos/what eren really, REALLY saw [KCKfWNLSn_I].webm",
-      "Videos/This Infinity Castle EDIT Took Me 20+ Hours [3kjgSHA-bM0].webm"
-    ]; // Paths directly reference your GitHub repo setup
-    let pressTimer;
-    const visionContainer = document.getElementById('vision-container'), visionVideo = document.getElementById('vision-video');
-
-    function checkValidTarget(e) { return !e.target.closest('button') && !e.target.closest('a') && !e.target.closest('#floating-music-player'); }
-
-    document.body.addEventListener('touchstart', (e) => { if (e.touches.length === 1 && checkValidTarget(e)) pressTimer = setTimeout(triggerVision, 1500); });
-    document.body.addEventListener('touchend', () => clearTimeout(pressTimer));
-    document.body.addEventListener('mousedown', (e) => { if (checkValidTarget(e)) pressTimer = setTimeout(triggerVision, 1500); });
-    document.body.addEventListener('mouseup', () => clearTimeout(pressTimer));
-
-    function triggerVision() {
-      triggerHaptic('success');
-      visionVideo.src = visionVideos[Math.floor(Math.random() * visionVideos.length)];
-      visionVideo.className = ''; 
-      const transitions = ['trans-focus', 'trans-glitch'];
-      visionVideo.classList.add(transitions[Math.floor(Math.random() * transitions.length)]);
-      visionContainer.classList.add('active');
-      visionVideo.play();
+      next() {
+        if (this.source.length === 0) return null;
+        if (this.queue.length === 0) this.refill();
+        const item = this.queue.shift();
+        this.lastPlayed = item;
+        return item;
+      }
     }
-    visionContainer.addEventListener('click', () => { visionContainer.classList.remove('active'); visionVideo.pause(); visionVideo.currentTime = 0; });
 
-    // --- Apple Music Floating Player ---
-    const audioFiles = [
-      { title: "Under the Tree", artist: "SiM", src: "Audio/SiM_-_Under_the_Tree_Attack_on_Titan_(mp3.pm).mp3" },
+    // Default Fallback Lists (if offline or before GitHub API responds)
+    const fallbackVideos = [
+      "Videos/what eren really, REALLY saw [KCKfWNLSn_I].webm",
+      "Videos/This Infinity Castle EDIT Took Me 20+ Hours [3kjgSHA-bM0].webm",
+      "Videos/The Best Naruto Edit You'll Ever See... 🔥 _ Headlights [4K]! [AX...].webm",
+      "Videos/Ruthless Character Identified 💀🔥! _ Leo X Funk Na Mira Edit ... .webm"
+    ];
+
+    const fallbackAudio = [
       { title: "Aalaporan Thamizhan", artist: "A.R. Rahman", src: "Audio/Aalaporan-Thamizhan-MassTamilan.com.mp3" },
-      { title: "Kannukulla", artist: "Unknown", src: "Audio/Kannukulla.mp3" }
-    ]; // Paths directly reference your GitHub repo setup
-    let currentTrackIndex = 0;
-    const audioPlayer = document.getElementById('bg-audio'), playBtn = document.getElementById('play-pause-btn'), wave = document.getElementById('wave'), trackLabel = document.getElementById('track-name');
+      { title: "Kannukulla", artist: "Indie OST", src: "Audio/Kannukulla.mp3" },
+      { title: "Pesamale", artist: "OST Mix", src: "Audio/Pesamale(KoshalWorld.Com).mp3" },
+      { title: "Under the Tree", artist: "SiM (Attack on Titan)", src: "Audio/SiM_-_Under_the_Tree_Attack_on_Titan_(mp3.pm).mp3" },
+      { title: "Thamarai Poovukum", artist: "Classic Tamil", src: "Audio/Thamarai Poovukum.mp3" }
+    ];
+
+    const landscapeDeck = new ShuffleDeck(fallbackVideos);
+    const portraitDeck = new ShuffleDeck(fallbackVideos);
+    const audioDeck = new ShuffleDeck(fallbackAudio);
+
+    // Dynamic GitHub Repository Scanner (Auto-discovers all files in Videos/Landscape, Videos/Potrait, and Audio)
+    async function syncRepoMedia() {
+      const repoBase = "https://api.github.com/repos/Thiruvannan/Thiruvannan.github.io/contents";
+      const isMedia = (name, exts) => exts.some(ext => name.toLowerCase().endsWith(ext));
+
+      try {
+        // 1. Fetch Landscape (Desktop) Videos
+        const resLand = await fetch(`${repoBase}/Videos/Landscape`);
+        if (resLand.ok) {
+          const files = await resLand.json();
+          const urls = files.filter(f => isMedia(f.name, ['.mp4', '.webm', '.mov', '.mkv'])).map(f => `Videos/Landscape/${encodeURIComponent(f.name)}`);
+          if (urls.length > 0) landscapeDeck.setItems(urls);
+        }
+
+        // 2. Fetch Potrait (Mobile) Videos (Matches exact repo folder spelling "Potrait")
+        const resPort = await fetch(`${repoBase}/Videos/Potrait`);
+        if (resPort.ok) {
+          const files = await resPort.json();
+          const urls = files.filter(f => isMedia(f.name, ['.mp4', '.webm', '.mov', '.mkv'])).map(f => `Videos/Potrait/${encodeURIComponent(f.name)}`);
+          if (urls.length > 0) portraitDeck.setItems(urls);
+        }
+
+        // 3. Also check root Videos/ if any exist
+        const resRootVid = await fetch(`${repoBase}/Videos`);
+        if (resRootVid.ok) {
+          const files = await resRootVid.json();
+          const rootUrls = files.filter(f => f.type === 'file' && isMedia(f.name, ['.mp4', '.webm', '.mov'])).map(f => `Videos/${encodeURIComponent(f.name)}`);
+          if (rootUrls.length > 0 && landscapeDeck.source === fallbackVideos) landscapeDeck.setItems(rootUrls);
+          if (rootUrls.length > 0 && portraitDeck.source === fallbackVideos) portraitDeck.setItems(rootUrls);
+        }
+
+        // 4. Fetch All Audio Tracks from Audio/
+        const resAud = await fetch(`${repoBase}/Audio`);
+        if (resAud.ok) {
+          const files = await resAud.json();
+          const tracks = files.filter(f => isMedia(f.name, ['.mp3', '.wav', '.ogg', '.m4a'])).map(f => {
+            const cleanName = f.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+            return {
+              title: cleanName,
+              artist: "SRM Hub OST",
+              src: `Audio/${encodeURIComponent(f.name)}`
+            };
+          });
+          if (tracks.length > 0) audioDeck.setItems(tracks);
+        }
+      } catch (err) {
+        console.log("Using cached fallback media deck.");
+      }
+    }
+    syncRepoMedia();
+
+    // ==========================================
+    // 5. EREN'S VISION LONG-PRESS VIDEO PLAYER
+    // ==========================================
+    let pressTimer = null;
+    let holdStartCoords = { x: 0, y: 0 };
+    const visionContainer = document.getElementById('vision-container');
+    const visionVideo = document.getElementById('vision-video');
+    const holdIndicator = document.getElementById('hold-indicator');
+
+    function isInteractiveElement(target) {
+      return target.closest('button') || target.closest('a') || target.closest('select') || target.closest('#floating-music-player') || target.closest('#ryuk-widget') || target.closest('#vision-container');
+    }
+
+    function startHold(x, y, target) {
+      if (isInteractiveElement(target)) return;
+      holdStartCoords = { x, y };
+      holdIndicator.style.left = `${x}px`;
+      holdIndicator.style.top = `${y}px`;
+      holdIndicator.classList.add('holding');
+
+      pressTimer = setTimeout(() => {
+        holdIndicator.classList.remove('holding');
+        triggerVision(x, y);
+      }, 950); // Responsive 0.95s hold
+    }
+
+    function cancelHold() {
+      clearTimeout(pressTimer);
+      holdIndicator.classList.remove('holding');
+    }
+
+    document.body.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) startHold(e.touches[0].clientX, e.touches[0].clientY, e.target);
+      else cancelHold();
+    }, { passive: true });
+    document.body.addEventListener('touchmove', cancelHold, { passive: true });
+    document.body.addEventListener('touchend', cancelHold, { passive: true });
+
+    document.body.addEventListener('mousedown', (e) => {
+      if (e.button === 0) startHold(e.clientX, e.clientY, e.target);
+    });
+    document.body.addEventListener('mousemove', (e) => {
+      if (Math.hypot(e.clientX - holdStartCoords.x, e.clientY - holdStartCoords.y) > 15) cancelHold();
+    });
+    document.body.addEventListener('mouseup', cancelHold);
+
+    let wasMusicPlayingBeforeVision = false;
+
+    function triggerVision(x, y) {
+      triggerHaptic('success');
+
+      // Pause background music cleanly so audio doesn't clash
+      if (!audioPlayer.paused) {
+        wasMusicPlayingBeforeVision = true;
+        audioPlayer.pause();
+      } else {
+        wasMusicPlayingBeforeVision = false;
+      }
+
+      // Select Mobile (Potrait) vs Desktop (Landscape) Deck automatically
+      const isMobileViewport = window.matchMedia("(max-width: 768px)").matches;
+      const activeDeck = isMobileViewport ? portraitDeck : landscapeDeck;
+      const chosenVideoSrc = activeDeck.next();
+      if (!chosenVideoSrc) return;
+
+      // Pass finger/cursor coordinates for Iris reveal transition
+      document.documentElement.style.setProperty('--click-x', `${x}px`);
+      document.documentElement.style.setProperty('--click-y', `${y}px`);
+
+      visionVideo.className = '';
+      const transitions = ['trans-zoom', 'trans-flash', 'trans-iris'];
+      const chosenTrans = transitions[Math.floor(Math.random() * transitions.length)];
+      visionVideo.classList.add(chosenTrans);
+
+      visionVideo.src = chosenVideoSrc;
+      visionContainer.classList.add('active');
+      visionVideo.play().catch(() => {});
+    }
+
+    function closeVision() {
+      if (!visionContainer.classList.contains('active')) return;
+      visionContainer.classList.remove('active');
+      visionVideo.pause();
+      visionVideo.removeAttribute('src');
+      visionVideo.load();
+
+      if (wasMusicPlayingBeforeVision) {
+        audioPlayer.play().catch(() => {});
+      }
+    }
+
+    visionContainer.addEventListener('click', closeVision);
+    visionVideo.addEventListener('ended', closeVision);
+
+    // ==========================================
+    // 6. APPLE MUSIC PLAYER & OS LOCK SCREEN API
+    // ==========================================
+    const audioPlayer = document.getElementById('bg-audio');
+    const playBtn = document.getElementById('play-pause-btn');
+    const wave = document.getElementById('wave');
+    const trackLabel = document.getElementById('track-name');
+    const musicWidget = document.getElementById('floating-music-player');
+    let currentTrack = null;
+
+    function updatePlayerUI(isPlaying) {
+      if (isPlaying) {
+        playBtn.innerHTML = '<i data-lucide="pause"></i>';
+        wave.classList.add('active');
+        musicWidget.classList.add('playing');
+      } else {
+        playBtn.innerHTML = '<i data-lucide="play"></i>';
+        wave.classList.remove('active');
+        musicWidget.classList.remove('playing');
+      }
+      lucide.createIcons();
+    }
+
+    function loadNextShuffledTrack() {
+      currentTrack = audioDeck.next();
+      if (!currentTrack) return;
+      audioPlayer.src = currentTrack.src;
+      trackLabel.textContent = `${currentTrack.title} • ${currentTrack.artist}`;
+      setupMediaSession(currentTrack);
+    }
 
     function toggleMusic() {
+      triggerHaptic('light');
       if (audioPlayer.paused) {
-        if (!audioPlayer.src) loadTrack(currentTrackIndex);
-        audioPlayer.play();
-        playBtn.innerHTML = '<i data-lucide="pause"></i>'; lucide.createIcons();
-        wave.classList.add('active'); setupMediaSession();
+        if (!audioPlayer.src || !currentTrack) loadNextShuffledTrack();
+        audioPlayer.play().then(() => updatePlayerUI(true)).catch(() => {});
       } else {
         audioPlayer.pause();
-        playBtn.innerHTML = '<i data-lucide="play"></i>'; lucide.createIcons();
-        wave.classList.remove('active');
+        updatePlayerUI(false);
       }
+    }
+
+    function playNextRandomTrack() {
       triggerHaptic('light');
+      loadNextShuffledTrack();
+      audioPlayer.play().then(() => updatePlayerUI(true)).catch(() => {});
     }
 
-    function loadTrack(index) {
-      const track = audioFiles[index];
-      audioPlayer.src = track.src;
-      trackLabel.innerText = `${track.title} - ${track.artist}`;
-    }
-
-    function setupMediaSession() {
-      if ('mediaSession' in navigator) {
-        const track = audioFiles[currentTrackIndex];
+    function setupMediaSession(track) {
+      if ('mediaSession' in navigator && track) {
         navigator.mediaSession.metadata = new MediaMetadata({
-          title: track.title, artist: track.artist, album: "SRM Hub OST",
-          artwork: [{ src: "https://github.com/Thiruvannan.png", sizes: "512x512", type: "image/png" }]
+          title: track.title,
+          artist: track.artist,
+          album: "SRM Hub OST",
+          artwork: [
+            { src: "https://github.com/Thiruvannan.png", sizes: "512x512", type: "image/png" }
+          ]
         });
-        navigator.mediaSession.setActionHandler('nexttrack', () => {
-          currentTrackIndex = (currentTrackIndex + 1) % audioFiles.length;
-          loadTrack(currentTrackIndex); audioPlayer.play(); setupMediaSession();
-        });
+        navigator.mediaSession.setActionHandler('play', () => { audioPlayer.play(); updatePlayerUI(true); });
+        navigator.mediaSession.setActionHandler('pause', () => { audioPlayer.pause(); updatePlayerUI(false); });
+        navigator.mediaSession.setActionHandler('nexttrack', playNextRandomTrack);
+        navigator.mediaSession.setActionHandler('previoustrack', playNextRandomTrack);
       }
     }
-    audioPlayer.addEventListener('ended', () => {
-      currentTrackIndex = (currentTrackIndex + 1) % audioFiles.length;
-      loadTrack(currentTrackIndex); audioPlayer.play(); setupMediaSession();
-    });
+
+    audioPlayer.addEventListener('ended', playNextRandomTrack);
   </script>
 </body>
 </html>
