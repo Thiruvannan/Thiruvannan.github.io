@@ -10,7 +10,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <style>
-    /* 1. APPLE MUSIC "LIQUID AURORA" BACKGROUND */
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif; }
     
     @keyframes slowDrift {
@@ -38,7 +37,6 @@
 
     ::-webkit-scrollbar { width: 0px; background: transparent; }
 
-    /* FLUID VIEW TRANSITIONS API (The Morphing Magic) */
     #app-wrapper { 
       width: 100%; max-width: 420px; 
       view-transition-name: app-morph;
@@ -58,7 +56,6 @@
       .tracker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
     }
 
-    /* 3. HEAVY FROSTED GLASS */
     .glass-panel {
       background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(48px) saturate(200%);
@@ -68,85 +65,91 @@
       border-radius: 32px;
     }
 
-    /* Profile Card */
     .id-card { padding: 40px 24px; text-align: center; }
     .avatar { width: 100px; height: 100px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); margin-bottom: 20px; box-shadow: 0 12px 24px rgba(0,0,0,0.5); }
     .id-card h1 { font-size: 24px; font-weight: 800; letter-spacing: 0.2px; margin-bottom: 6px; }
-    .id-card p { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 32px; font-weight: 500; }
+    .id-card p { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 24px; font-weight: 500; }
     
-    /* Interactive Links */
-    .btn-group { display: flex; flex-direction: column; gap: 12px; }
+    /* Increased gap to 18px to prevent misclicks */
+    .btn-group { display: flex; flex-direction: column; gap: 18px; }
     .btn-link { display: flex; align-items: center; justify-content: center; padding: 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); }
     .btn-link:hover { background: rgba(255, 255, 255, 0.12); transform: scale(1.02); border-color: rgba(255, 255, 255, 0.2); }
     .btn-link:active { transform: scale(0.96); }
-    .btn-tracker { background: rgba(255, 255, 255, 0.9); color: #000; border: none; }
+    .btn-tracker { background: rgba(255, 255, 255, 0.9); color: #000; border: none; font-size: 15px; font-weight: 700; box-shadow: 0 8px 16px rgba(255,255,255,0.1); }
     .btn-tracker:hover { background: #ffffff; border-color: transparent; }
+    .btn-sos { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.3); color: #fb7185; }
 
-    /* Tracker Header Nav */
-    .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding: 0 4px; }
-    .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 16px; border-radius: 14px; font-size: 14px; font-weight: 600; cursor: pointer; backdrop-filter: blur(20px); transition: 0.2s; }
-    .back-btn:active { transform: scale(0.95); }
+    /* Increased gaps in top nav */
+    .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 4px; gap: 12px; flex-wrap: wrap; }
+    .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 16px; border-radius: 14px; font-size: 14px; font-weight: 600; cursor: pointer; backdrop-filter: blur(20px); }
+    
+    .lock-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #94a3b8; padding: 10px 14px; border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(10px); transition: 0.2s; }
+    .lock-btn:active { transform: scale(0.94); }
+    .lock-btn.unlocked { color: #fbbf24; background: rgba(251, 191, 36, 0.15); border-color: rgba(251, 191, 36, 0.3); }
+
+    .undo-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fbbf24; padding: 10px 14px; border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: none; }
     .sync-status { font-size: 12px; color: #fff; font-weight: 600; display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.1); padding: 8px 14px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); }
     .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 10px #34d399; }
 
-    /* Section Titles */
-    .section-title { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; justify-content: space-between; align-items: center; padding: 0 8px;}
-    select { background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; backdrop-filter: blur(20px); }
+    .live-slot-banner { background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 18px; padding: 12px 16px; margin-bottom: 20px; font-size: 12px; font-weight: 600; color: #7dd3fc; display: flex; align-items: center; justify-content: space-between; }
 
-    /* CASCADE ANIMATION FOR CARDS */
+    .section-title { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; justify-content: space-between; align-items: center; }
+    select { background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; backdrop-filter: blur(20px); }
+
     @keyframes slideUpFade {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(16px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    
-    .animated-card {
-      animation: slideUpFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
-    }
+    .animated-card { animation: slideUpFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
 
-    /* Inner Glass Cards */
-    .class-card { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px; transition: transform 0.2s; }
+    .class-card { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 18px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 14px; }
+    .class-card.current-active { border-color: rgba(56, 189, 248, 0.5); box-shadow: 0 0 20px rgba(56, 189, 248, 0.2); }
     .class-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .class-code { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 600; letter-spacing: 0.5px; }
-    .class-name { font-size: 16px; font-weight: 800; margin-top: 6px; letter-spacing: 0.2px; }
-    .class-time { font-size: 12px; background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 12px; color: #fff; font-weight: 600; backdrop-filter: blur(10px); }
+    .class-code { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 600; }
+    .class-name { font-size: 15px; font-weight: 800; margin-top: 4px; }
+    .class-time { font-size: 11px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; color: #fff; font-weight: 600; }
     
-    /* Smooth Logging Buttons */
-    .btn-row { display: flex; gap: 12px; }
-    .btn-log { flex: 1; padding: 14px; border-radius: 16px; font-weight: 700; font-size: 14px; cursor: pointer; border: 1px solid transparent; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    /* Increased gap for attendance logging buttons */
+    .btn-row { display: flex; gap: 16px; }
+    .btn-log { flex: 1; padding: 12px; border-radius: 14px; font-weight: 700; font-size: 13px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
     .btn-log:active { transform: scale(0.94); }
     .btn-attend { background: rgba(52, 211, 153, 0.15); color: #4ade80; border-color: rgba(52, 211, 153, 0.3); }
     .btn-miss { background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.3); }
     
-    .logged-status { font-size: 14px; font-weight: 700; padding: 14px; border-radius: 16px; text-align: center; width: 100%; backdrop-filter: blur(10px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.1); }
+    .logged-status { font-size: 13px; font-weight: 700; padding: 12px; border-radius: 14px; text-align: center; width: 100%; backdrop-filter: blur(10px); }
     .logged-att { background: rgba(52, 211, 153, 0.2); color: #4ade80; border: 1px solid rgba(52, 211, 153, 0.4); }
     .logged-mis { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+    .logged-locked { background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.5); border: 1px dashed rgba(255,255,255,0.2); font-weight: 600; }
 
-    /* Matrix Cards */
-    .matrix-grid { display: flex; flex-direction: column; gap: 16px; }
-    .matrix-card { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+    .matrix-grid { display: flex; flex-direction: column; gap: 14px; }
+    .matrix-card { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
     .matrix-top { display: flex; justify-content: space-between; align-items: flex-start; }
-    .matrix-name { font-size: 15px; font-weight: 800; letter-spacing: 0.2px; }
-    .matrix-perc { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
-    .matrix-mid { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+    .matrix-name { font-size: 14px; font-weight: 800; }
+    .matrix-perc { font-size: 18px; font-weight: 800; }
+    .matrix-mid { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
     .matrix-stats { color: rgba(255,255,255,0.6); font-weight: 600; }
     
-    .matrix-margin { font-weight: 700; padding: 6px 10px; border-radius: 10px; font-size: 12px; }
+    .matrix-margin { font-weight: 700; padding: 4px 8px; border-radius: 8px; font-size: 11px; }
     .margin-safe { color: #4ade80; background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52,211,153,0.3); }
     .margin-danger { color: #fb7185; background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244,63,94,0.3); }
     
-    .extra-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; margin-top: 4px; }
-    .extra-label { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
-    .extra-btns { display: flex; gap: 10px; }
-    .btn-extra { padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; transition: 0.2s; backdrop-filter: blur(10px); }
-    .btn-extra:active { transform: scale(0.92); background: rgba(255,255,255,0.15); }
+    /* Increased gap for surprise class buttons */
+    .extra-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 2px; }
+    .extra-label { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; font-weight: 800; }
+    .extra-btns { display: flex; gap: 12px; }
+    .btn-extra { padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; }
     
-    .safe { color: #4ade80; text-shadow: 0 0 16px rgba(52,211,153,0.4); }
-    .danger { color: #fb7185; text-shadow: 0 0 16px rgba(244,63,94,0.4); }
+    .safe { color: #4ade80; }
+    .danger { color: #fb7185; }
+
+    /* Emergency Modal with increased vertical gap */
+    #sos-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
+    .modal-box { background: #18121a; border: 1px solid rgba(244,63,94,0.4); border-radius: 28px; padding: 28px; width: 100%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+    .modal-box div { display: flex; flex-direction: column; gap: 16px; }
   </style>
 </head>
 <body>
 
-  <!-- UNIVERSAL APP WRAPPER -->
   <div id="app-wrapper">
 
     <!-- PROFILE PANEL -->
@@ -155,12 +158,14 @@
       <h1>Thiruvannan</h1>
       <p>Developer | SRMIST CSE</p>
       
+      <!-- Reordered buttons with View Attendance at the bottom -->
       <div class="btn-group">
-        <button class="btn-link btn-tracker desktop-hide" onclick="toggleView('tracker-view')">View Attendance</button>
+        <button class="btn-link btn-sos" onclick="toggleSOS(true)">🚨 SRM Emergency Contacts</button>
         <a class="btn-link" href="https://github.com/Thiruvannan" target="_blank">GitHub Profile</a>
         <a class="btn-link" href="contact.vcf">Save Contact</a>
         <a class="btn-link" href="https://wa.me/919080792117?text=Hey!" target="_blank">WhatsApp</a>
         <a class="btn-link" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR">Pay via UPI</a>
+        <button class="btn-link btn-tracker desktop-hide" onclick="toggleView('tracker-view')">View Attendance</button>
       </div>
     </div>
 
@@ -168,13 +173,23 @@
     <div id="tracker-view">
       <div class="top-nav">
         <button class="back-btn desktop-hide" onclick="toggleView('id-view')">Done</button>
+        
+        <!-- SECURITY TOGGLE -->
+        <button class="lock-btn" id="lockToggleBtn" onclick="toggleEditMode()">🔒 View Only</button>
+        <button class="undo-btn" id="undoBtn" onclick="undoLastAction()">↩ Undo Tap</button>
+        
         <div class="sync-status">
           <span class="sync-dot"></span>
           <span id="syncLabel">Live</span>
         </div>
       </div>
 
-      <!-- DESKTOP GRID SPLIT -->
+      <!-- Real-Time Slot Tracker -->
+      <div class="live-slot-banner" id="liveSlotBanner">
+        <span id="slotStatusText">Syncing Schedule...</span>
+        <span id="slotTimeRemaining"></span>
+      </div>
+
       <div class="tracker-grid">
         <div class="glass-panel" style="padding: 24px;">
           <div class="section-title">
@@ -200,8 +215,23 @@
 
   </div>
 
+  <!-- EMERGENCY POPUP -->
+  <div id="sos-modal">
+    <div class="modal-box">
+      <h2 style="font-size: 18px; color: #fb7185; margin-bottom: 8px;">SRM Campus SOS</h2>
+      <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 20px;">Tap any number to call immediately:</p>
+      
+      <div>
+        <a class="btn-link" href="tel:105786" style="background: rgba(244,63,94,0.2); border-color: rgba(244,63,94,0.4); color: #fff;">🚑 Ambulance: 105786</a>
+        <a class="btn-link" href="tel:04427478000" style="font-size: 14px;">🏥 Casualty: 044-27478000</a>
+        <a class="btn-link" href="tel:04427417000" style="font-size: 14px;">🛡️ Security: 044-27417000</a>
+        <a class="btn-link" href="tel:917026452645" style="font-size: 14px;">📞 Student Help: 70 2645 2645</a>
+        <button class="btn-link" onclick="toggleSOS(false)" style="margin-top: 10px; background: rgba(255,255,255,0.05);">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // FIREBASE CORE 
     const firebaseConfig = {
       apiKey: "AIzaSyDFM_WnGNOjUNIAC6ck6eGRjAeTDvjdzJQ",
       authDomain: "srm-hub-4dc4b.firebaseapp.com",
@@ -218,20 +248,57 @@
     const countsRef = db.ref('attendance_counts');
     const logsRef = db.ref('daily_logs');
 
-    // HAPTIC FEEDBACK ENGINE
+    // SECURITY SYSTEM CONFIG
+    const SECRET_PIN = "5428"; // PIN requested by user
+    let isEditMode = false;
+    let historyStack = [];
+
     function triggerHaptic(type = 'light') {
       if (!navigator.vibrate) return;
       if (type === 'light') navigator.vibrate(40);
-      if (type === 'success') navigator.vibrate([30, 40, 30]); // Double tap for saving data
+      if (type === 'success') navigator.vibrate([30, 40, 30]);
+      if (type === 'undo') navigator.vibrate([60, 50]);
+      if (type === 'error') navigator.vibrate([50, 100, 50, 100, 50]);
     }
 
-    // FLUID MORPHING VIEW SWITCHER (View Transitions API)
+    // LOCK/UNLOCK LOGIC
+    function toggleEditMode() {
+      const lockBtn = document.getElementById('lockToggleBtn');
+      if (isEditMode) {
+        // Lock it back
+        isEditMode = false;
+        lockBtn.innerHTML = "🔒 View Only";
+        lockBtn.classList.remove('unlocked');
+        triggerHaptic('light');
+        document.getElementById('undoBtn').style.display = 'none';
+        renderUI();
+        renderMatrix();
+      } else {
+        // Attempt to unlock
+        const pin = prompt("Enter PIN to unlock Edit Mode:");
+        if (pin === SECRET_PIN) {
+          isEditMode = true;
+          lockBtn.innerHTML = "🔓 Edit Mode";
+          lockBtn.classList.add('unlocked');
+          triggerHaptic('success');
+          renderUI();
+          renderMatrix();
+        } else if (pin !== null) {
+          alert("Incorrect PIN. Access Denied.");
+          triggerHaptic('error');
+        }
+      }
+    }
+
+    function toggleSOS(show) {
+      triggerHaptic('light');
+      document.getElementById('sos-modal').style.display = show ? 'flex' : 'none';
+    }
+
     function toggleView(viewId) {
       if (window.innerWidth >= 1024) return;
-      
       triggerHaptic('light');
 
-      // Native Morphing for Supported Browsers (Chrome/Safari 18+)
       if (document.startViewTransition) {
         document.startViewTransition(() => {
           document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
@@ -239,7 +306,6 @@
           if (viewId === 'tracker-view') forceDayOrder();
         });
       } else {
-        // Fallback for older browsers
         document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
         document.getElementById('tracker-view').style.display = viewId === 'tracker-view' ? 'block' : 'none';
         if (viewId === 'tracker-view') forceDayOrder();
@@ -257,9 +323,17 @@
     };
 
     const slots = {
-      1: "08:00 - 08:50", 2: "08:50 - 09:40", 3: "09:45 - 10:35", 4: "10:40 - 11:30",
-      5: "11:35 - 12:25", 6: "12:30 - 13:20", 7: "13:25 - 14:15", 8: "14:20 - 15:10",
-      9: "15:10 - 16:00", 10: "16:00 - 16:50", 11: "16:50 - 17:30"
+      1: { str: "08:00 - 08:50", start: 480, end: 530 },
+      2: { str: "08:50 - 09:40", start: 530, end: 580 },
+      3: { str: "09:45 - 10:35", start: 585, end: 635 },
+      4: { str: "10:40 - 11:30", start: 640, end: 690 },
+      5: { str: "11:35 - 12:25", start: 695, end: 745 },
+      6: { str: "12:30 - 13:20", start: 750, end: 800 },
+      7: { str: "13:25 - 14:15", start: 805, end: 855 },
+      8: { str: "14:20 - 15:10", start: 860, end: 910 },
+      9: { str: "15:10 - 16:00", start: 910, end: 960 },
+      10: { str: "16:00 - 16:50", start: 960, end: 1010 },
+      11: { str: "16:50 - 17:30", start: 1010, end: 1050 }
     };
 
     const timetable = {
@@ -318,13 +392,18 @@
       const val = document.getElementById("daySelector").value;
       activeDayOrder = (val === "auto") ? getTodayDayOrder() : parseInt(val);
       renderUI();
+      updateDynamicIsland();
     }
 
     function logClass(code, slotNum, status) {
-      triggerHaptic('success'); // Physical double-tap feedback
+      if (!isEditMode) return;
+      triggerHaptic('success');
       const today = getTodayDateStr();
       const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
       
+      historyStack.push({ type: 'slot', code, slotNum, logKey, previousData: JSON.parse(JSON.stringify(myData)) });
+      document.getElementById('undoBtn').style.display = 'block';
+
       if (!myData[code]) myData[code] = { name: code, attended: 0, conducted: 0 };
 
       if (status === 'attended') {
@@ -337,14 +416,18 @@
 
       renderUI();
       renderMatrix();
-      countsRef.set(myData).catch(err => console.error(err));
-      logsRef.child(logKey).set(status).catch(err => console.error(err));
+      countsRef.set(myData);
+      logsRef.child(logKey).set(status);
     }
 
     function logSurprise(code, status) {
-      triggerHaptic('success'); // Physical double-tap feedback
+      if (!isEditMode) return;
+      triggerHaptic('success');
       if (!myData[code]) return;
       
+      historyStack.push({ type: 'surprise', code, previousData: JSON.parse(JSON.stringify(myData)) });
+      document.getElementById('undoBtn').style.display = 'block';
+
       if (status === 'attended') {
         myData[code].attended++;
         myData[code].conducted++;
@@ -352,7 +435,25 @@
         myData[code].conducted++;
       }
       renderMatrix();
-      countsRef.set(myData).catch(err => console.error(err));
+      countsRef.set(myData);
+    }
+
+    function undoLastAction() {
+      if (historyStack.length === 0 || !isEditMode) return;
+      triggerHaptic('undo');
+      const last = historyStack.pop();
+
+      myData = last.previousData;
+      if (last.type === 'slot') {
+        delete loggedDailyActions[last.logKey];
+        logsRef.child(last.logKey).remove();
+      }
+      
+      countsRef.set(myData);
+      renderUI();
+      renderMatrix();
+
+      if (historyStack.length === 0) document.getElementById('undoBtn').style.display = 'none';
     }
 
     function calculateMargin(attended, conducted) {
@@ -366,6 +467,38 @@
         return { text: `Attend ${mustAttend} to recover`, safe: false };
       }
     }
+
+    function updateDynamicIsland() {
+      const now = new Date();
+      const currentMins = (now.getHours() * 60) + now.getMinutes();
+      const banner = document.getElementById('slotStatusText');
+      const timeRemaining = document.getElementById('slotTimeRemaining');
+
+      if (!activeDayOrder || !timetable[activeDayOrder]) {
+        banner.textContent = "No classes in session";
+        timeRemaining.textContent = "";
+        return;
+      }
+
+      let activeFound = false;
+      for (const [slotNum, slotData] of Object.entries(slots)) {
+        if (currentMins >= slotData.start && currentMins < slotData.end) {
+          const code = timetable[activeDayOrder][slotNum];
+          const sub = myData[code] || { name: code || "Break" };
+          banner.textContent = `Live: ${sub.name}`;
+          timeRemaining.textContent = `${slotData.end - currentMins}m left`;
+          activeFound = true;
+          break;
+        }
+      }
+
+      if (!activeFound) {
+        banner.textContent = "Campus Day Order " + activeDayOrder;
+        timeRemaining.textContent = "Outside Hours";
+      }
+    }
+
+    setInterval(updateDynamicIsland, 30000);
 
     function renderUI() {
       if (activeDayOrder === null) activeDayOrder = getTodayDayOrder();
@@ -392,12 +525,17 @@
         } else if (previousAction === 'missed') {
           actionUI = `<div class="logged-status logged-mis">Logged: Missed ✖</div>`;
         } else {
-          actionUI = `
-            <div class="btn-row">
-              <button class="btn-log btn-attend" type="button" onclick="logClass('${code}', '${slotNum}', 'attended')">✔ Attended</button>
-              <button class="btn-log btn-miss" type="button" onclick="logClass('${code}', '${slotNum}', 'missed')">✖ Missed</button>
-            </div>
-          `;
+          // Conditional Rendering based on Lock Status
+          if (isEditMode) {
+            actionUI = `
+              <div class="btn-row">
+                <button class="btn-log btn-attend" type="button" onclick="logClass('${code}', '${slotNum}', 'attended')">✔ Attended</button>
+                <button class="btn-log btn-miss" type="button" onclick="logClass('${code}', '${slotNum}', 'missed')">✖ Missed</button>
+              </div>
+            `;
+          } else {
+            actionUI = `<div class="logged-status logged-locked">🔒 Action Required (Unlock to Log)</div>`;
+          }
         }
         
         container.innerHTML += `
@@ -407,7 +545,7 @@
                 <div class="class-code">${code} (Slot ${slotNum})</div>
                 <div class="class-name">${sub.name}</div>
               </div>
-              <div class="class-time">${slots[slotNum]}</div>
+              <div class="class-time">${slots[slotNum].str}</div>
             </div>
             ${actionUI}
           </div>
@@ -427,6 +565,20 @@
         const colorClass = perc >= 75 ? "safe" : "danger";
         const marginClass = margin.safe ? "margin-safe" : "margin-danger";
 
+        // Only show the Surprise Class buttons if unlocked
+        let extraRowUI = '';
+        if (isEditMode) {
+          extraRowUI = `
+            <div class="extra-row">
+              <span class="extra-label">Surprise Class</span>
+              <div class="extra-btns">
+                <button class="btn-extra" onclick="logSurprise('${code}', 'attended')">+ Attend</button>
+                <button class="btn-extra" onclick="logSurprise('${code}', 'missed')">+ Miss</button>
+              </div>
+            </div>
+          `;
+        }
+
         container.innerHTML += `
           <div class="matrix-card animated-card" style="animation-delay: ${delayCounter * 0.05}s">
             <div class="matrix-top">
@@ -437,13 +589,7 @@
               <span class="matrix-stats">${data.attended} / ${data.conducted}</span>
               <span class="matrix-margin ${marginClass}">${margin.text}</span>
             </div>
-            <div class="extra-row">
-              <span class="extra-label">Surprise Class</span>
-              <div class="extra-btns">
-                <button class="btn-extra" onclick="logSurprise('${code}', 'attended')">+ Attend</button>
-                <button class="btn-extra" onclick="logSurprise('${code}', 'missed')">+ Miss</button>
-              </div>
-            </div>
+            ${extraRowUI}
           </div>
         `;
         delayCounter++;
