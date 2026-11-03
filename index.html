@@ -2,12 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Thiruvannan | SRM Hub</title>
   
-  <!-- Firebase App & Realtime Database SDKs -->
+  <!-- Firebase & Icons -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Steins;Gate Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif; }
@@ -29,23 +33,17 @@
       background-attachment: fixed;
       color: #ffffff;
       min-height: 100vh; 
-      padding: 24px 16px; 
+      padding: 24px 16px 100px 16px; /* Extra bottom padding for music player */
       display: flex; 
       justify-content: center;
       -webkit-font-smoothing: antialiased;
+      transition: background 0.8s ease, color 0.8s ease;
     }
 
     ::-webkit-scrollbar { width: 0px; background: transparent; }
 
-    #app-wrapper { 
-      width: 100%; max-width: 420px; 
-      view-transition-name: app-morph;
-    }
-    ::view-transition-old(app-morph),
-    ::view-transition-new(app-morph) {
-      animation-duration: 0.4s;
-      animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
+    #app-wrapper { width: 100%; max-width: 420px; view-transition-name: app-morph; z-index: 10; position: relative; }
+    ::view-transition-old(app-morph), ::view-transition-new(app-morph) { animation-duration: 0.4s; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
     #tracker-view { display: none; }
 
     @media (min-width: 1024px) {
@@ -63,6 +61,7 @@
       border: 1px solid rgba(255, 255, 255, 0.12);
       box-shadow: 0 32px 64px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
       border-radius: 32px;
+      transition: all 0.5s ease;
     }
 
     .id-card { padding: 40px 24px; text-align: center; }
@@ -70,16 +69,16 @@
     .id-card h1 { font-size: 24px; font-weight: 800; letter-spacing: 0.2px; margin-bottom: 6px; }
     .id-card p { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 24px; font-weight: 500; }
     
-    /* Increased gap to 18px to prevent misclicks */
-    .btn-group { display: flex; flex-direction: column; gap: 18px; }
-    .btn-link { display: flex; align-items: center; justify-content: center; padding: 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .btn-group { display: flex; flex-direction: column; gap: 14px; }
+    .btn-link { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); }
     .btn-link:hover { background: rgba(255, 255, 255, 0.12); transform: scale(1.02); border-color: rgba(255, 255, 255, 0.2); }
     .btn-link:active { transform: scale(0.96); }
+    .btn-link i { width: 18px; height: 18px; }
+    
     .btn-tracker { background: rgba(255, 255, 255, 0.9); color: #000; border: none; font-size: 15px; font-weight: 700; box-shadow: 0 8px 16px rgba(255,255,255,0.1); }
     .btn-tracker:hover { background: #ffffff; border-color: transparent; }
     .btn-sos { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.3); color: #fb7185; }
 
-    /* Increased gaps in top nav */
     .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 4px; gap: 12px; flex-wrap: wrap; }
     .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 16px; border-radius: 14px; font-size: 14px; font-weight: 600; cursor: pointer; backdrop-filter: blur(20px); }
     
@@ -96,59 +95,118 @@
     .section-title { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; justify-content: space-between; align-items: center; }
     select { background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; backdrop-filter: blur(20px); }
 
-    @keyframes slideUpFade {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes slideUpFade { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     .animated-card { animation: slideUpFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
 
-    .class-card { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 18px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 14px; }
+    .class-card { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 18px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden; }
     .class-card.current-active { border-color: rgba(56, 189, 248, 0.5); box-shadow: 0 0 20px rgba(56, 189, 248, 0.2); }
-    .class-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .class-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; position: relative; }
     .class-code { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 600; }
     .class-name { font-size: 15px; font-weight: 800; margin-top: 4px; }
     .class-time { font-size: 11px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; color: #fff; font-weight: 600; }
     
-    /* Increased gap for attendance logging buttons */
-    .btn-row { display: flex; gap: 16px; }
-    .btn-log { flex: 1; padding: 12px; border-radius: 14px; font-weight: 700; font-size: 13px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .btn-row { display: flex; gap: 16px; z-index: 2; position: relative; }
+    .btn-log { flex: 1; padding: 12px; border-radius: 14px; font-weight: 700; font-size: 13px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-log i { width: 14px; height: 14px; }
     .btn-log:active { transform: scale(0.94); }
     .btn-attend { background: rgba(52, 211, 153, 0.15); color: #4ade80; border-color: rgba(52, 211, 153, 0.3); }
     .btn-miss { background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.3); }
     
-    .logged-status { font-size: 13px; font-weight: 700; padding: 12px; border-radius: 14px; text-align: center; width: 100%; backdrop-filter: blur(10px); }
+    .logged-status { font-size: 13px; font-weight: 700; padding: 12px; border-radius: 14px; text-align: center; width: 100%; backdrop-filter: blur(10px); z-index: 2; position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .logged-att { background: rgba(52, 211, 153, 0.2); color: #4ade80; border: 1px solid rgba(52, 211, 153, 0.4); }
     .logged-mis { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
     .logged-locked { background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.5); border: 1px dashed rgba(255,255,255,0.2); font-weight: 600; }
 
+    /* Steins;Gate Divergence Meter */
+    .steins-gate-meter {
+      background: rgba(10, 10, 12, 0.8); border: 1px solid rgba(255, 140, 0, 0.3);
+      padding: 12px 20px; border-radius: 24px; text-align: center; margin-bottom: 20px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 0 15px rgba(255, 140, 0, 0.1);
+      position: relative; overflow: hidden;
+    }
+    .nixie-digit {
+      font-family: 'Share Tech Mono', monospace; font-size: 32px; color: #ff9d00;
+      text-shadow: 0 0 10px #ff9d00, 0 0 20px #ff5500; margin: 0 2px; font-weight: bold; transition: all 0.3s ease;
+    }
+    .meter-label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 2px; margin-top: 6px; font-weight: 700; }
+    .timeline-alpha .nixie-digit { color: #ff2a2a; text-shadow: 0 0 10px #ff2a2a, 0 0 20px #ff0000; animation: tubeGlitch 0.2s infinite; }
+    @keyframes tubeGlitch { 0% { transform: translate(0) } 20% { transform: translate(-2px, 1px) } 40% { transform: translate(-1px, -1px) } 60% { transform: translate(2px, 1px) } 80% { transform: translate(1px, -1px) } 100% { transform: translate(0) } }
+
     .matrix-grid { display: flex; flex-direction: column; gap: 14px; }
-    .matrix-card { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
-    .matrix-top { display: flex; justify-content: space-between; align-items: flex-start; }
-    .matrix-name { font-size: 14px; font-weight: 800; }
-    .matrix-perc { font-size: 18px; font-weight: 800; }
-    .matrix-mid { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
-    .matrix-stats { color: rgba(255,255,255,0.6); font-weight: 600; }
+    .matrix-card { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; }
+    .watermark-icon { position: absolute; right: -10px; bottom: -10px; width: 80px; height: 80px; opacity: 0.05; color: #fff; z-index: 1; pointer-events: none; }
     
+    .matrix-top { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; position: relative; }
+    .matrix-name { font-size: 14px; font-weight: 800; max-width: 70%; }
+    
+    /* AoT Badges */
+    .aot-badge { display: flex; align-items: center; gap: 6px; font-size: 18px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: rgba(255,255,255,0.05); }
+    .aot-badge i { width: 16px; height: 16px; }
+    .rank-scout { color: #34d399; text-shadow: 0 0 10px rgba(52,211,153,0.4); }
+    .rank-garrison { color: #fbbf24; }
+    .rank-fodder { color: #fb7185; animation: slightGlitch 2s infinite; }
+    @keyframes slightGlitch { 0%, 95% { transform: translateX(0); } 97% { transform: translateX(2px); } 99% { transform: translateX(-2px); } }
+
+    .matrix-mid { display: flex; justify-content: space-between; align-items: center; font-size: 12px; z-index: 2; position: relative; }
+    .matrix-stats { color: rgba(255,255,255,0.6); font-weight: 600; }
     .matrix-margin { font-weight: 700; padding: 4px 8px; border-radius: 8px; font-size: 11px; }
     .margin-safe { color: #4ade80; background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52,211,153,0.3); }
     .margin-danger { color: #fb7185; background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244,63,94,0.3); }
     
-    /* Increased gap for surprise class buttons */
-    .extra-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 2px; }
+    .extra-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 2px; z-index: 2; position: relative; }
     .extra-label { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; font-weight: 800; }
     .extra-btns { display: flex; gap: 12px; }
     .btn-extra { padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; }
-    
-    .safe { color: #4ade80; }
-    .danger { color: #fb7185; }
 
-    /* Emergency Modal with increased vertical gap */
     #sos-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
     .modal-box { background: #18121a; border: 1px solid rgba(244,63,94,0.4); border-radius: 28px; padding: 28px; width: 100%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
     .modal-box div { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Domain Expansion Mode */
+    body.domain-expansion {
+      background: linear-gradient(-45deg, #050000, #1a0000, #050000); background-size: 200% 200%; color: #ff4d4d;
+    }
+    .domain-expansion .glass-panel { background: rgba(10, 0, 0, 0.8); border-color: rgba(255, 0, 0, 0.4); box-shadow: 0 32px 64px rgba(255, 0, 0, 0.1), inset 0 1px 0 rgba(255, 0, 0, 0.2); }
+    .domain-expansion .btn-link { background: rgba(255, 0, 0, 0.1); border-color: rgba(255, 0, 0, 0.3); color: #ff8080; }
+    .domain-expansion .aot-badge, .domain-expansion .nixie-digit { filter: hue-rotate(-45deg) saturate(200%); }
+    
+    .domain-ring { position: fixed; top: 50%; left: 50%; width: 0; height: 0; background: #000; border-radius: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; transition: width 0.8s cubic-bezier(0.85, 0, 0.15, 1), height 0.8s cubic-bezier(0.85, 0, 0.15, 1); }
+    .domain-ring.expand { width: 300vw; height: 300vw; }
+
+    /* Vision Player */
+    #vision-container { position: fixed; inset: 0; z-index: 10000; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+    #vision-container.active { opacity: 1; pointer-events: all; }
+    #vision-video { width: 100%; max-height: 100vh; object-fit: contain; mix-blend-mode: screen; }
+    .trans-focus { animation: deepFocus 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    @keyframes deepFocus { from { filter: blur(20px); transform: scale(1.1); } to { filter: blur(0); transform: scale(1); } }
+    .trans-glitch { animation: neuralGlitch 0.4s steps(5); }
+    @keyframes neuralGlitch { 0% { filter: hue-rotate(90deg) contrast(200%); } 50% { filter: invert(1); } 100% { filter: none; } }
+
+    /* Apple Music Floating Player */
+    #floating-music-player {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,0.08); backdrop-filter: blur(30px);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 40px; padding: 8px 16px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 50; width: 280px;
+    }
+    .marquee-container { flex: 1; overflow: hidden; white-space: nowrap; font-size: 12px; font-weight: 600; color: #fff; }
+    #track-name { display: inline-block; animation: marquee 10s linear infinite; }
+    @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+    #play-pause-btn { background: #fff; color: #000; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    #play-pause-btn i { width: 16px; height: 16px; fill: #000; }
+    .waveform { display: flex; gap: 2px; align-items: center; height: 16px; opacity: 0; transition: opacity 0.3s; }
+    .waveform.active { opacity: 1; }
+    .waveform span { width: 3px; background: #34d399; border-radius: 2px; animation: bounce 1s ease-in-out infinite; }
+    .waveform span:nth-child(2) { animation-delay: 0.2s; }
+    .waveform span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%, 100% { height: 4px; } 50% { height: 14px; } }
   </style>
 </head>
 <body>
+
+  <!-- JJK Domain Expansion Element -->
+  <div class="domain-ring" id="domainRing"></div>
 
   <div id="app-wrapper">
 
@@ -158,14 +216,13 @@
       <h1>Thiruvannan</h1>
       <p>Developer | SRMIST CSE</p>
       
-      <!-- Reordered buttons with View Attendance at the bottom -->
       <div class="btn-group">
-        <button class="btn-link btn-sos" onclick="toggleSOS(true)">🚨 SRM Emergency Contacts</button>
-        <a class="btn-link" href="https://github.com/Thiruvannan" target="_blank">GitHub Profile</a>
-        <a class="btn-link" href="contact.vcf">Save Contact</a>
-        <a class="btn-link" href="https://wa.me/919080792117?text=Hey!" target="_blank">WhatsApp</a>
-        <a class="btn-link" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR">Pay via UPI</a>
-        <button class="btn-link btn-tracker desktop-hide" onclick="toggleView('tracker-view')">View Attendance</button>
+        <button class="btn-link btn-sos" onclick="toggleSOS(true)"><i data-lucide="shield-alert"></i> Emergency Contacts</button>
+        <a class="btn-link" href="https://github.com/Thiruvannan" target="_blank"><i data-lucide="github"></i> GitHub Profile</a>
+        <a class="btn-link" href="contact.vcf"><i data-lucide="user-plus"></i> Save Contact</a>
+        <a class="btn-link" href="https://wa.me/919080792117?text=Hey!" target="_blank"><i data-lucide="message-circle"></i> WhatsApp</a>
+        <a class="btn-link" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR"><i data-lucide="credit-card"></i> Pay via UPI</a>
+        <button class="btn-link btn-tracker desktop-hide" onclick="toggleView('tracker-view')"><i data-lucide="layout-dashboard"></i> View Attendance</button>
       </div>
     </div>
 
@@ -173,18 +230,11 @@
     <div id="tracker-view">
       <div class="top-nav">
         <button class="back-btn desktop-hide" onclick="toggleView('id-view')">Done</button>
-        
-        <!-- SECURITY TOGGLE -->
-        <button class="lock-btn" id="lockToggleBtn" onclick="toggleEditMode()">🔒 View Only</button>
-        <button class="undo-btn" id="undoBtn" onclick="undoLastAction()">↩ Undo Tap</button>
-        
-        <div class="sync-status">
-          <span class="sync-dot"></span>
-          <span id="syncLabel">Live</span>
-        </div>
+        <button class="lock-btn" id="lockToggleBtn" onclick="toggleEditMode()"><i data-lucide="lock" style="width:14px;"></i> View Only</button>
+        <button class="undo-btn" id="undoBtn" onclick="undoLastAction()"><i data-lucide="rotate-ccw" style="width:14px; display:inline-block; vertical-align:middle;"></i> Undo</button>
+        <div class="sync-status"><span class="sync-dot"></span><span id="syncLabel">Live</span></div>
       </div>
 
-      <!-- Real-Time Slot Tracker -->
       <div class="live-slot-banner" id="liveSlotBanner">
         <span id="slotStatusText">Syncing Schedule...</span>
         <span id="slotTimeRemaining"></span>
@@ -207,7 +257,14 @@
         </div>
 
         <div class="glass-panel" style="padding: 24px;">
-          <div class="section-title"><span>Overall Attendance</span></div>
+          <div class="section-title"><span>Global Matrix</span></div>
+          
+          <!-- Steins;Gate Divergence Meter -->
+          <div class="steins-gate-meter" id="globalDivergence">
+            <span class="nixie-digit">0</span>.<span class="nixie-digit">0</span><span class="nixie-digit">0</span><span class="nixie-digit">0</span><span class="nixie-digit">0</span><span class="nixie-digit">0</span><span class="nixie-digit" id="div-perc">00</span>
+            <div class="meter-label">Divergence / Overall %</div>
+          </div>
+
           <div class="matrix-grid" id="matrix-container"></div>
         </div>
       </div>
@@ -220,7 +277,6 @@
     <div class="modal-box">
       <h2 style="font-size: 18px; color: #fb7185; margin-bottom: 8px;">SRM Campus SOS</h2>
       <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 20px;">Tap any number to call immediately:</p>
-      
       <div>
         <a class="btn-link" href="tel:105786" style="background: rgba(244,63,94,0.2); border-color: rgba(244,63,94,0.4); color: #fff;">🚑 Ambulance: 105786</a>
         <a class="btn-link" href="tel:04427478000" style="font-size: 14px;">🏥 Casualty: 044-27478000</a>
@@ -231,7 +287,24 @@
     </div>
   </div>
 
+  <!-- VISION VIDEO PLAYER -->
+  <div id="vision-container">
+    <video id="vision-video" playsinline preload="auto"></video>
+  </div>
+
+  <!-- APPLE MUSIC PLAYER -->
+  <div id="floating-music-player">
+    <div class="waveform" id="wave"><span></span><span></span><span></span></div>
+    <div class="marquee-container"><span id="track-name">No track playing</span></div>
+    <button id="play-pause-btn" onclick="toggleMusic()"><i data-lucide="play"></i></button>
+    <audio id="bg-audio" preload="none"></audio>
+  </div>
+
   <script>
+    // Initialize Lucide Icons initially
+    lucide.createIcons();
+
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyDFM_WnGNOjUNIAC6ck6eGRjAeTDvjdzJQ",
       authDomain: "srm-hub-4dc4b.firebaseapp.com",
@@ -248,8 +321,7 @@
     const countsRef = db.ref('attendance_counts');
     const logsRef = db.ref('daily_logs');
 
-    // SECURITY SYSTEM CONFIG
-    const SECRET_PIN = "5428"; // PIN requested by user
+    const SECRET_PIN = "5428";
     let isEditMode = false;
     let historyStack = [];
 
@@ -261,44 +333,35 @@
       if (type === 'error') navigator.vibrate([50, 100, 50, 100, 50]);
     }
 
-    // LOCK/UNLOCK LOGIC
     function toggleEditMode() {
       const lockBtn = document.getElementById('lockToggleBtn');
       if (isEditMode) {
-        // Lock it back
         isEditMode = false;
-        lockBtn.innerHTML = "🔒 View Only";
+        lockBtn.innerHTML = '<i data-lucide="lock" style="width:14px;"></i> View Only';
         lockBtn.classList.remove('unlocked');
         triggerHaptic('light');
         document.getElementById('undoBtn').style.display = 'none';
-        renderUI();
-        renderMatrix();
+        renderUI(); renderMatrix();
       } else {
-        // Attempt to unlock
         const pin = prompt("Enter PIN to unlock Edit Mode:");
         if (pin === SECRET_PIN) {
           isEditMode = true;
-          lockBtn.innerHTML = "🔓 Edit Mode";
+          lockBtn.innerHTML = '<i data-lucide="unlock" style="width:14px;"></i> Edit Mode';
           lockBtn.classList.add('unlocked');
           triggerHaptic('success');
-          renderUI();
-          renderMatrix();
+          renderUI(); renderMatrix();
         } else if (pin !== null) {
           alert("Incorrect PIN. Access Denied.");
           triggerHaptic('error');
         }
       }
+      lucide.createIcons();
     }
 
-    function toggleSOS(show) {
-      triggerHaptic('light');
-      document.getElementById('sos-modal').style.display = show ? 'flex' : 'none';
-    }
-
+    function toggleSOS(show) { triggerHaptic('light'); document.getElementById('sos-modal').style.display = show ? 'flex' : 'none'; }
     function toggleView(viewId) {
       if (window.innerWidth >= 1024) return;
       triggerHaptic('light');
-
       if (document.startViewTransition) {
         document.startViewTransition(() => {
           document.getElementById('id-view').style.display = viewId === 'id-view' ? 'block' : 'none';
@@ -312,147 +375,73 @@
       }
     }
 
+    // Baseline Data
     const baselineAttendance = {
-      "26CYB1002J": { name: "CHEMISTRY FOR CS", attended: 49, conducted: 49 },
-      "26BTB1001T": { name: "COMPUTATIONAL BIOLOGY", attended: 17, conducted: 17 },
-      "26MEE1001L": { name: "WORKSHOP PRACTICE", attended: 44, conducted: 44 },
-      "26CSE1002J": { name: "PROGRAMMING", attended: 45, conducted: 45 },
-      "26MAB1001T": { name: "CALCULUS & ALGEBRA", attended: 37, conducted: 37 },
-      "26LCA1006J": { name: "KOREAN", attended: 30, conducted: 33 },
-      "26GNN1007J": { name: "YOGA", attended: 18, conducted: 18 }
+      "26CYB1002J": { name: "CHEMISTRY FOR CS", attended: 49, conducted: 49, icon: "flask-conical" },
+      "26BTB1001T": { name: "COMPUTATIONAL BIOLOGY", attended: 17, conducted: 17, icon: "dna" },
+      "26MEE1001L": { name: "WORKSHOP PRACTICE", attended: 44, conducted: 44, icon: "wrench" },
+      "26CSE1002J": { name: "PROGRAMMING", attended: 45, conducted: 45, icon: "terminal" },
+      "26MAB1001T": { name: "CALCULUS & ALGEBRA", attended: 37, conducted: 37, icon: "sigma" },
+      "26LCA1006J": { name: "KOREAN", attended: 30, conducted: 33, icon: "languages" },
+      "26GNN1007J": { name: "YOGA", attended: 18, conducted: 18, icon: "activity" }
     };
 
-    const slots = {
-      1: { str: "08:00 - 08:50", start: 480, end: 530 },
-      2: { str: "08:50 - 09:40", start: 530, end: 580 },
-      3: { str: "09:45 - 10:35", start: 585, end: 635 },
-      4: { str: "10:40 - 11:30", start: 640, end: 690 },
-      5: { str: "11:35 - 12:25", start: 695, end: 745 },
-      6: { str: "12:30 - 13:20", start: 750, end: 800 },
-      7: { str: "13:25 - 14:15", start: 805, end: 855 },
-      8: { str: "14:20 - 15:10", start: 860, end: 910 },
-      9: { str: "15:10 - 16:00", start: 910, end: 960 },
-      10: { str: "16:00 - 16:50", start: 960, end: 1010 },
-      11: { str: "16:50 - 17:30", start: 1010, end: 1050 }
-    };
-
-    const timetable = {
-      1: { 1: "26CYB1002J", 2: "26CYB1002J", 8: "26LCA1006J", 9: "26LCA1006J" },
-      2: { 1: "26CYB1002J", 2: "26CYB1002J", 3: "26LCA1006J", 4: "26BTB1001T", 7: "26CSE1002J", 8: "26CSE1002J" },
-      3: { 1: "26MEE1001L", 2: "26MEE1001L", 3: "26MEE1001L", 4: "26MEE1001L", 9: "26MAB1001T" },
-      4: { 1: "26MAB1001T", 2: "26MAB1001T", 3: "26CYB1002J", 4: "26CSE1002J", 7: "26GNN1007J", 8: "26GNN1007J", 9: "26GNN1007J" },
-      5: { 6: "26CSE1002J", 7: "26CSE1002J", 9: "26LCA1006J", 10: "26MAB1001T" }
-    };
-
-    const academicPlanner = {
-      "2026-11-02": 3, "2026-11-03": 4, "2026-11-04": 5, "2026-11-05": 1, "2026-11-06": 2,
-      "2026-11-10": 4, "2026-11-11": 5, "2026-11-12": 1, "2026-11-13": 2, "2026-11-16": 3,
-      "2026-11-17": 4, "2026-11-18": 5, "2026-11-19": 1, "2026-11-20": 2, "2026-11-23": 3,
-      "2026-11-24": 4, "2026-11-25": 5, "2026-11-26": 1, "2026-11-27": 2, "2026-11-30": 3,
-      "2026-12-01": 4, "2026-12-02": 5, "2026-12-03": 1, "2026-12-04": 2, "2026-12-07": 3
-    };
+    const slots = { 1: { str: "08:00 - 08:50", start: 480, end: 530 }, 2: { str: "08:50 - 09:40", start: 530, end: 580 }, 3: { str: "09:45 - 10:35", start: 585, end: 635 }, 4: { str: "10:40 - 11:30", start: 640, end: 690 }, 5: { str: "11:35 - 12:25", start: 695, end: 745 }, 6: { str: "12:30 - 13:20", start: 750, end: 800 }, 7: { str: "13:25 - 14:15", start: 805, end: 855 }, 8: { str: "14:20 - 15:10", start: 860, end: 910 }, 9: { str: "15:10 - 16:00", start: 910, end: 960 }, 10: { str: "16:00 - 16:50", start: 960, end: 1010 }, 11: { str: "16:50 - 17:30", start: 1010, end: 1050 } };
+    const timetable = { 1: { 1: "26CYB1002J", 2: "26CYB1002J", 8: "26LCA1006J", 9: "26LCA1006J" }, 2: { 1: "26CYB1002J", 2: "26CYB1002J", 3: "26LCA1006J", 4: "26BTB1001T", 7: "26CSE1002J", 8: "26CSE1002J" }, 3: { 1: "26MEE1001L", 2: "26MEE1001L", 3: "26MEE1001L", 4: "26MEE1001L", 9: "26MAB1001T" }, 4: { 1: "26MAB1001T", 2: "26MAB1001T", 3: "26CYB1002J", 4: "26CSE1002J", 7: "26GNN1007J", 8: "26GNN1007J", 9: "26GNN1007J" }, 5: { 6: "26CSE1002J", 7: "26CSE1002J", 9: "26LCA1006J", 10: "26MAB1001T" } };
+    const academicPlanner = { "2026-11-02": 3, "2026-11-03": 4, "2026-11-04": 5, "2026-11-05": 1, "2026-11-06": 2, "2026-11-10": 4, "2026-11-11": 5, "2026-11-12": 1, "2026-11-13": 2, "2026-11-16": 3, "2026-11-17": 4, "2026-11-18": 5, "2026-11-19": 1, "2026-11-20": 2, "2026-11-23": 3, "2026-11-24": 4, "2026-11-25": 5, "2026-11-26": 1, "2026-11-27": 2, "2026-11-30": 3, "2026-12-01": 4, "2026-12-02": 5, "2026-12-03": 1, "2026-12-04": 2, "2026-12-07": 3 };
 
     let myData = JSON.parse(JSON.stringify(baselineAttendance));
     let loggedDailyActions = {};
     let activeDayOrder = null;
 
     countsRef.on('value', (snapshot) => {
-      if (snapshot.exists()) {
-        myData = snapshot.val();
-      } else {
-        countsRef.set(baselineAttendance);
-        myData = JSON.parse(JSON.stringify(baselineAttendance));
-      }
+      if (snapshot.exists()) myData = snapshot.val();
+      else countsRef.set(baselineAttendance);
       renderMatrix();
     });
 
     logsRef.on('value', (snapshot) => {
-      if (snapshot.exists()) {
-        loggedDailyActions = snapshot.val();
-      } else {
-        loggedDailyActions = {};
-      }
-      if (window.innerWidth >= 1024 || document.getElementById('tracker-view').style.display === 'block') {
-        renderUI();
-      }
+      if (snapshot.exists()) loggedDailyActions = snapshot.val();
+      else loggedDailyActions = {};
+      if (window.innerWidth >= 1024 || document.getElementById('tracker-view').style.display === 'block') renderUI();
     });
 
     if (window.innerWidth >= 1024) forceDayOrder();
 
-    function getTodayDateStr() {
-      const now = new Date();
-      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-      const istTime = new Date(utc + (3600000 * 5.5));
-      return istTime.toISOString().split('T')[0];
-    }
-
+    function getTodayDateStr() { const now = new Date(); const utc = now.getTime() + (now.getTimezoneOffset() * 60000); return new Date(utc + (3600000 * 5.5)).toISOString().split('T')[0]; }
     function getTodayDayOrder() { return academicPlanner[getTodayDateStr()] || null; }
 
     function forceDayOrder() {
       const val = document.getElementById("daySelector").value;
       activeDayOrder = (val === "auto") ? getTodayDayOrder() : parseInt(val);
-      renderUI();
-      updateDynamicIsland();
+      renderUI(); updateDynamicIsland();
     }
 
     function logClass(code, slotNum, status) {
-      if (!isEditMode) return;
-      triggerHaptic('success');
-      const today = getTodayDateStr();
-      const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
-      
+      if (!isEditMode) return; triggerHaptic('success');
+      const logKey = `${getTodayDateStr()}_D${activeDayOrder}_S${slotNum}_${code}`;
       historyStack.push({ type: 'slot', code, slotNum, logKey, previousData: JSON.parse(JSON.stringify(myData)) });
       document.getElementById('undoBtn').style.display = 'block';
-
       if (!myData[code]) myData[code] = { name: code, attended: 0, conducted: 0 };
-
-      if (status === 'attended') {
-        myData[code].attended++;
-        myData[code].conducted++;
-      } else {
-        myData[code].conducted++;
-      }
+      status === 'attended' ? (myData[code].attended++, myData[code].conducted++) : myData[code].conducted++;
       loggedDailyActions[logKey] = status;
-
-      renderUI();
-      renderMatrix();
-      countsRef.set(myData);
-      logsRef.child(logKey).set(status);
+      renderUI(); renderMatrix(); countsRef.set(myData); logsRef.child(logKey).set(status);
     }
 
     function logSurprise(code, status) {
-      if (!isEditMode) return;
-      triggerHaptic('success');
-      if (!myData[code]) return;
-      
+      if (!isEditMode || !myData[code]) return; triggerHaptic('success');
       historyStack.push({ type: 'surprise', code, previousData: JSON.parse(JSON.stringify(myData)) });
       document.getElementById('undoBtn').style.display = 'block';
-
-      if (status === 'attended') {
-        myData[code].attended++;
-        myData[code].conducted++;
-      } else {
-        myData[code].conducted++;
-      }
-      renderMatrix();
-      countsRef.set(myData);
+      status === 'attended' ? (myData[code].attended++, myData[code].conducted++) : myData[code].conducted++;
+      renderMatrix(); countsRef.set(myData);
     }
 
     function undoLastAction() {
-      if (historyStack.length === 0 || !isEditMode) return;
-      triggerHaptic('undo');
+      if (historyStack.length === 0 || !isEditMode) return; triggerHaptic('undo');
       const last = historyStack.pop();
-
       myData = last.previousData;
-      if (last.type === 'slot') {
-        delete loggedDailyActions[last.logKey];
-        logsRef.child(last.logKey).remove();
-      }
-      
-      countsRef.set(myData);
-      renderUI();
-      renderMatrix();
-
+      if (last.type === 'slot') { delete loggedDailyActions[last.logKey]; logsRef.child(last.logKey).remove(); }
+      countsRef.set(myData); renderUI(); renderMatrix();
       if (historyStack.length === 0) document.getElementById('undoBtn').style.display = 'none';
     }
 
@@ -469,132 +458,174 @@
     }
 
     function updateDynamicIsland() {
-      const now = new Date();
-      const currentMins = (now.getHours() * 60) + now.getMinutes();
-      const banner = document.getElementById('slotStatusText');
-      const timeRemaining = document.getElementById('slotTimeRemaining');
-
-      if (!activeDayOrder || !timetable[activeDayOrder]) {
-        banner.textContent = "No classes in session";
-        timeRemaining.textContent = "";
-        return;
-      }
-
+      const now = new Date(), currentMins = (now.getHours() * 60) + now.getMinutes();
+      const banner = document.getElementById('slotStatusText'), timeRemaining = document.getElementById('slotTimeRemaining');
+      if (!activeDayOrder || !timetable[activeDayOrder]) { banner.textContent = "No classes in session"; timeRemaining.textContent = ""; return; }
       let activeFound = false;
       for (const [slotNum, slotData] of Object.entries(slots)) {
         if (currentMins >= slotData.start && currentMins < slotData.end) {
           const code = timetable[activeDayOrder][slotNum];
-          const sub = myData[code] || { name: code || "Break" };
-          banner.textContent = `Live: ${sub.name}`;
+          banner.textContent = `Live: ${myData[code]?.name || "Class"}`;
           timeRemaining.textContent = `${slotData.end - currentMins}m left`;
-          activeFound = true;
-          break;
+          activeFound = true; break;
         }
       }
-
-      if (!activeFound) {
-        banner.textContent = "Campus Day Order " + activeDayOrder;
-        timeRemaining.textContent = "Outside Hours";
-      }
+      if (!activeFound) { banner.textContent = "Campus Day Order " + activeDayOrder; timeRemaining.textContent = "Outside Hours"; }
     }
-
     setInterval(updateDynamicIsland, 30000);
+
+    function updateDivergenceMeter() {
+      let totalAttended = 0, totalConducted = 0;
+      for (const key in myData) { totalAttended += myData[key].attended; totalConducted += myData[key].conducted; }
+      const globalPerc = totalConducted === 0 ? 100 : ((totalAttended / totalConducted) * 100);
+      const meter = document.getElementById('globalDivergence'), percText = document.getElementById('div-perc');
+      percText.innerText = (globalPerc).toFixed(2).replace('.', '');
+      globalPerc < 75 ? meter.classList.add('timeline-alpha') : meter.classList.remove('timeline-alpha');
+    }
 
     function renderUI() {
       if (activeDayOrder === null) activeDayOrder = getTodayDayOrder();
-      const container = document.getElementById("schedule-container");
-      container.innerHTML = "";
-
-      if (!activeDayOrder) {
-        container.innerHTML = `<div class="class-card animated-card"><p style="text-align:center; color:rgba(255,255,255,0.6); font-size: 14px; font-weight:600;">No classes scheduled today.</p></div>`;
-        return;
-      }
-
-      const today = getTodayDateStr();
-      const dayClasses = timetable[activeDayOrder];
-      let delayCounter = 0;
-
+      const container = document.getElementById("schedule-container"); container.innerHTML = "";
+      if (!activeDayOrder) { container.innerHTML = `<div class="class-card animated-card"><p style="text-align:center; color:rgba(255,255,255,0.6); font-size: 14px; font-weight:600;">No classes scheduled today.</p></div>`; return; }
+      
+      const today = getTodayDateStr(), dayClasses = timetable[activeDayOrder]; let delayCounter = 0;
       for (const [slotNum, code] of Object.entries(dayClasses)) {
-        const sub = myData[code] || { name: code };
-        const logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`;
-        const previousAction = loggedDailyActions[logKey];
-
+        const sub = myData[code] || { name: code }, logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`, previousAction = loggedDailyActions[logKey];
         let actionUI = '';
-        if (previousAction === 'attended') {
-          actionUI = `<div class="logged-status logged-att">Logged: Attended ✓</div>`;
-        } else if (previousAction === 'missed') {
-          actionUI = `<div class="logged-status logged-mis">Logged: Missed ✖</div>`;
-        } else {
-          // Conditional Rendering based on Lock Status
-          if (isEditMode) {
-            actionUI = `
-              <div class="btn-row">
-                <button class="btn-log btn-attend" type="button" onclick="logClass('${code}', '${slotNum}', 'attended')">✔ Attended</button>
-                <button class="btn-log btn-miss" type="button" onclick="logClass('${code}', '${slotNum}', 'missed')">✖ Missed</button>
-              </div>
-            `;
-          } else {
-            actionUI = `<div class="logged-status logged-locked">🔒 Action Required (Unlock to Log)</div>`;
-          }
-        }
+        if (previousAction === 'attended') actionUI = `<div class="logged-status logged-att"><i data-lucide="check-circle"></i> Logged: Attended</div>`;
+        else if (previousAction === 'missed') actionUI = `<div class="logged-status logged-mis"><i data-lucide="x-circle"></i> Logged: Missed</div>`;
+        else if (isEditMode) actionUI = `<div class="btn-row"><button class="btn-log btn-attend" onclick="logClass('${code}', '${slotNum}', 'attended')"><i data-lucide="check"></i> Attended</button><button class="btn-log btn-miss" onclick="logClass('${code}', '${slotNum}', 'missed')"><i data-lucide="x"></i> Missed</button></div>`;
+        else actionUI = `<div class="logged-status logged-locked"><i data-lucide="lock"></i> Action Required (Unlock)</div>`;
         
         container.innerHTML += `
           <div class="class-card animated-card" style="animation-delay: ${delayCounter * 0.05}s">
+            <i data-lucide="${sub.icon || 'book'}" class="watermark-icon"></i>
             <div class="class-header">
-              <div>
-                <div class="class-code">${code} (Slot ${slotNum})</div>
-                <div class="class-name">${sub.name}</div>
-              </div>
+              <div><div class="class-code">${code} (Slot ${slotNum})</div><div class="class-name">${sub.name}</div></div>
               <div class="class-time">${slots[slotNum].str}</div>
             </div>
             ${actionUI}
-          </div>
-        `;
+          </div>`;
         delayCounter++;
       }
+      lucide.createIcons();
     }
 
     function renderMatrix() {
-      const container = document.getElementById("matrix-container");
-      container.innerHTML = "";
+      const container = document.getElementById("matrix-container"); container.innerHTML = "";
       let delayCounter = 0;
-
       for (const [code, data] of Object.entries(myData)) {
-        const perc = data.conducted === 0 ? 100 : ((data.attended / data.conducted) * 100).toFixed(1);
+        const perc = data.conducted === 0 ? 100 : ((data.attended / data.conducted) * 100);
+        const percFormatted = perc.toFixed(1);
         const margin = calculateMargin(data.attended, data.conducted);
-        const colorClass = perc >= 75 ? "safe" : "danger";
         const marginClass = margin.safe ? "margin-safe" : "margin-danger";
+        
+        // AoT Badge Logic
+        let aotBadgeUI = '';
+        if (perc >= 90) aotBadgeUI = `<div class="aot-badge rank-scout"><i data-lucide="feather"></i> ${percFormatted}%</div>`;
+        else if (perc >= 75) aotBadgeUI = `<div class="aot-badge rank-garrison"><i data-lucide="shield"></i> ${percFormatted}%</div>`;
+        else aotBadgeUI = `<div class="aot-badge rank-fodder"><i data-lucide="shield-alert"></i> ${percFormatted}%</div>`;
 
-        // Only show the Surprise Class buttons if unlocked
-        let extraRowUI = '';
-        if (isEditMode) {
-          extraRowUI = `
-            <div class="extra-row">
-              <span class="extra-label">Surprise Class</span>
-              <div class="extra-btns">
-                <button class="btn-extra" onclick="logSurprise('${code}', 'attended')">+ Attend</button>
-                <button class="btn-extra" onclick="logSurprise('${code}', 'missed')">+ Miss</button>
-              </div>
-            </div>
-          `;
-        }
+        let extraRowUI = isEditMode ? `<div class="extra-row"><span class="extra-label">Surprise Class</span><div class="extra-btns"><button class="btn-extra" onclick="logSurprise('${code}', 'attended')">+ Attend</button><button class="btn-extra" onclick="logSurprise('${code}', 'missed')">+ Miss</button></div></div>` : '';
 
         container.innerHTML += `
           <div class="matrix-card animated-card" style="animation-delay: ${delayCounter * 0.05}s">
-            <div class="matrix-top">
-              <span class="matrix-name">${data.name}</span>
-              <span class="matrix-perc ${colorClass}">${perc}%</span>
-            </div>
-            <div class="matrix-mid">
-              <span class="matrix-stats">${data.attended} / ${data.conducted}</span>
-              <span class="matrix-margin ${marginClass}">${margin.text}</span>
-            </div>
+            <i data-lucide="${data.icon || 'book'}" class="watermark-icon"></i>
+            <div class="matrix-top"><span class="matrix-name">${data.name}</span>${aotBadgeUI}</div>
+            <div class="matrix-mid"><span class="matrix-stats">${data.attended} / ${data.conducted}</span><span class="matrix-margin ${marginClass}">${margin.text}</span></div>
             ${extraRowUI}
-          </div>
-        `;
+          </div>`;
         delayCounter++;
       }
+      updateDivergenceMeter();
+      lucide.createIcons();
     }
+
+    // --- Domain Expansion Gesture Logic ---
+    let touchStartY = 0;
+    const ring = document.getElementById('domainRing');
+    document.addEventListener('touchstart', (e) => { if (e.touches.length === 2) touchStartY = e.touches[0].clientY; });
+    document.addEventListener('touchend', (e) => {
+      if (e.changedTouches.length === 2) {
+        if (e.changedTouches[0].clientY - touchStartY > 120) {
+          triggerHaptic('success'); ring.classList.add('expand');
+          setTimeout(() => { document.body.classList.toggle('domain-expansion'); ring.classList.remove('expand'); }, 400);
+        }
+      }
+    });
+
+    // --- Eren's Vision Video Engine ---
+    const visionVideos = [
+      "Videos/what eren really, REALLY saw [KCKfWNLSn_I].webm",
+      "Videos/This Infinity Castle EDIT Took Me 20+ Hours [3kjgSHA-bM0].webm"
+    ]; // Paths directly reference your GitHub repo setup
+    let pressTimer;
+    const visionContainer = document.getElementById('vision-container'), visionVideo = document.getElementById('vision-video');
+
+    function checkValidTarget(e) { return !e.target.closest('button') && !e.target.closest('a') && !e.target.closest('#floating-music-player'); }
+
+    document.body.addEventListener('touchstart', (e) => { if (e.touches.length === 1 && checkValidTarget(e)) pressTimer = setTimeout(triggerVision, 1500); });
+    document.body.addEventListener('touchend', () => clearTimeout(pressTimer));
+    document.body.addEventListener('mousedown', (e) => { if (checkValidTarget(e)) pressTimer = setTimeout(triggerVision, 1500); });
+    document.body.addEventListener('mouseup', () => clearTimeout(pressTimer));
+
+    function triggerVision() {
+      triggerHaptic('success');
+      visionVideo.src = visionVideos[Math.floor(Math.random() * visionVideos.length)];
+      visionVideo.className = ''; 
+      const transitions = ['trans-focus', 'trans-glitch'];
+      visionVideo.classList.add(transitions[Math.floor(Math.random() * transitions.length)]);
+      visionContainer.classList.add('active');
+      visionVideo.play();
+    }
+    visionContainer.addEventListener('click', () => { visionContainer.classList.remove('active'); visionVideo.pause(); visionVideo.currentTime = 0; });
+
+    // --- Apple Music Floating Player ---
+    const audioFiles = [
+      { title: "Under the Tree", artist: "SiM", src: "Audio/SiM_-_Under_the_Tree_Attack_on_Titan_(mp3.pm).mp3" },
+      { title: "Aalaporan Thamizhan", artist: "A.R. Rahman", src: "Audio/Aalaporan-Thamizhan-MassTamilan.com.mp3" },
+      { title: "Kannukulla", artist: "Unknown", src: "Audio/Kannukulla.mp3" }
+    ]; // Paths directly reference your GitHub repo setup
+    let currentTrackIndex = 0;
+    const audioPlayer = document.getElementById('bg-audio'), playBtn = document.getElementById('play-pause-btn'), wave = document.getElementById('wave'), trackLabel = document.getElementById('track-name');
+
+    function toggleMusic() {
+      if (audioPlayer.paused) {
+        if (!audioPlayer.src) loadTrack(currentTrackIndex);
+        audioPlayer.play();
+        playBtn.innerHTML = '<i data-lucide="pause"></i>'; lucide.createIcons();
+        wave.classList.add('active'); setupMediaSession();
+      } else {
+        audioPlayer.pause();
+        playBtn.innerHTML = '<i data-lucide="play"></i>'; lucide.createIcons();
+        wave.classList.remove('active');
+      }
+      triggerHaptic('light');
+    }
+
+    function loadTrack(index) {
+      const track = audioFiles[index];
+      audioPlayer.src = track.src;
+      trackLabel.innerText = `${track.title} - ${track.artist}`;
+    }
+
+    function setupMediaSession() {
+      if ('mediaSession' in navigator) {
+        const track = audioFiles[currentTrackIndex];
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: track.title, artist: track.artist, album: "SRM Hub OST",
+          artwork: [{ src: "https://github.com/Thiruvannan.png", sizes: "512x512", type: "image/png" }]
+        });
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+          currentTrackIndex = (currentTrackIndex + 1) % audioFiles.length;
+          loadTrack(currentTrackIndex); audioPlayer.play(); setupMediaSession();
+        });
+      }
+    }
+    audioPlayer.addEventListener('ended', () => {
+      currentTrackIndex = (currentTrackIndex + 1) % audioFiles.length;
+      loadTrack(currentTrackIndex); audioPlayer.play(); setupMediaSession();
+    });
   </script>
 </body>
 </html>
