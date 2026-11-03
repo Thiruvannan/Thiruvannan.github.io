@@ -233,7 +233,7 @@
     @keyframes visionFlash { 0% { opacity: 0; transform: scale(0.94) translateZ(0); } 40% { opacity: 1; transform: scale(1.02) translateZ(0); } 100% { opacity: 1; transform: scale(1) translateZ(0); } }
     
     .trans-iris { animation: visionIris 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    @keyframes visionIris { from { clip-path: circle(0% at var(-- click-x, 50%) var(--click-y, 50%)); } to { clip-path: circle(150% at var(--click-x, 50%) var(--click-y, 50%)); } }
+    @keyframes visionIris { from { clip-path: circle(0% at var(--click-x, 50%) var(--click-y, 50%)); } to { clip-path: circle(150% at var(--click-x, 50%) var(--click-y, 50%)); } }
 
     .vision-hud {
       position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
@@ -686,7 +686,7 @@
       const tubesContainer = document.getElementById('nixie-tubes');
       const label = document.getElementById('divergence-label');
 
-      // Format as Steins;Gate Worldline (1.04XXXX if safe >=75%, 0.XXXXXX if danger <75%)
+      // Format as Steins;Gate Worldline (1.04XXXX if safe >=75%, 0.33XXXX if danger <75%)
       const scaledDigits = Math.min(9999, Math.round(globalPerc * 98.8)).toString().padStart(4, '0');
       const worldlineStr = globalPerc >= 75 ? `1.04${scaledDigits}` : `0.33${scaledDigits}`;
 
@@ -912,7 +912,7 @@
     const portraitDeck = new ShuffleDeck(fallbackVideos);
     const audioDeck = new ShuffleDeck(fallbackAudio);
 
-    // Dynamic GitHub Repository Scanner (Auto-discovers all files in Videos/Landscape, Videos/Potrait, and Audio)
+    // Dynamic GitHub Repository Scanner (Auto-discovers all files in Videos/Landscape, Videos/Portrait, and Audio)
     async function syncRepoMedia() {
       const repoBase = "https://api.github.com/repos/Thiruvannan/Thiruvannan.github.io/contents";
       const isMedia = (name, exts) => exts.some(ext => name.toLowerCase().endsWith(ext));
@@ -926,11 +926,11 @@
           if (urls.length > 0) landscapeDeck.setItems(urls);
         }
 
-        // 2. Fetch Potrait (Mobile) Videos (Matches exact repo folder spelling "Potrait")
-        const resPort = await fetch(`${repoBase}/Videos/Potrait`);
+        // 2. Fetch Portrait (Mobile) Videos 
+        const resPort = await fetch(`${repoBase}/Videos/Portrait`);
         if (resPort.ok) {
           const files = await resPort.json();
-          const urls = files.filter(f => isMedia(f.name, ['.mp4', '.webm', '.mov', '.mkv'])).map(f => `Videos/Potrait/${encodeURIComponent(f.name)}`);
+          const urls = files.filter(f => isMedia(f.name, ['.mp4', '.webm', '.mov', '.mkv'])).map(f => `Videos/Portrait/${encodeURIComponent(f.name)}`);
           if (urls.length > 0) portraitDeck.setItems(urls);
         }
 
@@ -986,7 +986,7 @@
       pressTimer = setTimeout(() => {
         holdIndicator.classList.remove('holding');
         triggerVision(x, y);
-      }, 950); // Responsive 0.95s hold
+      }, 1500); // Responsive 1.5s hold (updated from 950ms)
     }
 
     function cancelHold() {
@@ -1022,7 +1022,7 @@
         wasMusicPlayingBeforeVision = false;
       }
 
-      // Select Mobile (Potrait) vs Desktop (Landscape) Deck automatically
+      // Select Mobile (Portrait) vs Desktop (Landscape) Deck automatically
       const isMobileViewport = window.matchMedia("(max-width: 768px)").matches;
       const activeDeck = isMobileViewport ? portraitDeck : landscapeDeck;
       const chosenVideoSrc = activeDeck.next();
