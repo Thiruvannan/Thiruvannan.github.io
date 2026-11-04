@@ -12,7 +12,7 @@ let globalHunterAttended = 0;
 let globalHunterBunks = 0;
 let lastKnownAttended = 0;
 
-// UTILS
+// UTILS & HAPTICS
 function triggerHaptic(type = 'light') {
   if (!navigator.vibrate) return;
   if (type === 'light') navigator.vibrate(35);
@@ -41,6 +41,13 @@ function calculateMargin(attended, conducted) {
   }
 }
 
+// THE LIVE TICKING CLOCK
+setInterval(() => {
+  const now = new Date();
+  const clockEl = document.getElementById('liveClock');
+  if(clockEl) clockEl.textContent = now.toLocaleTimeString('en-US', { hour12: false });
+}, 1000);
+
 // FIREBASE & UI RENDERING
 function initFirebaseApp() {
   firebase.initializeApp(firebaseConfig);
@@ -60,12 +67,27 @@ function initFirebaseApp() {
   });
 
   window.logClass = (code, slotNum, status) => {
-    if (!isEditMode) return; triggerHaptic('success');
+    if (!isEditMode) return; 
+    triggerHaptic('success');
+
+    // Force Audio Authorization on user click
+    const cashSfx = document.getElementById('cash-sfx');
+    cashSfx.volume = 1.0;
+    
     const logKey = `${getTodayDateStr()}_D${activeDayOrder}_S${slotNum}_${code}`;
     historyStack.push({ type: 'slot', code, slotNum, logKey, previousData: JSON.parse(JSON.stringify(myData)) });
     document.getElementById('undoBtn').style.display = 'inline-flex';
+    
     if (!myData[code]) myData[code] = { name: code, attended: 0, conducted: 0 };
-    status === 'attended' ? (myData[code].attended++, myData[code].conducted++) : myData[code].conducted++;
+    if (status === 'attended') {
+      myData[code].attended++;
+      myData[code].conducted++;
+      cashSfx.currentTime = 0;
+      cashSfx.play().catch(()=>{}); // Plays Cash Tick instantly
+    } else {
+      myData[code].conducted++;
+    }
+    
     loggedDailyActions[logKey] = status;
     renderUI(); renderMatrix(); countsRef.set(myData); logsRef.child(logKey).set(status);
   };
@@ -109,12 +131,7 @@ function updateSquidGameTallyAndHunterBadge() {
 
   if (globalPerc < 75) board.classList.add('eliminated');
   else board.classList.remove('eliminated');
-
-  if (lastKnownAttended > 0 && totalAttended > lastKnownAttended) {
-    const cashSfx = document.getElementById('cash-sfx');
-    cashSfx.currentTime = 0;
-    cashSfx.play().catch(()=>{});
-  }
+  
   lastKnownAttended = totalAttended;
 
   const badge = document.getElementById('hunter-badge');
@@ -134,10 +151,12 @@ function renderUI() {
   for (const [slotNum, code] of Object.entries(dayClasses)) {
     const sub = myData[code] || { name: code }, logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`, previousAction = loggedDailyActions[logKey];
     let actionUI = '';
-    if (previousAction === 'attended') actionUI = `<div class="logged-status logged-att"><i data-lucide="check-circle-2"></i> Logged: Attended</div>`;
-    else if (previousAction === 'missed') actionUI = `<div class="logged-status logged-mis"><i data-lucide="x-circle"></i> Logged: Missed</div>`;
-    else if (isEditMode) actionUI = `<div class="btn-row"><button class="btn-log btn-attend" onclick="logClass('${code}', '${slotNum}', 'attended')"><i data-lucide="check"></i> Attended</button><button class="btn-log btn-miss" onclick="logClass('${code}', '${slotNum}', 'missed')"><i data-lucide="x"></i> Missed</button></div>`;
-    else actionUI = `<div class="logged-status logged-locked"><i data-lucide="lock"></i> View Only (Unlock to Log)</div>`;
+    
+    // PURGED GREEN CLASSES - Now using Neon Blue & Minimal Glass
+    if (previousAction === 'attended') actionUI = `<div class="logged-status" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);"><i data-lucide="check-circle-2"></i> Logged: Attended</div>`;
+    else if (previousAction === 'missed') actionUI = `<div class="logged-status" style="background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3);"><i data-lucide="x-circle"></i> Logged: Missed</div>`;
+    else if (isEditMode) actionUI = `<div class="btn-row"><button class="btn-log" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onclick="logClass('${code}', '${slotNum}', 'attended')"><i data-lucide="check"></i> Attended</button><button class="btn-log" style="background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3);" onclick="logClass('${code}', '${slotNum}', 'missed')"><i data-lucide="x"></i> Missed</button></div>`;
+    else actionUI = `<div class="logged-status" style="background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.45); border: 1px dashed rgba(255,255,255,0.18);"><i data-lucide="lock"></i> View Only (Unlock to Log)</div>`;
     
     container.innerHTML += `
       <div class="class-card">
@@ -156,22 +175,26 @@ function renderMatrix() {
   for (const [code, data] of Object.entries(myData)) {
     const perc = data.conducted === 0 ? 100 : ((data.attended / data.conducted) * 100);
     const margin = calculateMargin(data.attended, data.conducted);
-    const marginClass = margin.safe ? "margin-safe" : "margin-danger";
     
-    let aotBadgeUI = '';
-    let regimentTitle = '';
-    if (perc >= 90) { aotBadgeUI = `<div class="aot-badge rank-scout"><img class="aot-crest" src="Assets/scout.webp" alt="Scout"> ${perc.toFixed(1)}%</div>`; regimentTitle = 'Scout Regiment'; }
-    else if (perc >= 75) { aotBadgeUI = `<div class="aot-badge rank-garrison"><img class="aot-crest" src="Assets/garrison.webp" alt="Garrison"> ${perc.toFixed(1)}%</div>`; regimentTitle = 'Garrison Wall'; }
-    else { aotBadgeUI = `<div class="aot-badge rank-fodder"><i data-lucide="skull" style="width:18px;height:18px;"></i> ${perc.toFixed(1)}%</div>`; regimentTitle = 'Titan Fodder'; }
+    // PURGED AOT SHIELDS - Now using Neon Squid Game Geometry
+    let rankUI = '';
+    if (perc >= 90) { rankUI = `<div class="aot-badge" style="color: #38bdf8; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3);"><span class="neon-shape shape-circle">○</span> ${perc.toFixed(1)}%</div>`; }
+    else if (perc >= 75) { rankUI = `<div class="aot-badge" style="color: #fbbf24; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3);"><span class="neon-shape shape-triangle">△</span> ${perc.toFixed(1)}%</div>`; }
+    else { rankUI = `<div class="aot-badge" style="color: #ef4444; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4);"><span class="neon-shape shape-square">□</span> ${perc.toFixed(1)}%</div>`; }
+
+    // PURGED GREEN MARGIN
+    const marginUI = margin.safe 
+      ? `<span class="matrix-margin" style="color: #38bdf8; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3);">${margin.text}</span>`
+      : `<span class="matrix-margin" style="color: #fb7185; background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.35);">${margin.text}</span>`;
 
     let extraRowUI = isEditMode ? `<div class="extra-row"><span class="extra-label">Extra / Makeup Slot</span><div class="extra-btns"><button class="btn-extra" onclick="logSurprise('${code}', 'attended')">+ Attend</button><button class="btn-extra" onclick="logSurprise('${code}', 'missed')">+ Miss</button></div></div>` : '';
 
     container.innerHTML += `
       <div class="matrix-card">
-        <div class="matrix-top"><span class="matrix-name">${data.name}</span>${aotBadgeUI}</div>
+        <div class="matrix-top"><span class="matrix-name">${data.name}</span>${rankUI}</div>
         <div class="matrix-mid">
-          <span class="matrix-stats"><span>${data.attended} / ${data.conducted}</span> <span class="regiment-tag">${regimentTitle}</span></span>
-          <span class="matrix-margin ${marginClass}">${margin.text}</span>
+          <span class="matrix-stats"><span>${data.attended} / ${data.conducted}</span></span>
+          ${marginUI}
         </div>
         ${extraRowUI}
       </div>`;
@@ -243,7 +266,10 @@ window.toggleHunterLicense = (show) => {
 window.triggerInfinityCastle = () => {
   triggerHaptic('domain');
   const isActivating = !document.body.classList.contains('infinity-castle');
+  
+  // Force Audio Authorization
   const biwaSfx = document.getElementById('biwa-sfx');
+  biwaSfx.volume = 1.0;
   biwaSfx.currentTime = 0;
   biwaSfx.play().catch(()=>{});
 
