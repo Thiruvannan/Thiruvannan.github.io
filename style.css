@@ -154,13 +154,12 @@
   }
 
   /* SOLO LEVELING HUNTER BADGE (Naked Image + Pure Glow) */
-  #hunter-badge {
-    position: fixed; top: 24px; right: 24px; width: 54px; height: 54px;
-    cursor: pointer; z-index: 90;
-    display: flex; align-items: center; justify-content: center;
-    background: transparent; /* Killed the ugly flat background */
-    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
+  #hunter-badge img { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: contain;
+  filter: brightness(1.6) contrast(1.2); /* Makes the dark crest pop on OLED */
+}
   #hunter-badge:active { transform: scale(0.92); }
   #hunter-badge img { width: 100%; height: 100%; object-fit: contain; }
   
