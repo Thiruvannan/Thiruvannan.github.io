@@ -5,10 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Thiruvannan | SRM Hub</title>
   
+  <!-- Firebase & Lucide Icons -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
+  <!-- Fonts & Styles -->
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 
@@ -21,9 +23,9 @@
 </head>
 <body>
 
-  <!-- INFINITY CASTLE BACKGROUNDS -->
-  <video id="castle-video-desktop" class="castle-bg" src="Assets/infinity_castle_desktop.webm" muted loop playsinline disablePictureInPicture controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"></video>
-  <video id="castle-video-mobile" class="castle-bg" src="Assets/infinity_castle_mobile.webm" muted loop playsinline disablePictureInPicture controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"></video>
+  <!-- INFINITY CASTLE BACKGROUNDS (Mobile Optimized) -->
+  <video id="castle-video-desktop" class="castle-bg" src="Assets/infinity_castle_desktop.webm" preload="auto" muted loop playsinline disablePictureInPicture controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"></video>
+  <video id="castle-video-mobile" class="castle-bg" src="Assets/infinity_castle_mobile.webm" preload="auto" muted loop playsinline disablePictureInPicture controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"></video>
 
   <!-- HIDDEN AUDIO TRIGGERS -->
   <audio id="biwa-sfx" src="Assets/biwa.mp3" preload="auto"></audio>
@@ -38,6 +40,7 @@
   </div>
 
   <div id="app-wrapper">
+    <!-- PROFILE PANEL -->
     <div id="id-view" class="glass-panel id-card">
       <div class="avatar-wrap">
         <img class="avatar" src="https://github.com/Thiruvannan.png" alt="Avatar">
@@ -45,6 +48,7 @@
       <h1>Thiruvannan</h1>
       <p>Developer | SRMIST CSE</p>
       
+      <!-- iOS INSET GROUPED LIST -->
       <div class="ios-list">
         <a class="ios-row" href="tel:105786">
           <i data-lucide="shield-alert" style="color: #fb7185;"></i><span>Emergency Contacts</span><i data-lucide="chevron-right" class="chevron"></i>
@@ -59,7 +63,8 @@
         </a>
         <div class="ios-divider"></div>
         <a class="ios-row" href="https://wa.me/919080792117?text=Hey!" target="_blank">
-          <i data-lucide="message-circle" style="color: #4ade80;"></i><span>WhatsApp</span><i data-lucide="chevron-right" class="chevron"></i>
+          <!-- WhatsApp Icon Harmonized to Cyan -->
+          <i data-lucide="message-circle" style="color: #38bdf8;"></i><span>WhatsApp</span><i data-lucide="chevron-right" class="chevron"></i>
         </a>
         <div class="ios-divider"></div>
         <a class="ios-row" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR">
@@ -76,6 +81,7 @@
       </button>
     </div>
 
+    <!-- TRACKER PANEL -->
     <div id="tracker-view">
       <div class="top-nav">
         <button class="back-btn desktop-hide" onclick="toggleView('id-view')"><i data-lucide="arrow-left" style="width:15px;"></i> ID Card</button>
@@ -114,7 +120,8 @@
             <span>Overall Attendance</span>
           </div>
           
-          <div class="squid-board" id="globalSquidBoard">
+          <!-- SQUID GAME VAULT TALLY (Now Clickable for Sound) -->
+          <div class="squid-board" id="globalSquidBoard" onclick="triggerCashSound()">
             <div class="squid-title">○ △ □ VAULT TALLY</div>
             <div class="squid-numbers" id="squid-digits">
               <span class="squid-digit">0</span>
@@ -130,6 +137,7 @@
     </div>
   </div>
 
+  <!-- HUNTER LICENSE MODAL -->
   <div id="hunter-modal">
     <div class="hunter-card">
       <h2 id="hunter-rank-title" style="color: #fbbf24;">E-RANK HUNTER</h2>
@@ -141,26 +149,27 @@
     </div>
   </div>
 
+  <!-- HARDWARE-ISOLATED EREN'S VISION PLAYER -->
   <div id="vision-container">
     <video id="vision-video" playsinline preload="metadata" disablePictureInPicture controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"></video>
     <div class="vision-vignette"></div>
   </div>
 
+  <!-- ENHANCED APPLE MUSIC FLOATING PLAYER -->
   <div id="floating-music-player">
     <div class="art-wrap">
       <div class="art-progress" style="--progress: 0%;"></div>
-      <svg class="art-disc" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5">
-        <circle cx="12" cy="12" r="10" fill="#111"></circle>
-        <circle cx="12" cy="12" r="3" stroke="rgba(255,255,255,0.4)"></circle>
-        <circle cx="12" cy="12" r="1" fill="#fff"></circle>
-      </svg>
+      <!-- CSS Rendered Vinyl Record -->
+      <div class="art-disc"></div>
     </div>
+    <!-- Masked Marquee Container -->
     <div class="marquee-container"><span id="track-name">Loading OST Deck...</span></div>
     <button class="music-ctrl-btn" id="play-pause-btn" onclick="toggleMusic()" title="Play/Pause"><i data-lucide="play"></i></button>
     <button class="music-ctrl-btn" onclick="playNextRandomTrack()" title="Next Random Track"><i data-lucide="skip-forward"></i></button>
     <audio id="bg-audio" preload="metadata"></audio>
   </div>
 
+  <!-- MODULE ENGINE BINDING -->
   <script type="module" src="js/main.js"></script>
 </body>
 </html>
