@@ -55,15 +55,15 @@
       .tracker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
     }
 
-    /* GPU-Optimized Glassmorphism (10px blur + deeper tint = zero video stutter) */
+    /* GPU-Optimized Glassmorphism */
     .glass-panel {
       background: rgba(18, 18, 26, 0.72);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.12);
       box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18);
       border-radius: 32px;
-      transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+      transition: background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
       transform: translateZ(0);
     }
 
@@ -82,7 +82,7 @@
     .btn-tracker { background: rgba(255, 255, 255, 0.92); color: #000; border: none; font-size: 15px; font-weight: 700; box-shadow: 0 8px 20px rgba(255,255,255,0.12); }
     .btn-tracker:hover { background: #ffffff; color: #000; }
     .btn-sos { background: rgba(244, 63, 94, 0.14); border-color: rgba(244, 63, 94, 0.32); color: #fb7185; }
-    .btn-domain { background: rgba(139, 92, 246, 0.12); border-color: rgba(139, 92, 246, 0.3); color: #c4b5fd; font-size: 12px; padding: 11px; }
+    .btn-domain { background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.3); color: #7dd3fc; font-size: 13px; padding: 12px; }
 
     .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px; gap: 10px; flex-wrap: wrap; }
     .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 16px; border-radius: 14px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
@@ -182,30 +182,64 @@
     .modal-box { background: #141018; border: 1px solid rgba(244,63,94,0.4); border-radius: 28px; padding: 28px; width: 100%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.85); }
     .modal-box div { display: flex; flex-direction: column; gap: 14px; }
 
-    /* Jujutsu Kaisen: Malevolent Shrine Domain Expansion */
+    /* DOMAIN EXPANSION 2.0: Infinite Void */
     body.domain-expansion {
-      background: 
-        radial-gradient(circle at 50% 15%, rgba(220, 38, 38, 0.35), transparent 55%),
-        radial-gradient(circle at 80% 85%, rgba(153, 27, 27, 0.3), transparent 50%),
-        linear-gradient(-45deg, #050000, #140202, #050000);
-      background-size: 200% 200%;
-      color: #fecaca;
+      background: radial-gradient(circle at 30% 30%, #0a0418 0%, #000000 60%),
+                  radial-gradient(circle at 80% 80%, #081128 0%, #000000 70%);
+      color: #e0f2fe;
     }
     .domain-expansion .glass-panel {
-      background: rgba(14, 3, 3, 0.82);
-      border-color: rgba(239, 68, 68, 0.35);
-      box-shadow: 0 28px 56px rgba(220, 38, 38, 0.14), inset 0 1px 0 rgba(248, 113, 113, 0.22);
+      background: rgba(10, 15, 25, 0.45); 
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-color: rgba(56, 189, 248, 0.3);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.9), 0 0 20px rgba(56, 189, 248, 0.12), inset 0 1px 0 rgba(255,255,255,0.15);
     }
-    .domain-expansion .btn-link { background: rgba(220, 38, 38, 0.12); border-color: rgba(239, 68, 68, 0.3); color: #fca5a5; }
-    .domain-expansion .btn-tracker { background: #ef4444; color: #fff; }
-    .domain-expansion .live-slot-banner { background: rgba(220, 38, 38, 0.15); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; }
+    .domain-expansion .btn-link { background: rgba(56, 189, 248, 0.08); border-color: rgba(56, 189, 248, 0.25); color: #bae6fd; }
+    .domain-expansion .btn-tracker { background: #38bdf8; color: #000; box-shadow: 0 0 20px rgba(56, 189, 248, 0.3); }
+    .domain-expansion .live-slot-banner { background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3); color: #bae6fd; }
     
-    .domain-ring { position: fixed; top: 50%; left: 50%; width: 0; height: 0; background: radial-gradient(circle, #7f1d1d 0%, #000000 70%); border-radius: 50%; transform: translate(-50%, -50%); z-index: 9998; pointer-events: none; transition: width 0.65s cubic-bezier(0.85, 0, 0.15, 1), height 0.65s cubic-bezier(0.85, 0, 0.15, 1); }
-    .domain-ring.expand { width: 300vmax; height: 300vmax; }
-    #domain-toast { position: fixed; top: 28px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(15, 2, 2, 0.92); border: 1px solid #ef4444; color: #f87171; padding: 8px 18px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; z-index: 9999; opacity: 0; pointer-events: none; transition: all 0.35s ease; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+    .domain-ring { position: fixed; top: 50%; left: 50%; width: 0; height: 0; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); z-index: 9998; pointer-events: none; transition: width 0.7s cubic-bezier(0.85, 0, 0.15, 1), height 0.7s cubic-bezier(0.85, 0, 0.15, 1); opacity: 0.9; mix-blend-mode: overlay; }
+    .domain-ring.expand { width: 300vmax; height: 300vmax; opacity: 0; }
+    #domain-toast { position: fixed; top: 28px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(5, 8, 15, 0.92); border: 1px solid #38bdf8; color: #7dd3fc; padding: 8px 18px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; z-index: 9999; opacity: 0; pointer-events: none; transition: all 0.35s ease; box-shadow: 0 0 20px rgba(56, 189, 248, 0.3); }
     #domain-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* Hardware-Isolated Eren's Vision Player (Zero Blur/Blend Lag) */
+    /* Premium Infinity Core Companion (Replaces Ryuk) */
+    #infinity-core {
+      position: fixed; top: 24px; right: 24px; z-index: 90;
+      width: 44px; height: 44px; border-radius: 22px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 0 12px rgba(56, 189, 248, 0.2);
+      cursor: pointer; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    #infinity-core:active { transform: scale(0.92); }
+    #infinity-core::before {
+      content: ''; position: absolute; inset: -50%;
+      background: conic-gradient(from 0deg, transparent, rgba(56, 189, 248, 0.8), rgba(168, 85, 247, 0.8), transparent);
+      animation: spinCore 4s linear infinite;
+    }
+    #infinity-core::after {
+      content: ''; position: absolute; inset: 3px; border-radius: 50%;
+      background: #0f0f14;
+    }
+    @keyframes spinCore { 100% { transform: rotate(360deg); } }
+    
+    .core-ripple {
+      position: fixed; top: 46px; right: 46px; width: 0; height: 0;
+      border-radius: 50%; background: rgba(56, 189, 248, 0.2);
+      box-shadow: 0 0 40px 20px rgba(56, 189, 248, 0.15);
+      transform: translate(50%, -50%); z-index: 89; pointer-events: none;
+      animation: coreRippleAnim 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes coreRippleAnim {
+      0% { width: 0; height: 0; opacity: 1; }
+      100% { width: 150vw; height: 150vw; opacity: 0; backdrop-filter: blur(8px); }
+    }
+
+    /* Hardware-Isolated Eren's Vision Player (Edge-to-Edge with Vignette) */
     #vision-container {
       position: fixed; inset: 0; z-index: 10000;
       display: flex; justify-content: center; align-items: center;
@@ -216,15 +250,24 @@
       will-change: opacity;
     }
     #vision-container.active { opacity: 1; visibility: visible; pointer-events: all; }
+    
+    /* Vignette Shadow Overlay (Eliminates Flat Video Feel) */
+    .vision-vignette {
+      position: absolute; inset: 0; z-index: 10001; pointer-events: none;
+      background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.85) 100%);
+      box-shadow: inset 0 0 80px 30px rgba(0,0,0,0.9);
+    }
+    
     #vision-video {
       width: 100vw; height: 100vh;
-      object-fit: contain;
+      object-fit: cover; /* Forces bleed to edges, zero black bars */
       background: #000;
       transform: translateZ(0);
       will-change: transform, opacity;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
     }
+    
     /* High-FPS GPU-Only Entrance Transitions */
     .trans-zoom { animation: visionZoom 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     @keyframes visionZoom { from { transform: scale(1.12) translateZ(0); opacity: 0; } to { transform: scale(1) translateZ(0); opacity: 1; } }
@@ -235,76 +278,22 @@
     .trans-iris { animation: visionIris 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     @keyframes visionIris { from { clip-path: circle(0% at var(--click-x, 50%) var(--click-y, 50%)); } to { clip-path: circle(150% at var(--click-x, 50%) var(--click-y, 50%)); } }
 
-    .vision-hud {
-      position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
-      background: rgba(15, 15, 20, 0.75); border: 1px solid rgba(255,255,255,0.18);
-      padding: 6px 14px; border-radius: 20px; font-size: 11px; color: rgba(255,255,255,0.7);
-      font-weight: 600; letter-spacing: 0.8px; pointer-events: none;
-    }
-
     /* Hold Progress Ring Indicator */
     #hold-indicator {
       position: fixed; width: 54px; height: 54px; border-radius: 50%;
-      border: 2px solid rgba(56, 189, 248, 0.25);
-      border-top-color: #38bdf8;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-top-color: #ffffff;
       pointer-events: none; z-index: 9990;
       opacity: 0; transform: translate(-50%, -50%) scale(0.5);
-      transition: opacity 0.2s ease, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transition: opacity 0.2s ease, transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
     #hold-indicator.holding { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(360deg); }
-
-    /* Interactive Ryuk (visionOS Spatial Companion) */
-    #ryuk-widget {
-      position: fixed; top: 18px; right: 18px; z-index: 90;
-      width: 82px; height: 82px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transform: translateZ(0);
-    }
-    #ryuk-img {
-      width: 100%; height: 100%; object-fit: contain;
-      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.75));
-      transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.35s ease;
-    }
-    /* Ryuk Non-Generic State Machine Classes */
-    .ryuk-state-float { animation: ryukFloat 4.2s ease-in-out infinite; }
-    .ryuk-state-look { animation: ryukLookAround 3.6s ease-in-out infinite; }
-    .ryuk-state-stare { transform: scale(1.18) translateY(4px); filter: drop-shadow(0 0 16px rgba(244, 63, 94, 0.65)) !important; }
-    .ryuk-state-laugh { animation: ryukLaugh 0.45s ease-in-out 4; }
-    .ryuk-state-catch { animation: ryukCatch 0.85s cubic-bezier(0.2, 0.8, 0.2, 1); }
-
-    @keyframes ryukFloat { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-9px) rotate(2deg); } }
-    @keyframes ryukLookAround { 0%, 100% { transform: rotate(0deg) scaleX(1); } 30% { transform: rotate(-6deg) translateY(-4px); } 70% { transform: rotate(6deg) translateY(-2px); } }
-    @keyframes ryukLaugh { 0%, 100% { transform: translateY(0) scale(1.05); } 50% { transform: translateY(-5px) scale(1.1); } }
-    @keyframes ryukCatch { 0% { transform: scale(1); } 30% { transform: translateY(6px) scale(0.92); } 65% { transform: translateY(-10px) scale(1.12); } 100% { transform: scale(1); } }
-
-    #ryuk-bubble {
-      position: absolute; top: 12px; right: 88px;
-      background: rgba(18, 18, 24, 0.88); border: 1px solid rgba(255,255,255,0.18);
-      color: #fca5a5; font-size: 11px; font-weight: 700; padding: 6px 11px;
-      border-radius: 12px; white-space: nowrap; pointer-events: none;
-      opacity: 0; transform: translateX(8px); transition: all 0.25s ease;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-    }
-    #ryuk-bubble.show { opacity: 1; transform: translateX(0); }
-
-    /* Parabolic Thrown Apple */
-    .shinigami-apple {
-      position: absolute; width: 22px; height: 22px; pointer-events: none; z-index: 95;
-      left: 30px; top: 28px;
-      animation: appleArc 0.85s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    }
-    @keyframes appleArc {
-      0% { transform: translate(0, 10px) scale(0.5) rotate(0deg); opacity: 1; }
-      45% { transform: translate(-22px, -68px) scale(1.15) rotate(190deg); opacity: 1; }
-      85% { transform: translate(-4px, 4px) scale(0.9) rotate(340deg); opacity: 1; }
-      100% { transform: translate(0, 8px) scale(0) rotate(360deg); opacity: 0; }
-    }
 
     /* Apple Music Floating Pill */
     #floating-music-player {
       position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateZ(0);
       background: rgba(20, 20, 28, 0.82);
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255,255,255,0.16); border-radius: 40px; padding: 8px 14px;
       display: flex; align-items: center; gap: 10px;
       box-shadow: 0 16px 36px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
@@ -346,16 +335,13 @@
 
   <!-- JJK Domain Expansion Overlay & Toast -->
   <div class="domain-ring" id="domainRing"></div>
-  <div id="domain-toast">Domain Expansion: Malevolent Shrine</div>
+  <div id="domain-toast">Domain Expansion: Infinite Void</div>
 
   <!-- Long-Press Visual Ring -->
   <div id="hold-indicator"></div>
 
-  <!-- Interactive Ryuk Companion (Top Right) -->
-  <div id="ryuk-widget" onclick="tossApple(event)" title="Tap to feed Ryuk an apple">
-    <div id="ryuk-bubble">Heh... Got any apples?</div>
-    <img id="ryuk-img" class="ryuk-state-float" src="Assets/ryuk.png" alt="Ryuk">
-  </div>
+  <!-- The Infinity Core (Glass Companion replacing Ryuk) -->
+  <div id="infinity-core" onclick="pulseInfinityCore(event)"></div>
 
   <div id="app-wrapper">
 
@@ -373,7 +359,7 @@
         <a class="btn-link" href="contact.vcf"><i data-lucide="user-plus"></i> Save Contact</a>
         <a class="btn-link" href="https://wa.me/919080792117?text=Hey!" target="_blank"><i data-lucide="message-circle"></i> WhatsApp</a>
         <a class="btn-link" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR"><i data-lucide="wallet"></i> Pay via UPI</a>
-        <button class="btn-link btn-domain" onclick="triggerDomainExpansion()"><i data-lucide="flame"></i> Domain Expansion (or 2-Finger Swipe)</button>
+        <button class="btn-link btn-domain" onclick="triggerDomainExpansion()"><i data-lucide="flame"></i> Domain Expansion</button>
         <button class="btn-link btn-tracker desktop-hide" onclick="toggleView('tracker-view')"><i data-lucide="swords"></i> View Survival Matrix</button>
       </div>
     </div>
@@ -411,7 +397,6 @@
         <div class="glass-panel" style="padding: 24px;">
           <div class="section-title">
             <span>Overall Attendance</span>
-            <span style="font-size:10px; color:rgba(255,255,255,0.45);">Hold Blank Space for Vision</span>
           </div>
           
           <!-- Steins;Gate Divergence Meter -->
@@ -451,10 +436,10 @@
     </div>
   </div>
 
-  <!-- EREN'S VISION VIDEO PLAYER (Hardware Composited) -->
+  <!-- EREN'S VISION VIDEO PLAYER -->
   <div id="vision-container">
+    <div class="vision-vignette"></div>
     <video id="vision-video" playsinline preload="metadata"></video>
-    <div class="vision-hud" id="vision-hud">Tap anywhere to sever the connection</div>
   </div>
 
   <!-- APPLE MUSIC FLOATING PLAYER -->
@@ -677,7 +662,6 @@
     }
     setInterval(updateDynamicIsland, 30000);
 
-    // Authentic Steins;Gate Nixie Tube Formatter
     function updateDivergenceMeter() {
       let totalAttended = 0, totalConducted = 0;
       for (const key in myData) { totalAttended += myData[key].attended; totalConducted += myData[key].conducted; }
@@ -686,7 +670,6 @@
       const tubesContainer = document.getElementById('nixie-tubes');
       const label = document.getElementById('divergence-label');
 
-      // Format as Steins;Gate Worldline (1.04XXXX if safe >=75%, 0.33XXXX if danger <75%)
       const scaledDigits = Math.min(9999, Math.round(globalPerc * 98.8)).toString().padStart(4, '0');
       const worldlineStr = globalPerc >= 75 ? `1.04${scaledDigits}` : `0.33${scaledDigits}`;
 
@@ -736,7 +719,6 @@
         const marginClass = margin.safe ? "margin-safe" : "margin-danger";
         const iconName = subjectIcons[code] || "book-open";
         
-        // Authentic Attack on Titan Regiment Crests from Assets/
         let aotBadgeUI = '';
         let regimentTitle = '';
         if (perc >= 90) {
@@ -769,7 +751,7 @@
     }
 
     // ==========================================
-    // 2. JUJUTSU KAISEN DOMAIN EXPANSION
+    // 2. INFINITE VOID DOMAIN EXPANSION
     // ==========================================
     let touchStartY = 0;
     const domainRing = document.getElementById('domainRing');
@@ -779,13 +761,13 @@
       triggerHaptic('success');
       domainRing.classList.add('expand');
       const isActivating = !document.body.classList.contains('domain-expansion');
-      domainToast.textContent = isActivating ? "Domain Expansion: Malevolent Shrine" : "Domain Collapsed";
+      domainToast.textContent = isActivating ? "Domain Expansion: Infinite Void" : "Domain Collapsed";
       domainToast.classList.add('show');
 
       setTimeout(() => {
         document.body.classList.toggle('domain-expansion');
         domainRing.classList.remove('expand');
-      }, 380);
+      }, 400);
       setTimeout(() => domainToast.classList.remove('show'), 2400);
     }
 
@@ -797,63 +779,17 @@
     }, { passive: true });
 
     // ==========================================
-    // 3. INTERACTIVE RYUK STATE MACHINE & APPLE
+    // 3. INFINITY CORE (Spatial UI Ripple)
     // ==========================================
-    const ryukImg = document.getElementById('ryuk-img');
-    const ryukBubble = document.getElementById('ryuk-bubble');
-    const ryukWidget = document.getElementById('ryuk-widget');
-    let ryukBusy = false;
-
-    const ryukLines = [
-      "Humans are so interesting!",
-      "75% mandatory? Sounds like a Shinigami rule.",
-      "Hehehe... juicy red apples!",
-      "Don't drop into Titan Fodder..."
-    ];
-
-    function showRyukLine(text) {
-      ryukBubble.textContent = text;
-      ryukBubble.classList.add('show');
-      setTimeout(() => ryukBubble.classList.remove('show'), 2600);
-    }
-
-    // Non-generic randomized idle state machine every 5.5s
-    setInterval(() => {
-      if (ryukBusy) return;
-      const roll = Math.random();
-      ryukImg.className = '';
-      if (roll < 0.50) {
-        ryukImg.classList.add('ryuk-state-float');
-      } else if (roll < 0.78) {
-        ryukImg.classList.add('ryuk-state-look');
-      } else if (roll < 0.92) {
-        ryukImg.classList.add('ryuk-state-stare');
-        if (Math.random() < 0.4) showRyukLine(ryukLines[Math.floor(Math.random() * ryukLines.length)]);
-      } else {
-        ryukImg.classList.add('ryuk-state-laugh');
-      }
-    }, 5500);
-
-    function tossApple(e) {
+    function pulseInfinityCore(e) {
       e.stopPropagation();
-      if (ryukBusy) return;
-      ryukBusy = true;
       triggerHaptic('success');
-
-      // Spawn SVG Shinigami Apple
-      const apple = document.createElement('div');
-      apple.className = 'shinigami-apple';
-      apple.innerHTML = `<svg viewBox="0 0 24 24" fill="#ef4444" stroke="#7f1d1d" stroke-width="1.5"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5" stroke="#4ade80" stroke-width="2" fill="none"/></svg>`;
-      ryukWidget.appendChild(apple);
-
-      ryukImg.className = 'ryuk-state-catch';
-      showRyukLine("Delicious! 🍎");
-
-      setTimeout(() => {
-        apple.remove();
-        ryukImg.className = 'ryuk-state-float';
-        ryukBusy = false;
-      }, 880);
+      
+      const ripple = document.createElement('div');
+      ripple.className = 'core-ripple';
+      document.body.appendChild(ripple);
+      
+      setTimeout(() => ripple.remove(), 700);
     }
 
     // ==========================================
@@ -877,7 +813,6 @@
           const j = Math.floor(Math.random() * (i + 1));
           [this.queue[i], this.queue[j]] = [this.queue[j], this.queue[i]];
         }
-        // Prevent immediate boundary repeat when reshuffling
         if (this.queue.length > 1 && this.queue[0] === this.lastPlayed) {
           const first = this.queue.shift();
           this.queue.push(first);
@@ -892,7 +827,6 @@
       }
     }
 
-    // Default Fallback Lists (if offline or before GitHub API responds)
     const fallbackVideos = [
       "Videos/what eren really, REALLY saw [KCKfWNLSn_I].webm",
       "Videos/This Infinity Castle EDIT Took Me 20+ Hours [3kjgSHA-bM0].webm",
@@ -912,13 +846,11 @@
     const portraitDeck = new ShuffleDeck(fallbackVideos);
     const audioDeck = new ShuffleDeck(fallbackAudio);
 
-    // Dynamic GitHub Repository Scanner (Auto-discovers all files in Videos/Landscape, Videos/Portrait, and Audio)
     async function syncRepoMedia() {
       const repoBase = "https://api.github.com/repos/Thiruvannan/Thiruvannan.github.io/contents";
       const isMedia = (name, exts) => exts.some(ext => name.toLowerCase().endsWith(ext));
 
       try {
-        // 1. Fetch Landscape (Desktop) Videos
         const resLand = await fetch(`${repoBase}/Videos/Landscape`);
         if (resLand.ok) {
           const files = await resLand.json();
@@ -926,7 +858,6 @@
           if (urls.length > 0) landscapeDeck.setItems(urls);
         }
 
-        // 2. Fetch Portrait (Mobile) Videos 
         const resPort = await fetch(`${repoBase}/Videos/Portrait`);
         if (resPort.ok) {
           const files = await resPort.json();
@@ -934,7 +865,6 @@
           if (urls.length > 0) portraitDeck.setItems(urls);
         }
 
-        // 3. Also check root Videos/ if any exist
         const resRootVid = await fetch(`${repoBase}/Videos`);
         if (resRootVid.ok) {
           const files = await resRootVid.json();
@@ -943,17 +873,12 @@
           if (rootUrls.length > 0 && portraitDeck.source === fallbackVideos) portraitDeck.setItems(rootUrls);
         }
 
-        // 4. Fetch All Audio Tracks from Audio/
         const resAud = await fetch(`${repoBase}/Audio`);
         if (resAud.ok) {
           const files = await resAud.json();
           const tracks = files.filter(f => isMedia(f.name, ['.mp3', '.wav', '.ogg', '.m4a'])).map(f => {
             const cleanName = f.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-            return {
-              title: cleanName,
-              artist: "SRM Hub OST",
-              src: `Audio/${encodeURIComponent(f.name)}`
-            };
+            return { title: cleanName, artist: "SRM Hub OST", src: `Audio/${encodeURIComponent(f.name)}` };
           });
           if (tracks.length > 0) audioDeck.setItems(tracks);
         }
@@ -964,8 +889,9 @@
     syncRepoMedia();
 
     // ==========================================
-    // 5. EREN'S VISION LONG-PRESS VIDEO PLAYER
+    // 5. THE VISION PLAYER (Delayed Haptic Hold)
     // ==========================================
+    let showRingTimer = null;
     let pressTimer = null;
     let holdStartCoords = { x: 0, y: 0 };
     const visionContainer = document.getElementById('vision-container');
@@ -973,23 +899,28 @@
     const holdIndicator = document.getElementById('hold-indicator');
 
     function isInteractiveElement(target) {
-      return target.closest('button') || target.closest('a') || target.closest('select') || target.closest('#floating-music-player') || target.closest('#ryuk-widget') || target.closest('#vision-container');
+      return target.closest('button') || target.closest('a') || target.closest('select') || target.closest('#floating-music-player') || target.closest('#infinity-core') || target.closest('#vision-container');
     }
 
     function startHold(x, y, target) {
       if (isInteractiveElement(target)) return;
       holdStartCoords = { x, y };
-      holdIndicator.style.left = `${x}px`;
-      holdIndicator.style.top = `${y}px`;
-      holdIndicator.classList.add('holding');
+
+      // Delay the appearance of the progress ring by 300ms so quick taps remain invisible
+      showRingTimer = setTimeout(() => {
+        holdIndicator.style.left = `${x}px`;
+        holdIndicator.style.top = `${y}px`;
+        holdIndicator.classList.add('holding');
+      }, 300);
 
       pressTimer = setTimeout(() => {
         holdIndicator.classList.remove('holding');
         triggerVision(x, y);
-      }, 1500); // Responsive 1.5s hold (updated from 950ms)
+      }, 1500);
     }
 
     function cancelHold() {
+      clearTimeout(showRingTimer);
       clearTimeout(pressTimer);
       holdIndicator.classList.remove('holding');
     }
@@ -1014,7 +945,6 @@
     function triggerVision(x, y) {
       triggerHaptic('success');
 
-      // Pause background music cleanly so audio doesn't clash
       if (!audioPlayer.paused) {
         wasMusicPlayingBeforeVision = true;
         audioPlayer.pause();
@@ -1022,13 +952,11 @@
         wasMusicPlayingBeforeVision = false;
       }
 
-      // Select Mobile (Portrait) vs Desktop (Landscape) Deck automatically
       const isMobileViewport = window.matchMedia("(max-width: 768px)").matches;
       const activeDeck = isMobileViewport ? portraitDeck : landscapeDeck;
       const chosenVideoSrc = activeDeck.next();
       if (!chosenVideoSrc) return;
 
-      // Pass finger/cursor coordinates for Iris reveal transition
       document.documentElement.style.setProperty('--click-x', `${x}px`);
       document.documentElement.style.setProperty('--click-y', `${y}px`);
 
@@ -1058,7 +986,7 @@
     visionVideo.addEventListener('ended', closeVision);
 
     // ==========================================
-    // 6. APPLE MUSIC PLAYER & OS LOCK SCREEN API
+    // 6. APPLE MUSIC PLAYER
     // ==========================================
     const audioPlayer = document.getElementById('bg-audio');
     const playBtn = document.getElementById('play-pause-btn');
@@ -1111,9 +1039,7 @@
           title: track.title,
           artist: track.artist,
           album: "SRM Hub OST",
-          artwork: [
-            { src: "https://github.com/Thiruvannan.png", sizes: "512x512", type: "image/png" }
-          ]
+          artwork: [{ src: "https://github.com/Thiruvannan.png", sizes: "512x512", type: "image/png" }]
         });
         navigator.mediaSession.setActionHandler('play', () => { audioPlayer.play(); updatePlayerUI(true); });
         navigator.mediaSession.setActionHandler('pause', () => { audioPlayer.pause(); updatePlayerUI(false); });
