@@ -88,7 +88,6 @@ export function initMediaEngine(triggerHapticFn) {
   const visionVideo = document.getElementById('vision-video');
   const holdIndicator = document.getElementById('hold-indicator');
 
-  // MUSIC PLAYER LOGIC
   function updatePlayerUI(isPlaying) {
     if (isPlaying) {
       playBtn.innerHTML = '<i data-lucide="pause"></i>';
@@ -104,13 +103,12 @@ export function initMediaEngine(triggerHapticFn) {
     currentTrack = audioDeck.next();
     if (!currentTrack) return;
     audioPlayer.src = currentTrack.src;
-    trackLabel.textContent = currentTrack.title;
+    trackLabel.textContent = currentTrack.title; // FIX: Strict Title Only
     
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: currentTrack.title,
-        artist: currentTrack.artist,
-        album: "SRM Hub OST",
+        artist: "SRM Hub",
         artwork: [{ src: "https://github.com/Thiruvannan.png", sizes: "512x512", type: "image/png" }]
       });
       navigator.mediaSession.setActionHandler('play', () => { audioPlayer.play(); updatePlayerUI(true); });
@@ -149,7 +147,6 @@ export function initMediaEngine(triggerHapticFn) {
     if (Math.abs(musicTouchStartX - e.changedTouches[0].clientX) > 40) playNextTrack();
   }, {passive: true});
 
-  // VISION ENGINE LOGIC
   function isInteractiveElement(target) {
     return target.closest('a') || target.closest('select') || target.closest('#floating-music-player') || target.closest('#hunter-badge') || target.closest('.ios-row') || target.closest('button');
   }
@@ -215,7 +212,6 @@ export function initMediaEngine(triggerHapticFn) {
   visionContainer.addEventListener('click', closeVision);
   visionVideo.addEventListener('ended', closeVision);
 
-  // Expose triggers to window for HTML onclicks
   window.toggleMusic = toggleMusic;
   window.playNextRandomTrack = playNextTrack;
 }
