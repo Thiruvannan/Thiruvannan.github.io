@@ -5,44 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Thiruvannan | SRM Hub</title>
   
-  <!-- Firebase & Lucide Icons -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <!-- Squid Game Vault Font & External Stylesheet -->
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 
-  <!-- Force Cache Override for New Geometry -->
   <style>
-    .neon-shape { font-size: 16px; margin-right: 6px; display: inline-block; }
-    .shape-circle { color: #38bdf8; text-shadow: 0 0 12px #38bdf8; }
-    .shape-triangle { color: #fbbf24; text-shadow: 0 0 12px #fbbf24; }
-    .shape-square { color: #ef4444; text-shadow: 0 0 12px #ef4444; }
+    .neon-shape { font-size: 15px; margin-right: 5px; display: inline-block; font-weight: 900; }
+    .shape-circle { color: #38bdf8; text-shadow: 0 0 10px #38bdf8; }
+    .shape-triangle { color: #fbbf24; text-shadow: 0 0 10px #fbbf24; }
+    .shape-square { color: #ef4444; text-shadow: 0 0 10px #ef4444; }
   </style>
 </head>
 <body>
 
   <!-- INFINITY CASTLE BACKGROUNDS -->
-  <video id="castle-video-desktop" class="castle-bg" src="Assets/infinity_castle_desktop.webm" muted loop playsinline disablePictureInPicture></video>
-  <video id="castle-video-mobile" class="castle-bg" src="Assets/infinity_castle_mobile.webm" muted loop playsinline disablePictureInPicture></video>
+  <video id="castle-video-desktop" class="castle-bg" src="Assets/infinity_castle_desktop.webm" muted loop playsinline disablePictureInPicture controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"></video>
+  <video id="castle-video-mobile" class="castle-bg" src="Assets/infinity_castle_mobile.webm" muted loop playsinline disablePictureInPicture controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"></video>
 
   <!-- HIDDEN AUDIO TRIGGERS -->
-  <!-- Corrected paths matching your Assets folder -->
   <audio id="biwa-sfx" src="Assets/biwa.mp3" preload="auto"></audio>
   <audio id="cash-sfx" src="Assets/cash_tick.mp3" preload="auto"></audio>
 
   <!-- DELAYED LONG-PRESS RING -->
   <div id="hold-indicator"></div>
 
-  <!-- SOLO LEVELING HUNTER BADGE (Scaled up, pure transparency) -->
-  <div id="hunter-badge" class="rank-e" onclick="toggleHunterLicense(true)" style="width: 58px; height: 58px; background: transparent; border: none; box-shadow: none;">
-    <img src="Assets/hunter_crest.png" alt="Hunter Crest" style="width: 100%; height: 100%; object-fit: contain;">
+  <!-- SOLO LEVELING HUNTER BADGE -->
+  <div id="hunter-badge" class="rank-e" onclick="toggleHunterLicense(true)">
+    <img src="Assets/hunter_crest.png" alt="Hunter Crest">
   </div>
 
   <div id="app-wrapper">
-    <!-- PROFILE PANEL -->
     <div id="id-view" class="glass-panel id-card">
       <div class="avatar-wrap">
         <img class="avatar" src="https://github.com/Thiruvannan.png" alt="Avatar">
@@ -50,42 +45,29 @@
       <h1>Thiruvannan</h1>
       <p>Developer | SRMIST CSE</p>
       
-      <!-- iOS INSET GROUPED LIST -->
       <div class="ios-list">
         <a class="ios-row" href="tel:105786">
-          <i data-lucide="shield-alert" style="color: #fb7185;"></i>
-          <span>Emergency Contacts</span>
-          <i data-lucide="chevron-right" class="chevron"></i>
+          <i data-lucide="shield-alert" style="color: #fb7185;"></i><span>Emergency Contacts</span><i data-lucide="chevron-right" class="chevron"></i>
         </a>
         <div class="ios-divider"></div>
         <a class="ios-row" href="https://github.com/Thiruvannan" target="_blank">
-          <img src="Assets/github.svg" class="icon" alt="GitHub">
-          <span>GitHub Profile</span>
-          <i data-lucide="chevron-right" class="chevron"></i>
+          <img src="Assets/github.svg" class="icon" alt="GitHub"><span>GitHub Profile</span><i data-lucide="chevron-right" class="chevron"></i>
         </a>
         <div class="ios-divider"></div>
         <a class="ios-row" href="contact.vcf">
-          <i data-lucide="user-plus" style="color: #38bdf8;"></i>
-          <span>Save Contact</span>
-          <i data-lucide="chevron-right" class="chevron"></i>
+          <i data-lucide="user-plus" style="color: #38bdf8;"></i><span>Save Contact</span><i data-lucide="chevron-right" class="chevron"></i>
         </a>
         <div class="ios-divider"></div>
         <a class="ios-row" href="https://wa.me/919080792117?text=Hey!" target="_blank">
-          <i data-lucide="message-circle" style="color: #4ade80;"></i>
-          <span>WhatsApp</span>
-          <i data-lucide="chevron-right" class="chevron"></i>
+          <i data-lucide="message-circle" style="color: #4ade80;"></i><span>WhatsApp</span><i data-lucide="chevron-right" class="chevron"></i>
         </a>
         <div class="ios-divider"></div>
         <a class="ios-row" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR">
-          <i data-lucide="wallet" style="color: #a78bfa;"></i>
-          <span>Pay via UPI</span>
-          <i data-lucide="chevron-right" class="chevron"></i>
+          <i data-lucide="wallet" style="color: #a78bfa;"></i><span>Pay via UPI</span><i data-lucide="chevron-right" class="chevron"></i>
         </a>
         <div class="ios-divider"></div>
         <div class="ios-row" onclick="triggerInfinityCastle()">
-          <i data-lucide="castle" style="color: #f59e0b;"></i>
-          <span>Infinity Castle</span>
-          <i data-lucide="chevron-right" class="chevron"></i>
+          <i data-lucide="castle" style="color: #f59e0b;"></i><span>Infinity Castle</span><i data-lucide="chevron-right" class="chevron"></i>
         </div>
       </div>
 
@@ -94,14 +76,12 @@
       </button>
     </div>
 
-    <!-- TRACKER PANEL -->
     <div id="tracker-view">
       <div class="top-nav">
         <button class="back-btn desktop-hide" onclick="toggleView('id-view')"><i data-lucide="arrow-left" style="width:15px;"></i> ID Card</button>
         <button class="lock-btn" id="lockToggleBtn" onclick="toggleEditMode()"><i data-lucide="lock" style="width:14px;"></i> View Only</button>
         <button class="undo-btn" id="undoBtn" onclick="undoLastAction()"><i data-lucide="rotate-ccw" style="width:14px;"></i> Undo</button>
         
-        <!-- ROLLING DIGITAL CLOCK -->
         <div class="sync-status">
           <span class="sync-dot"></span>
           <span class="live-clock" id="liveClock">00:00:00</span>
@@ -134,7 +114,6 @@
             <span>Overall Attendance</span>
           </div>
           
-          <!-- SQUID GAME VAULT TALLY -->
           <div class="squid-board" id="globalSquidBoard">
             <div class="squid-title">○ △ □ VAULT TALLY</div>
             <div class="squid-numbers" id="squid-digits">
@@ -151,7 +130,6 @@
     </div>
   </div>
 
-  <!-- HUNTER LICENSE MODAL -->
   <div id="hunter-modal">
     <div class="hunter-card">
       <h2 id="hunter-rank-title" style="color: #fbbf24;">E-RANK HUNTER</h2>
@@ -163,17 +141,14 @@
     </div>
   </div>
 
-  <!-- HARDWARE-ISOLATED EREN'S VISION PLAYER -->
   <div id="vision-container">
     <video id="vision-video" playsinline preload="metadata" disablePictureInPicture controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"></video>
     <div class="vision-vignette"></div>
   </div>
 
-  <!-- ENHANCED APPLE MUSIC FLOATING PLAYER -->
   <div id="floating-music-player">
     <div class="art-wrap">
       <div class="art-progress" style="--progress: 0%;"></div>
-      <!-- Minimalist Vinyl SVG replacing the profile picture -->
       <svg class="art-disc" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5">
         <circle cx="12" cy="12" r="10" fill="#111"></circle>
         <circle cx="12" cy="12" r="3" stroke="rgba(255,255,255,0.4)"></circle>
@@ -186,7 +161,6 @@
     <audio id="bg-audio" preload="metadata"></audio>
   </div>
 
-  <!-- MODULE ENGINE BINDING -->
   <script type="module" src="js/main.js"></script>
 </body>
 </html>
