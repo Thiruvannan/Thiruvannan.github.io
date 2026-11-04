@@ -25,7 +25,7 @@ body {
 
 ::-webkit-scrollbar { width: 0px; background: transparent; }
 
-/* INFINITY CASTLE BACKGROUNDS & RED LACQUER FALLBACK */
+/* INFINITY CASTLE BACKGROUNDS & DEEPENED FALLBACK */
 .castle-bg {
   position: fixed; inset: 0; width: 100vw; height: 100vh; object-fit: cover;
   z-index: 0; pointer-events: none; opacity: 0;
@@ -35,7 +35,8 @@ body {
 @media (min-width: 1024px) { #castle-video-desktop { display: block; } }
 @media (max-width: 1023px) { #castle-video-mobile { display: block; } }
 
-body.infinity-castle { background: linear-gradient(-45deg, #1a0f00, #381a05, #000000); color: #fef3c7; }
+/* Deep fallback gradient in case mobile video is throttled */
+body.infinity-castle { background: linear-gradient(135deg, #2a0800, #140500, #000000); color: #fef3c7; }
 body.infinity-castle .castle-bg { opacity: 0.75; }
 
 #app-wrapper { width: 100%; max-width: 420px; z-index: 10; position: relative; }
@@ -47,16 +48,17 @@ body.infinity-castle .castle-bg { opacity: 0.75; }
   .tracker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
 }
 
-/* HIGH-TRANSPARENCY OLED GLASS (Mobile Optimized) */
+/* OPTIMIZED MOBILE GLASS (Prevents hollow look & GPU lag) */
 .glass-panel {
-  background: rgba(18, 18, 26, 0.3); /* Lowered opacity for true frosted look */
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  background: rgba(18, 18, 26, 0.45); /* Increased base opacity */
+  backdrop-filter: blur(12px); /* Reduced blur to save GPU */
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 32px;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.28), inset 0 -1px 0 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 0 rgba(255, 255, 255, 0.05);
   transition: all 0.4s ease; transform: translateZ(0);
 }
 body.infinity-castle .glass-panel {
-  background: rgba(10, 5, 5, 0.45);
+  background: rgba(10, 5, 5, 0.6); /* Solid dark amber fallback */
   border-color: rgba(245, 158, 11, 0.35);
   box-shadow: 0 24px 48px rgba(0,0,0,0.9), inset 0 1.5px 0 0 rgba(245, 158, 11, 0.4), inset 0 -1px 0 0 rgba(245, 158, 11, 0.15);
 }
@@ -83,7 +85,7 @@ body.infinity-castle .ios-divider { background: rgba(245, 158, 11, 0.15); }
 .btn-tracker:active { transform: scale(0.96); }
 body.infinity-castle .btn-tracker { background: #f59e0b; color: #000; box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3); }
 
-/* SQUID GAME VAULT TALLY (Clickable) */
+/* SQUID GAME VAULT TALLY */
 .squid-board { background: #050505; border: 2px solid #1a1a1a; border-radius: 12px; padding: 24px 16px; text-align: center; box-shadow: inset 0 0 40px #000, 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 20px; transition: all 0.3s ease; cursor: pointer; }
 .squid-board:active { transform: scale(0.98); }
 body.infinity-castle .squid-board { border-color: #78350f; background: #1a0f00; }
@@ -94,7 +96,7 @@ body.infinity-castle .squid-board { border-color: #78350f; background: #1a0f00; 
 .squid-board.eliminated .squid-title { color: #ef4444; text-shadow: 0 0 15px rgba(239, 68, 68, 0.6); }
 .squid-board.eliminated .squid-digit { color: #ef4444; border-color: rgba(239, 68, 68, 0.4); text-shadow: 0 0 15px #ef4444, 0 0 30px #dc2626; box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.2); }
 
-/* SOLO LEVELING HUNTER BADGE */
+/* HUNTER BADGE */
 #hunter-badge { position: fixed !important; top: 24px; right: 24px; width: 58px; height: 58px; cursor: pointer; z-index: 9999; display: flex; align-items: center; justify-content: center; background: transparent !important; border: none !important; box-shadow: none !important; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
 #hunter-badge:active { transform: scale(0.92); }
 #hunter-badge img { width: 100%; height: 100%; object-fit: contain; filter: brightness(1.7) contrast(1.3); }
@@ -105,7 +107,7 @@ body.infinity-castle .squid-board { border-color: #78350f; background: #1a0f00; 
 .rank-e img { filter: brightness(1.7) contrast(1.3) drop-shadow(0 0 12px #ef4444) drop-shadow(0 0 25px #ef4444) !important; animation: pulseRedAura 1.5s infinite; }
 @keyframes pulseRedAura { 0%, 100% { filter: brightness(1.7) contrast(1.3) drop-shadow(0 0 12px #ef4444); } 50% { filter: brightness(1.7) contrast(1.3) drop-shadow(0 0 25px #ef4444) drop-shadow(0 0 40px #ef4444); } }
 
-/* Hunter Modal */
+/* MODALS & VIEWS */
 #hunter-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 20000; justify-content: center; align-items: center; padding: 20px; }
 .hunter-card { background: rgba(15, 15, 20, 0.9); border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; padding: 30px; width: 100%; max-width: 340px; box-shadow: 0 30px 60px rgba(0,0,0,0.9); text-align: center; }
 .hunter-card h2 { font-size: 20px; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
@@ -114,7 +116,6 @@ body.infinity-castle .squid-board { border-color: #78350f; background: #1a0f00; 
 .hunter-stat:last-child { border: none; margin-bottom: 20px; }
 .btn-dismiss { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 12px; width: 100%; border-radius: 14px; font-weight: 700; font-size: 14px; cursor: pointer; }
 
-/* TRACKER & MATRIX UI */
 #tracker-view { display: none; }
 .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px; gap: 10px; flex-wrap: wrap; }
 .back-btn, .lock-btn, .undo-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 14px; border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
@@ -129,14 +130,9 @@ body.infinity-castle .squid-board { border-color: #78350f; background: #1a0f00; 
 .live-slot-banner { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; padding: 12px 16px; margin-bottom: 20px; font-size: 12px; font-weight: 600; color: #fff; display: flex; align-items: center; justify-content: space-between; }
 body.infinity-castle .live-slot-banner { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); color: #fef3c7; }
 
-/* Custom Frosted Day Selector */
-.section-title { font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; justify-content: space-between; align-items: center; }
-select { 
-  appearance: none; -webkit-appearance: none;
-  background: rgba(255, 255, 255, 0.08) url("data:image/svg+xml;utf8,<svg fill='%23fff' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 8px center;
-  background-size: 16px; padding: 6px 32px 6px 12px; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; 
-}
+select { appearance: none; -webkit-appearance: none; background: rgba(255, 255, 255, 0.08) url("data:image/svg+xml;utf8,<svg fill='%23fff' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 8px center; background-size: 16px; padding: 6px 32px 6px 12px; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; }
 select option { background: #1a1a24; color: #fff; }
+.section-title { font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; justify-content: space-between; align-items: center; }
 
 .class-card, .matrix-card { background: rgba(0, 0, 0, 0.28); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 18px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden; }
 body.infinity-castle .class-card, body.infinity-castle .matrix-card { background: rgba(0,0,0,0.6); border-color: rgba(245, 158, 11, 0.2); }
@@ -155,7 +151,6 @@ body.infinity-castle .class-card, body.infinity-castle .matrix-card { background
 .matrix-top { display: flex; justify-content: space-between; align-items: center; z-index: 2; position: relative; gap: 10px; }
 .matrix-name { font-size: 14px; font-weight: 800; line-height: 1.3; }
 .aot-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 16px; font-weight: 800; padding: 5px 11px; border-radius: 14px; white-space: nowrap; }
-
 .matrix-mid { display: flex; justify-content: space-between; align-items: center; font-size: 12px; z-index: 2; position: relative; }
 .matrix-stats { color: rgba(255,255,255,0.65); font-weight: 600; display: flex; align-items: center; gap: 6px; }
 .matrix-margin { font-weight: 700; padding: 4px 9px; border-radius: 8px; font-size: 11px; }
@@ -165,7 +160,7 @@ body.infinity-castle .class-card, body.infinity-castle .matrix-card { background
 .extra-btns { display: flex; gap: 10px; }
 .btn-extra { padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; }
 
-/* HARDWARE-ISOLATED EREN'S VISION PLAYER (With Cloudy Vignette) */
+/* HARDWARE-ISOLATED EREN'S VISION PLAYER */
 #vision-container {
   position: fixed; inset: 0; z-index: 10000;
   display: flex; justify-content: center; align-items: center;
@@ -195,7 +190,6 @@ body.infinity-castle .class-card, body.infinity-castle .matrix-card { background
 }
 #floating-music-player.playing { border-color: rgba(251, 191, 36, 0.4); box-shadow: 0 16px 36px rgba(0,0,0,0.65), 0 0 20px rgba(251, 191, 36, 0.18), inset 0 1px 0 rgba(255,255,255,0.1); }
 
-/* Custom CSS Vinyl Record & Gold Ring */
 .art-wrap { position: relative; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #000; border: 1px solid rgba(255,255,255,0.1); }
 .art-progress { position: absolute; inset: -2px; border-radius: 50%; background: conic-gradient(#ffbf00 var(--progress, 0%), transparent 0); -webkit-mask: radial-gradient(transparent 20px, black 21px); pointer-events: none; filter: drop-shadow(0 0 6px rgba(255,191,0,0.6)); }
 .art-disc { width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle, #333 10%, #111 20%, #222 30%, #000 80%); animation: spinDisc 4s linear infinite; animation-play-state: paused; position: relative; }
@@ -203,7 +197,6 @@ body.infinity-castle .class-card, body.infinity-castle .matrix-card { background
 #floating-music-player.playing .art-disc { animation-play-state: running; }
 @keyframes spinDisc { 100% { transform: rotate(360deg); } }
 
-/* Apple-Style Text Gradient Mask */
 .marquee-container { flex: 1; overflow: hidden; white-space: nowrap; font-size: 13px; font-weight: 600; color: #fff; pointer-events: none; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%); mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%); }
 #track-name { display: inline-block; padding-left: 100%; animation: marquee 11s linear infinite; }
 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
