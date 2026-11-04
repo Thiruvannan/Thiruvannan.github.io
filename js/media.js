@@ -84,7 +84,6 @@ export function initMediaEngine(triggerHapticFn) {
   let holdStartCoords = { x: 0, y: 0 };
   let wasMusicPlayingBeforeVision = false;
 
-  // Initialize UI immediately so "Loading OST Deck..." is overwritten
   const initialTrack = audioDeck.source[0];
   if (initialTrack) {
     trackLabel.textContent = initialTrack.title;
@@ -105,8 +104,6 @@ export function initMediaEngine(triggerHapticFn) {
     currentTrack = audioDeck.next();
     if (!currentTrack) return;
     audioPlayer.src = currentTrack.src;
-    
-    // Strict assignment: ONLY the song title, no artist or OST suffix
     trackLabel.textContent = currentTrack.title; 
     
     if ('mediaSession' in navigator) {
@@ -199,12 +196,16 @@ export function initMediaEngine(triggerHapticFn) {
     if (wasMusicPlayingBeforeVision) audioPlayer.play().catch(() => {});
   }
 
+  // FIX: passive is false, e.preventDefault() added to override mobile scrolling
   document.body.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 1) startHold(e.touches[0].clientX, e.touches[0].clientY, e.target);
-    else cancelHold();
-  }, { passive: true });
+    if (e.touches.length === 1) {
+      if(!isInteractiveElement(e.target)) e.preventDefault();
+      startHold(e.touches[0].clientX, e.touches[0].clientY, e.target);
+    } else cancelHold();
+  }, { passive: false });
   document.body.addEventListener('touchmove', cancelHold, { passive: true });
   document.body.addEventListener('touchend', cancelHold, { passive: true });
+  
   document.body.addEventListener('mousedown', (e) => {
     if (e.button === 0) startHold(e.clientX, e.clientY, e.target);
   });
