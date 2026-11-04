@@ -84,9 +84,11 @@ export function initMediaEngine(triggerHapticFn) {
   let holdStartCoords = { x: 0, y: 0 };
   let wasMusicPlayingBeforeVision = false;
 
-  const visionContainer = document.getElementById('vision-container');
-  const visionVideo = document.getElementById('vision-video');
-  const holdIndicator = document.getElementById('hold-indicator');
+  // Initialize UI immediately so "Loading OST Deck..." is overwritten
+  const initialTrack = audioDeck.source[0];
+  if (initialTrack) {
+    trackLabel.textContent = initialTrack.title;
+  }
 
   function updatePlayerUI(isPlaying) {
     if (isPlaying) {
@@ -103,7 +105,9 @@ export function initMediaEngine(triggerHapticFn) {
     currentTrack = audioDeck.next();
     if (!currentTrack) return;
     audioPlayer.src = currentTrack.src;
-    trackLabel.textContent = currentTrack.title; // FIX: Strict Title Only
+    
+    // Strict assignment: ONLY the song title, no artist or OST suffix
+    trackLabel.textContent = currentTrack.title; 
     
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
