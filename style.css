@@ -1,4 +1,4 @@
-<style>
+
   * { 
     box-sizing: border-box; 
     margin: 0; 
@@ -327,4 +327,4 @@
   .music-ctrl-btn:active { transform: scale(0.9); }
   #play-pause-btn { background: #ffffff; color: #000000; }
   .music-ctrl-btn svg { width: 14px; height: 14px; }
-</style>
+
