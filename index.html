@@ -13,6 +13,14 @@
   <!-- Squid Game Vault Font & External Stylesheet -->
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+
+  <!-- Force Cache Override for New Geometry -->
+  <style>
+    .neon-shape { font-size: 16px; margin-right: 6px; display: inline-block; }
+    .shape-circle { color: #38bdf8; text-shadow: 0 0 12px #38bdf8; }
+    .shape-triangle { color: #fbbf24; text-shadow: 0 0 12px #fbbf24; }
+    .shape-square { color: #ef4444; text-shadow: 0 0 12px #ef4444; }
+  </style>
 </head>
 <body>
 
@@ -27,9 +35,9 @@
   <!-- DELAYED LONG-PRESS RING -->
   <div id="hold-indicator"></div>
 
-  <!-- SOLO LEVELING HUNTER BADGE -->
-  <div id="hunter-badge" class="rank-e" onclick="toggleHunterLicense(true)">
-    <img src="Assets/hunter_crest.png" alt="Hunter Crest">
+  <!-- SOLO LEVELING HUNTER BADGE (Scaled up, pure transparency) -->
+  <div id="hunter-badge" class="rank-e" onclick="toggleHunterLicense(true)" style="width: 58px; height: 58px; background: transparent; border: none; box-shadow: none;">
+    <img src="Assets/hunter_crest.png" alt="Hunter Crest" style="width: 100%; height: 100%; object-fit: contain;">
   </div>
 
   <div id="app-wrapper">
@@ -91,7 +99,12 @@
         <button class="back-btn desktop-hide" onclick="toggleView('id-view')"><i data-lucide="arrow-left" style="width:15px;"></i> ID Card</button>
         <button class="lock-btn" id="lockToggleBtn" onclick="toggleEditMode()"><i data-lucide="lock" style="width:14px;"></i> View Only</button>
         <button class="undo-btn" id="undoBtn" onclick="undoLastAction()"><i data-lucide="rotate-ccw" style="width:14px;"></i> Undo</button>
-        <div class="sync-status"><span class="sync-dot"></span><span id="syncLabel">Live</span></div>
+        
+        <!-- ROLLING DIGITAL CLOCK -->
+        <div class="sync-status">
+          <span class="sync-dot"></span>
+          <span class="live-clock" id="liveClock">00:00:00</span>
+        </div>
       </div>
 
       <div class="live-slot-banner" id="liveSlotBanner">
@@ -159,9 +172,14 @@
   <div id="floating-music-player">
     <div class="art-wrap">
       <div class="art-progress" style="--progress: 0%;"></div>
-      <img class="art-disc" src="https://github.com/Thiruvannan.png" alt="Disc">
+      <!-- Minimalist Vinyl SVG replacing the profile picture -->
+      <svg class="art-disc" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10" fill="#111"></circle>
+        <circle cx="12" cy="12" r="3" stroke="rgba(255,255,255,0.4)"></circle>
+        <circle cx="12" cy="12" r="1" fill="#fff"></circle>
+      </svg>
     </div>
-    <div class="marquee-container"><span id="track-name">Tap Play • Swipe to Skip</span></div>
+    <div class="marquee-container"><span id="track-name">Loading OST Deck...</span></div>
     <button class="music-ctrl-btn" id="play-pause-btn" onclick="toggleMusic()" title="Play/Pause"><i data-lucide="play"></i></button>
     <button class="music-ctrl-btn" onclick="playNextRandomTrack()" title="Next Random Track"><i data-lucide="skip-forward"></i></button>
     <audio id="bg-audio" preload="metadata"></audio>
