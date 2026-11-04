@@ -159,7 +159,7 @@
   height: 100%; 
   object-fit: contain;
   filter: brightness(1.6) contrast(1.2); /* Makes the dark crest pop on OLED */
-}
+ }
   #hunter-badge:active { transform: scale(0.92); }
   #hunter-badge img { width: 100%; height: 100%; object-fit: contain; }
   
