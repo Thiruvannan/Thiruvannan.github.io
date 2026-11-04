@@ -104,7 +104,7 @@ export function initMediaEngine(triggerHapticFn) {
     currentTrack = audioDeck.next();
     if (!currentTrack) return;
     audioPlayer.src = currentTrack.src;
-    trackLabel.textContent = `${currentTrack.title} • ${currentTrack.artist}`;
+    trackLabel.textContent = currentTrack.title; // Only the song title
     
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
