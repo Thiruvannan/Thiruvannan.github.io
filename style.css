@@ -300,8 +300,8 @@
   }
   
   /* 1px Circular Progress Ring - Changed to #ffbf00 Golden Amber */
-  .art-wrap { position: relative; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .art-progress { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(#ffbf00 var(--progress, 0%), transparent 0); -webkit-mask: radial-gradient(transparent 17px, black 17px); pointer-events: none; }
+  .art-wrap { position: relative; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .art-progress { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(#fbbf24 var(--progress, 0%), transparent 0); -webkit-mask: radial-gradient(transparent 15px, black 16px); pointer-events: none; filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.6)); }
   
   /* The Vinyl Record / Logo */
   .art-disc { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; animation: spinDisc 8s linear infinite; animation-play-state: paused; background: #000; border: 1px solid rgba(255,255,255,0.1); }
