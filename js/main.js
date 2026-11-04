@@ -12,7 +12,6 @@ let globalHunterAttended = 0;
 let globalHunterBunks = 0;
 let lastKnownAttended = 0;
 
-// UTILS & HAPTICS
 function triggerHaptic(type = 'light') {
   if (!navigator.vibrate) return;
   if (type === 'light') navigator.vibrate(35);
@@ -41,14 +40,12 @@ function calculateMargin(attended, conducted) {
   }
 }
 
-// THE LIVE TICKING CLOCK
 setInterval(() => {
   const now = new Date();
   const clockEl = document.getElementById('liveClock');
   if(clockEl) clockEl.textContent = now.toLocaleTimeString('en-US', { hour12: false });
 }, 1000);
 
-// FIREBASE & UI RENDERING
 function initFirebaseApp() {
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
@@ -70,7 +67,6 @@ function initFirebaseApp() {
     if (!isEditMode) return; 
     triggerHaptic('success');
 
-    // Force Audio Authorization on user click
     const cashSfx = document.getElementById('cash-sfx');
     cashSfx.volume = 1.0;
     
@@ -83,7 +79,7 @@ function initFirebaseApp() {
       myData[code].attended++;
       myData[code].conducted++;
       cashSfx.currentTime = 0;
-      cashSfx.play().catch(()=>{}); // Plays Cash Tick instantly
+      cashSfx.play().catch(()=>{}); 
     } else {
       myData[code].conducted++;
     }
@@ -152,7 +148,6 @@ function renderUI() {
     const sub = myData[code] || { name: code }, logKey = `${today}_D${activeDayOrder}_S${slotNum}_${code}`, previousAction = loggedDailyActions[logKey];
     let actionUI = '';
     
-    // PURGED GREEN CLASSES - Now using Neon Blue & Minimal Glass
     if (previousAction === 'attended') actionUI = `<div class="logged-status" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);"><i data-lucide="check-circle-2"></i> Logged: Attended</div>`;
     else if (previousAction === 'missed') actionUI = `<div class="logged-status" style="background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3);"><i data-lucide="x-circle"></i> Logged: Missed</div>`;
     else if (isEditMode) actionUI = `<div class="btn-row"><button class="btn-log" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onclick="logClass('${code}', '${slotNum}', 'attended')"><i data-lucide="check"></i> Attended</button><button class="btn-log" style="background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3);" onclick="logClass('${code}', '${slotNum}', 'missed')"><i data-lucide="x"></i> Missed</button></div>`;
@@ -176,13 +171,11 @@ function renderMatrix() {
     const perc = data.conducted === 0 ? 100 : ((data.attended / data.conducted) * 100);
     const margin = calculateMargin(data.attended, data.conducted);
     
-    // PURGED AOT SHIELDS - Now using Neon Squid Game Geometry
     let rankUI = '';
     if (perc >= 90) { rankUI = `<div class="aot-badge" style="color: #38bdf8; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3);"><span class="neon-shape shape-circle">○</span> ${perc.toFixed(1)}%</div>`; }
     else if (perc >= 75) { rankUI = `<div class="aot-badge" style="color: #fbbf24; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3);"><span class="neon-shape shape-triangle">△</span> ${perc.toFixed(1)}%</div>`; }
     else { rankUI = `<div class="aot-badge" style="color: #ef4444; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4);"><span class="neon-shape shape-square">□</span> ${perc.toFixed(1)}%</div>`; }
 
-    // PURGED GREEN MARGIN
     const marginUI = margin.safe 
       ? `<span class="matrix-margin" style="color: #38bdf8; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3);">${margin.text}</span>`
       : `<span class="matrix-margin" style="color: #fb7185; background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.35);">${margin.text}</span>`;
@@ -263,28 +256,41 @@ window.toggleHunterLicense = (show) => {
   }
 };
 
+window.triggerCashSound = () => {
+  const cashSfx = document.getElementById('cash-sfx');
+  cashSfx.volume = 1.0;
+  cashSfx.currentTime = 0;
+  cashSfx.play().catch(()=>{});
+  triggerHaptic('light');
+};
+
 window.triggerInfinityCastle = () => {
   triggerHaptic('domain');
   const isActivating = !document.body.classList.contains('infinity-castle');
   
-  // Force Audio Authorization
   const biwaSfx = document.getElementById('biwa-sfx');
   biwaSfx.volume = 1.0;
   biwaSfx.currentTime = 0;
   biwaSfx.play().catch(()=>{});
 
+  const vidDesktop = document.getElementById('castle-video-desktop');
+  const vidMobile = document.getElementById('castle-video-mobile');
+
   if (isActivating) {
     document.body.classList.add('infinity-castle');
-    document.getElementById('castle-video-desktop').play().catch(()=>{});
-    document.getElementById('castle-video-mobile').play().catch(()=>{});
+    // Explicit trigger logic to bypass iOS Low Power Mode limitations
+    if (window.innerWidth >= 1024) {
+      vidDesktop.play().catch(()=>{});
+    } else {
+      vidMobile.play().catch(()=>{});
+    }
   } else {
     document.body.classList.remove('infinity-castle');
-    document.getElementById('castle-video-desktop').pause();
-    document.getElementById('castle-video-mobile').pause();
+    vidDesktop.pause();
+    vidMobile.pause();
   }
 };
 
-// INITIALIZATION BOOTSTRAP
 document.addEventListener('DOMContentLoaded', async () => {
   console.log("⚡ System Initializing...");
   initFirebaseApp();
