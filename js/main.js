@@ -229,6 +229,36 @@ function initFirebase() {
   }
 }
 
+// ==========================================================================
+// SEAMLESS SINGLE-STREAM LOOP CONTROLLER
+// ==========================================================================
+function getActiveVideo() {
+  return window.innerWidth >= 1024 
+    ? document.getElementById('castle-video-desktop') 
+    : document.getElementById('castle-video-mobile');
+}
+
+function bindSeamlessLoop(vid) {
+  if (!vid) return;
+  
+  // Cut off blank tail frames and seek to frame 1 before EOF
+  vid.addEventListener('timeupdate', function() {
+    if (this.duration && this.currentTime >= (this.duration - 0.35)) {
+      this.currentTime = 0.04;
+      this.play().catch(()=>{});
+    }
+  });
+
+  // Fallback safety if timeupdate skips on low battery mode
+  vid.addEventListener('ended', function() {
+    this.currentTime = 0.04;
+    this.play().catch(()=>{});
+  });
+}
+
+// ==========================================================================
+// EVENT LISTENERS & TRIGGERS
+// ==========================================================================
 document.addEventListener('click', (e) => {
   const trigger = e.target.closest('[data-trigger]');
   const logBtn = e.target.closest('[data-log-class]');
@@ -243,11 +273,11 @@ document.addEventListener('click', (e) => {
 
     if (action === 'open-telemetry') {
       document.getElementById('telemetry-drawer')?.classList.add('active');
-      document.body.classList.add('drawer-open'); // Triggers ghosting fix
+      document.body.classList.add('drawer-open');
     }
     if (action === 'close-telemetry') {
       document.getElementById('telemetry-drawer')?.classList.remove('active');
-      document.body.classList.remove('drawer-open'); // Reverts ghosting fix
+      document.body.classList.remove('drawer-open');
     }
     if (action === 'license-modal') {
       const modal = document.getElementById('hunter-modal');
@@ -260,38 +290,26 @@ document.addEventListener('click', (e) => {
       document.getElementById('hunter-modal')?.classList.add('hidden');
     }
     
-    // OPTICAL INFINITY CASTLE TRIGGER
+    // INFINITY CASTLE TRIGGER
     if (action === 'domain-expansion') {
       playAudioCue(biwaSfx);
       
       const isCastleActive = document.body.classList.toggle('infinity-castle');
       const layer = document.getElementById('cinematic-layer');
       const banner = document.getElementById('domain-hud-banner');
-      
-      const isDesktop = window.innerWidth >= 1024;
-      const activeVideo = isDesktop 
-        ? document.getElementById('castle-video-desktop') 
-        : document.getElementById('castle-video-mobile');
-      const inactiveVideo = isDesktop 
-        ? document.getElementById('castle-video-mobile') 
-        : document.getElementById('castle-video-desktop');
+      const activeVid = getActiveVideo();
 
       if (isCastleActive) {
         layer?.classList.add('active');
         banner?.classList.add('active');
-
-        const targetSrc = isDesktop ? 'Assets/infinity_castle_desktop.mp4' : 'Assets/infinity_castle_mobile.mp4';
-        if (activeVideo.getAttribute('src') !== targetSrc) {
-          activeVideo.src = targetSrc;
+        if (activeVid) {
+          activeVid.currentTime = 0.04;
+          activeVid.play().catch(err => console.warn("Autoplay note:", err.message));
         }
-        
-        activeVideo.play().catch(err => console.warn("Autoplay note:", err.message));
-        if (inactiveVideo) inactiveVideo.pause();
       } else {
         layer?.classList.remove('active');
         banner?.classList.remove('active');
-        if (activeVideo) activeVideo.pause();
-        if (inactiveVideo) inactiveVideo.pause();
+        if (activeVid) activeVid.pause();
       }
     }
   } 
@@ -436,19 +454,9 @@ function bootTelemetry() {
   renderSchedule();
   renderMatrix();
 
-  // SEAMLESS LOOP ENGINE (Eliminates the Black Blink)
-  ['castle-video-desktop', 'castle-video-mobile'].forEach(id => {
-    const vid = document.getElementById(id);
-    if (vid) {
-      vid.addEventListener('timeupdate', function() {
-        // Trigger the wrap exactly 0.25s before hardware EOF to prevent black decodes
-        if (this.duration && this.currentTime >= this.duration - 0.25) {
-          this.currentTime = 0.05; // Skips frame 0 which can sometimes render black
-          this.play().catch(()=>{});
-        }
-      });
-    }
-  });
+  // Attach precision loop listener to both streams
+  bindSeamlessLoop(document.getElementById('castle-video-desktop'));
+  bindSeamlessLoop(document.getElementById('castle-video-mobile'));
 }
 
 if (document.readyState === 'loading') {
