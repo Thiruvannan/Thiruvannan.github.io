@@ -1,5 +1,5 @@
 /* ==========================================================================
-   OPTICAL OBSIDIAN ARCHITECTURE (REFLECT & MACOS SPEC)
+   OPTICAL OBSIDIAN ARCHITECTURE (APPLE / VERCEL SPEC)
    ========================================================================== */
 
 :root {
@@ -26,18 +26,19 @@
 }
 
 html, body {
-  min-height: 100%;
+  min-height: 100vh;
   background-color: var(--bg-core);
   color: var(--text-primary);
   font-family: 'Inter', -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 body {
   display: flex;
   justify-content: center;
-  padding: 68px 16px 120px 16px; /* Generous clearance ensures banner never touches the avatar */
-  overflow-x: hidden;
+  align-items: center; /* Vercel Center-Lock */
+  padding: 0 16px;
   position: relative;
   transition: background-color 0.8s ease;
 }
@@ -51,15 +52,16 @@ button, .menu-row, .btn-icon {
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
 
 /* ==========================================================================
-   REFLECT.APP OPTICAL AURA (LIGHT BLOOM BEHIND GLASS)
+   REFLECT.APP OPTICAL AURA
    ========================================================================== */
 #ambient-glow-bloom {
   position: fixed;
-  top: -140px;
+  top: -10vh;
   left: 50%;
   transform: translateX(-50%);
-  width: 720px;
-  height: 520px;
+  width: 80vw;
+  max-width: 800px;
+  height: 60vh;
   background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(168, 85, 247, 0.12) 40%, transparent 70%);
   filter: blur(80px);
   pointer-events: none;
@@ -68,33 +70,30 @@ button, .menu-row, .btn-icon {
 }
 
 /* ==========================================================================
-   MACOS OPTICAL GLASS PANELS (TRUE TRANSLUCENCY)
+   MACOS OPTICAL GLASS PANELS
    ========================================================================== */
 .obsidian-glass {
-  background: rgba(14, 14, 20, 0.35); /* Pure optical glass: lets video shine through */
+  background: rgba(14, 14, 20, 0.35); 
   backdrop-filter: blur(28px) saturate(190%);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.25); /* Specular top light edge */
+  border-top: 1px solid rgba(255, 255, 255, 0.25); 
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ==========================================================================
-   INFINITY CASTLE DIMENSION (DEMON SLAYER SHIFT & SHARP CONTRAST)
+   INFINITY CASTLE DIMENSION (HIGH-TRANSPARENCY THEME)
    ========================================================================== */
 body.infinity-castle #ambient-glow-bloom {
-  top: -80px;
-  width: 950px;
-  height: 650px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.38) 0%, rgba(220, 38, 38, 0.2) 45%, transparent 75%);
-  filter: blur(90px);
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, rgba(220, 38, 38, 0.2) 50%, transparent 80%);
+  filter: blur(100px);
 }
 
 body.infinity-castle .obsidian-glass {
-  background: rgba(18, 10, 6, 0.38) !important; /* Low opacity prevents muddy brown stacking */
-  backdrop-filter: blur(30px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
+  background: rgba(18, 10, 6, 0.45) !important; 
+  backdrop-filter: blur(24px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
   border-color: rgba(245, 158, 11, 0.25) !important;
   border-top: 1px solid rgba(245, 158, 11, 0.65) !important;
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8), 
@@ -109,9 +108,8 @@ body.infinity-castle .btn-primary {
   box-shadow: 0 10px 30px rgba(245, 158, 11, 0.35) !important;
 }
 
-/* High-Contrast Castle Mode Elements */
 body.infinity-castle .telemetry-panel {
-  background: rgba(0, 0, 0, 0.25) !important;
+  background: rgba(0, 0, 0, 0.35) !important;
   border: 1px solid rgba(245, 158, 11, 0.15) !important;
 }
 
@@ -123,9 +121,8 @@ body.infinity-castle .live-slot-banner {
 
 body.infinity-castle #schedule-container > div,
 body.infinity-castle #matrix-container > div {
-  background: rgba(255, 255, 255, 0.04) !important;
+  background: rgba(0, 0, 0, 0.2) !important;
   border: 1px solid rgba(245, 158, 11, 0.22) !important;
-  backdrop-filter: blur(8px);
 }
 
 body.infinity-castle #schedule-container div[style*="font-weight:700"],
@@ -138,7 +135,6 @@ body.infinity-castle #schedule-container div[style*="font-family:'Share Tech Mon
   color: #e2e8f0 !important;
 }
 
-/* Crisp Attended / Missed badges over amber video */
 body.infinity-castle [data-status="attended"],
 body.infinity-castle div[style*="var(--accent-cyan)"] {
   background: rgba(56, 189, 248, 0.22) !important;
@@ -161,6 +157,7 @@ body.infinity-castle div[style*="var(--accent-red)"] {
   max-width: 440px;
   position: relative;
   z-index: 10;
+  margin-top: -60px; /* Slight lift to balance the bottom dock */
 }
 
 @media (min-width: 1024px) {
@@ -169,9 +166,9 @@ body.infinity-castle div[style*="var(--accent-red)"] {
     display: grid;
     grid-template-columns: 340px 1fr;
     gap: 32px;
-    align-items: start;
+    align-items: center; /* Vercel Center-Lock Desktop */
+    margin-top: 0;
   }
-  #identity-core { position: sticky; top: 68px; }
   .telemetry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .scroll-zone { max-height: 58vh; overflow-y: auto; }
 }
@@ -181,7 +178,7 @@ body.infinity-castle div[style*="var(--accent-red)"] {
    ========================================================================== */
 #identity-core {
   border-radius: var(--radius-lg);
-  padding: 24px;
+  padding: 28px 24px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -202,9 +199,9 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 .rank-label { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; }
 
 .profile-block { text-align: center; }
-.avatar-wrap { margin: 0 auto 14px; width: 88px; height: 88px; }
+.avatar-wrap { margin: 0 auto 16px; width: 96px; height: 96px; }
 .avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(255,255,255,0.18); object-fit: cover; }
-.dev-name { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.dev-name { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
 .dev-title { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 
 .tactical-menu {
@@ -239,7 +236,7 @@ body.infinity-castle div[style*="var(--accent-red)"] {
   color: var(--bg-core);
   border: none;
   width: 100%;
-  padding: 15px;
+  padding: 16px;
   border-radius: var(--radius-md);
   font-weight: 700;
   font-size: 14px;
@@ -257,7 +254,7 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 }
 
 /* ==========================================================================
-   TELEMETRY DRAWER (MOBILE OFF-CANVAS / FIXED FLUID SHEET)
+   TELEMETRY DRAWER
    ========================================================================== */
 #telemetry-drawer {
   display: flex;
@@ -389,27 +386,27 @@ body.infinity-castle div[style*="var(--accent-red)"] {
    ========================================================================== */
 #acoustic-dock {
   position: fixed;
-  bottom: 20px;
+  bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 32px);
-  max-width: 320px;
+  max-width: 340px;
   border-radius: 40px;
-  padding: 8px 14px;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   z-index: 200;
 }
-.track-info { display: flex; align-items: center; gap: 10px; overflow: hidden; }
-.track-marquee { font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--text-muted); }
-.audio-controls { display: flex; align-items: center; gap: 4px; }
+.track-info { display: flex; align-items: center; gap: 12px; overflow: hidden; }
+.track-marquee { font-size: 13px; font-weight: 600; white-space: nowrap; color: var(--text-muted); }
+.audio-controls { display: flex; align-items: center; gap: 6px; }
 .btn-icon {
   background: transparent;
   border: none;
   color: var(--text-primary);
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -417,10 +414,10 @@ body.infinity-castle div[style*="var(--accent-red)"] {
   cursor: pointer;
 }
 .play-btn { background: var(--text-primary); color: var(--bg-core); }
-.play-btn i { width: 15px; height: 15px; }
+.play-btn i { width: 16px; height: 16px; }
 
 /* ==========================================================================
-   INFINITY CASTLE VIDEO & COMPACT SINGLE-LINE HUD BANNER
+   INFINITY CASTLE VIDEO & ABSOLUTE TOP HUD BANNER
    ========================================================================== */
 #cinematic-layer {
   position: fixed;
@@ -432,7 +429,7 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 }
 
 #cinematic-layer.active {
-  opacity: 0.9;
+  opacity: 1;
 }
 
 .castle-bg {
@@ -440,7 +437,6 @@ body.infinity-castle div[style*="var(--accent-red)"] {
   height: 100vh;
   object-fit: cover;
   display: none;
-  filter: contrast(1.15) saturate(1.2);
 }
 
 @media (min-width: 1024px) { #castle-video-desktop { display: block; } }
@@ -449,29 +445,28 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 .vignette-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.7) 95%);
+  background: radial-gradient(circle at center, transparent 20%, rgba(0, 0, 0, 0.8) 95%);
   pointer-events: none;
 }
 
-/* Single-line sleek status pill (No wrapping, zero avatar overlap) */
+/* Locked to the extreme top edge to guarantee zero collision */
 #domain-hud-banner {
   position: fixed;
-  top: 12px;
+  top: 16px;
   left: 50%;
-  transform: translate(-50%, -20px);
+  transform: translate(-50%, -40px);
   z-index: 250;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 14px;
+  gap: 10px;
+  padding: 6px 18px;
   background: rgba(15, 8, 4, 0.94);
   border: 1px solid rgba(245, 158, 11, 0.45);
   border-radius: 9999px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 12px rgba(245, 158, 11, 0.2);
-  white-space: nowrap; /* PREVENTS VERTICAL TEXT WRAPPING */
-  max-width: 90vw;
+  white-space: nowrap; 
   opacity: 0;
   pointer-events: none;
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -486,7 +481,7 @@ body.infinity-castle div[style*="var(--accent-red)"] {
   font-family: serif;
   color: #f59e0b;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: 1.5px;
   text-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
   flex-shrink: 0;
@@ -494,17 +489,14 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 
 .domain-label {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 1.5px;
+  font-size: 11px;
+  letter-spacing: 2px;
   color: #fef3c7;
   text-transform: uppercase;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* ==========================================================================
-   TACTICAL HOLD RETICLE & FULLSCREEN VISION
+   MODALS & HUD
    ========================================================================== */
 #hold-reticle {
   position: fixed;
@@ -557,6 +549,6 @@ body.infinity-castle div[style*="var(--accent-red)"] {
   align-items: center;
   justify-content: center;
 }
-.modal-card { padding: 28px; border-radius: var(--radius-lg); text-align: center; width: 88%; max-width: 320px; }
-.modal-stats { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; font-weight: 600; }
-.stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; }
+.modal-card { padding: 32px 24px; border-radius: var(--radius-lg); text-align: center; width: 88%; max-width: 340px; }
+.modal-stats { margin: 24px 0; display: flex; flex-direction: column; gap: 14px; font-size: 14px; font-weight: 600; }
+.stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; }
