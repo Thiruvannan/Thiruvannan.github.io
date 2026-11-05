@@ -241,7 +241,6 @@ function getActiveVideo() {
 function bindSeamlessLoop(vid) {
   if (!vid) return;
   
-  // Cut off blank tail frames and seek to frame 1 before EOF
   vid.addEventListener('timeupdate', function() {
     if (this.duration && this.currentTime >= (this.duration - 0.35)) {
       this.currentTime = 0.04;
@@ -249,7 +248,6 @@ function bindSeamlessLoop(vid) {
     }
   });
 
-  // Fallback safety if timeupdate skips on low battery mode
   vid.addEventListener('ended', function() {
     this.currentTime = 0.04;
     this.play().catch(()=>{});
@@ -271,13 +269,10 @@ document.addEventListener('click', (e) => {
       triggerHaptic('light');
     }
 
-    // EMERGENCY CONTACTS PROTOCOL
+    // EMERGENCY CONTACTS PROTOCOL (Unified: Opens modal on both Mobile & Desktop)
     if (action === 'emergency-contacts') {
-      if (window.innerWidth >= 1024) {
-        e.preventDefault(); // Stop mobile tel link on desktop
-        document.getElementById('emergency-modal')?.classList.remove('hidden');
-      }
-      // Mobile allows default tel: href to execute immediately
+      e.preventDefault();
+      document.getElementById('emergency-modal')?.classList.remove('hidden');
     }
 
     if (action === 'close-emergency') {
@@ -467,11 +462,9 @@ function bootTelemetry() {
   renderSchedule();
   renderMatrix();
 
-  // Attach precision loop listener to both streams
   bindSeamlessLoop(document.getElementById('castle-video-desktop'));
   bindSeamlessLoop(document.getElementById('castle-video-mobile'));
   
-  // Close emergency modal on backdrop click
   document.getElementById('emergency-modal')?.addEventListener('click', (e) => {
     if (e.target.id === 'emergency-modal') {
       document.getElementById('emergency-modal').classList.add('hidden');
