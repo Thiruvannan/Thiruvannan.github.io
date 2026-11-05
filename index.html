@@ -15,8 +15,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   
-  <!-- CACHE BUSTER v4.0: Forces mobile to download the fixed layout -->
-  <link rel="stylesheet" href="style.css?v=6.0">
+  <!-- CACHE BUSTER v7.0: Forces immediate layout update -->
+  <link rel="stylesheet" href="style.css?v=7.0">
 </head>
 <body>
 
@@ -25,8 +25,9 @@
 
   <!-- LAYER 1: AMBIENT CINEMATIC ENVIRONMENT -->
   <div id="cinematic-layer">
-    <video id="castle-video-desktop" class="castle-bg" muted loop playsinline disablePictureInPicture></video>
-    <video id="castle-video-mobile" class="castle-bg" muted loop playsinline disablePictureInPicture></video>
+    <!-- Removed native 'loop' so the custom JS engine handles the seamless wrap -->
+    <video id="castle-video-desktop" class="castle-bg" muted playsinline disablePictureInPicture></video>
+    <video id="castle-video-mobile" class="castle-bg" muted playsinline disablePictureInPicture></video>
     <div class="vignette-overlay"></div>
   </div>
 
