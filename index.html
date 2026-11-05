@@ -15,18 +15,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   
-  <!-- CACHE BUSTER v9.0 -->
-  <link rel="stylesheet" href="style.css?v=9.0">
+  <!-- CACHE BUSTER v14.0 -->
+  <link rel="stylesheet" href="style.css?v=14.0">
 </head>
 <body>
 
   <!-- AMBIENT OPTICAL LIGHT SOURCE -->
   <div id="ambient-glow-bloom"></div>
 
-  <!-- LAYER 1: CINEMATIC ENVIRONMENT (Direct Native Preload) -->
+  <!-- LAYER 1: CINEMATIC ENVIRONMENT -->
   <div id="cinematic-layer">
-    <video id="castle-video-desktop" class="castle-bg" muted playsinline preload="auto" src="Assets/infinity_castle_desktop.mp4" disablePictureInPicture></video>
-    <video id="castle-video-mobile" class="castle-bg" muted playsinline preload="auto" src="Assets/infinity_castle_mobile.mp4" disablePictureInPicture></video>
+    <!-- src is explicitly left blank; JS will strictly inject the correct one based on device -->
+    <video id="castle-video-desktop" class="castle-bg" muted playsinline disablePictureInPicture></video>
+    <video id="castle-video-mobile" class="castle-bg" muted playsinline disablePictureInPicture></video>
     <div class="vignette-overlay"></div>
   </div>
 
@@ -67,13 +68,13 @@
       </div>
       
       <nav class="tactical-menu">
-        <a class="menu-row text-alert" href="tel:105786">
+        <a class="menu-row text-alert" href="tel:105786" data-trigger="emergency-contacts">
           <i data-lucide="shield-alert"></i>
           <span>Emergency Contacts</span>
         </a>
         <div class="divider"></div>
         <a class="menu-row text-neutral" href="https://github.com/Thiruvannan" target="_blank">
-          <i data-lucide="github"></i>
+          <img class="menu-icon github-icon" src="Assets/github.svg" alt="GitHub">
           <span>GitHub Profile</span>
         </a>
         <div class="divider"></div>
@@ -120,8 +121,8 @@
       </div>
 
       <div class="live-slot-banner" id="liveSlotBanner">
-        <span id="slotStatusText">Syncing Schedule...</span>
-        <span id="slotTimeRemaining"></span>
+        <span id="slotStatusText" class="banner-text-left">Syncing...</span>
+        <span id="slotTimeRemaining" class="banner-text-right"></span>
       </div>
 
       <div class="telemetry-grid">
@@ -152,22 +153,21 @@
         </section>
       </div>
     </aside>
-
   </div>
 
   <!-- LAYER 3: DOCKED ACOUSTIC CONSOLE -->
   <div id="acoustic-dock" class="obsidian-glass">
     <div class="track-info">
-      <div class="music-wave">
+      <div class="music-wave" id="music-visualizer">
         <span class="bar"></span><span class="bar"></span><span class="bar"></span>
       </div>
       <div class="track-marquee">
-        <span id="track-name">Deck offline</span>
+        <span id="track-name">Audio Deck Ready</span>
       </div>
     </div>
     <div class="audio-controls">
       <button class="btn-icon" data-trigger="audio-prev"><i data-lucide="skip-back"></i></button>
-      <button class="btn-icon play-btn" data-trigger="audio-toggle"><i data-lucide="play"></i></button>
+      <button class="btn-icon play-btn" data-trigger="audio-toggle" id="audio-play-btn"><i data-lucide="play"></i></button>
       <button class="btn-icon" data-trigger="audio-next"><i data-lucide="skip-forward"></i></button>
     </div>
   </div>
@@ -182,6 +182,86 @@
         <div class="stat-row"><span>Quest Buffer</span> <span id="hunter-buffer">0 Bunks Left</span></div>
       </div>
       <button class="btn-primary" data-trigger="close-license">Dismiss</button>
+    </div>
+  </div>
+
+  <!-- TACTICAL SOS DIRECTORY MODAL -->
+  <div id="emergency-modal" class="modal-backdrop hidden">
+    <div class="modal-card obsidian-glass emergency-modal-card">
+      <div class="emergency-modal-header">
+        <div>
+          <span class="emergency-tag">TACTICAL SOS DIRECTORY</span>
+          <h2>Emergency Protocols</h2>
+        </div>
+        <button class="btn-icon" data-trigger="close-emergency"><i data-lucide="x"></i></button>
+      </div>
+
+      <div class="emergency-scroll-zone">
+        <div class="emergency-group-title">SRMIST KTR Campus Direct Lines</div>
+        <div class="emergency-grid">
+          <a class="emergency-tile" href="tel:105786">
+            <div class="tile-meta">
+              <span class="tile-title">SRM Campus Ambulance / SOS</span>
+              <span class="tile-desc">SRM Global Hospital Trauma Care (24x7)</span>
+            </div>
+            <span class="tile-phone highlight">105786</span>
+          </a>
+          <a class="emergency-tile" href="tel:04427452270">
+            <div class="tile-meta">
+              <span class="tile-title">SRM Security Control Room</span>
+              <span class="tile-desc">Main Gate & Campus Patrol HQ</span>
+            </div>
+            <span class="tile-phone">044-27452270</span>
+          </a>
+          <a class="emergency-tile" href="tel:04427456730">
+            <div class="tile-meta">
+              <span class="tile-title">SRM Student Wellness Cell</span>
+              <span class="tile-desc">Confidential Psychological Support</span>
+            </div>
+            <span class="tile-phone">044-27456730</span>
+          </a>
+          <a class="emergency-tile" href="tel:18001805522">
+            <div class="tile-meta">
+              <span class="tile-title">National Anti-Ragging Cell</span>
+              <span class="tile-desc">UGC Anti-Ragging 24x7 Helpline</span>
+            </div>
+            <span class="tile-phone">1800-180-5522</span>
+          </a>
+        </div>
+
+        <div class="emergency-group-title">National Strategic Lifelines</div>
+        <div class="emergency-grid">
+          <a class="emergency-tile" href="tel:112">
+            <div class="tile-meta">
+              <span class="tile-title">National Emergency (All-in-One)</span>
+              <span class="tile-desc">Police (100), Fire (101), Ambulance (108)</span>
+            </div>
+            <span class="tile-phone highlight">112</span>
+          </a>
+          <a class="emergency-tile" href="tel:1930">
+            <div class="tile-meta">
+              <span class="tile-title">Cyber Financial Fraud SOS</span>
+              <span class="tile-desc">Freeze unauthorized UPI/bank transfers</span>
+            </div>
+            <span class="tile-phone highlight">1930</span>
+          </a>
+          <a class="emergency-tile" href="tel:14416">
+            <div class="tile-meta">
+              <span class="tile-title">Tele-MANAS Mental Health SOS</span>
+              <span class="tile-desc">Govt 24x7 Psychological Crisis Support</span>
+            </div>
+            <span class="tile-phone">14416</span>
+          </a>
+          <a class="emergency-tile" href="tel:1091">
+            <div class="tile-meta">
+              <span class="tile-title">Women Safety & Transit SOS</span>
+              <span class="tile-desc">National Commission for Women / Transit</span>
+            </div>
+            <span class="tile-phone">1091</span>
+          </a>
+        </div>
+      </div>
+      <button class="btn-primary" data-trigger="close-emergency" style="margin-top: 14px;">Dismiss Protocol</button>
     </div>
   </div>
 

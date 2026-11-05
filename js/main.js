@@ -1,5 +1,5 @@
 // ==========================================================================
-// PHASE 3: TACTICAL TELEMETRY ENGINE
+// UNIFIED TELEMETRY, MEDIA, AND TACTICAL ENGINE
 // ==========================================================================
 
 import { 
@@ -10,8 +10,6 @@ import {
   timetable, 
   academicPlanner 
 } from './config.js';
-
-import './media.js';
 
 let attendanceData = JSON.parse(JSON.stringify(baselineAttendance));
 let loggedDailyActions = {};
@@ -24,6 +22,7 @@ let totalConducted = 0;
 let totalSafeBunks = 0;
 let clearancePercentage = 100;
 
+// SOUND EFFECTS
 const cashSfx = document.getElementById('cash-sfx');
 const biwaSfx = document.getElementById('biwa-sfx');
 
@@ -41,6 +40,133 @@ function triggerHaptic(type = 'light') {
   if (type === 'undo') navigator.vibrate([50, 40]);
 }
 
+// ==========================================================================
+// FISHER-YATES SHUFFLE ENGINE
+// Guarantees zero repeats until the entire folder has played
+// ==========================================================================
+function shuffleArray(array) {
+  let curId = array.length;
+  while (0 !== curId) {
+    let randId = Math.floor(Math.random() * curId);
+    curId -= 1;
+    let tmp = array[curId];
+    array[curId] = array[randId];
+    array[randId] = tmp;
+  }
+  return array;
+}
+
+// 1. Audio Manifest
+const audioPool = shuffleArray([
+  "Assets/Audio/Aalaporan-Thamizhan.mp3",
+  "Assets/Audio/Kannukulla.mp3",
+  "Assets/Audio/Pesamale.mp3",
+  "Assets/Audio/SiM_-_Under_the_Tree_Attack_on_Titan_(mp3.pm).mp3",
+  "Assets/Audio/Thamarai Poovukum.mp3"
+]);
+
+// 2. Video Manifest (ensure filenames match your GH repo exactly)
+const landscapeVids = shuffleArray([
+  "Assets/Videos/Landscape/Dhurandhar | Use Headphones 🎧 [xThj4X8CVDM].webm",
+  "Assets/Videos/Landscape/Madara Uchiha Speech MV [zzalGC-MouU].webm",
+  "Assets/Videos/Landscape/The Best Naruto Edit You'll Ever See... 🔥 | Headlights [4K]! [AX...].webm",
+  "Assets/Videos/Landscape/This Infinity Castle EDIT Took Me 20+ Hours [3kjgSHA-bM0].webm",
+  "Assets/Videos/Landscape/what eren really, REALLY saw [KCKfWNLSn_I].webm"
+]);
+
+const portraitVids = shuffleArray([
+  "Assets/Videos/Portrait/Ruthless Character Identified 💀🔥! | Leo X Funk Na Mira Edit.webm"
+]);
+
+let trackIdx = 0;
+let landIdx = 0;
+let portIdx = 0;
+
+// ==========================================================================
+// MEDIA & HARDWARE CONTROL
+// ==========================================================================
+const bgAudio = document.getElementById('bg-audio');
+const visualizer = document.getElementById('music-visualizer');
+const trackNameEl = document.getElementById('track-name');
+const audioPlayBtn = document.getElementById('audio-play-btn');
+
+function updateAudioTrack() {
+  if(!bgAudio) return;
+  const rawPath = audioPool[trackIdx];
+  bgAudio.src = rawPath;
+  const niceName = rawPath.split('/').pop().replace('.mp3', '').replace(/_/g, ' ');
+  if(trackNameEl) trackNameEl.textContent = niceName;
+}
+
+function toggleAudio() {
+  if(!bgAudio.src || bgAudio.src === window.location.href) {
+    updateAudioTrack();
+  }
+  if (bgAudio.paused) {
+    bgAudio.play().catch(()=>{});
+    audioPlayBtn.innerHTML = '<i data-lucide="pause"></i>';
+    visualizer?.classList.add('active');
+  } else {
+    bgAudio.pause();
+    audioPlayBtn.innerHTML = '<i data-lucide="play"></i>';
+    visualizer?.classList.remove('active');
+  }
+  if(window.lucide) window.lucide.createIcons();
+}
+
+bgAudio?.addEventListener('ended', () => {
+  trackIdx = (trackIdx + 1) % audioPool.length;
+  updateAudioTrack();
+  bgAudio.play().catch(()=>{});
+});
+
+// STRICT HARDWARE EVICTION: Unloads unused 1080p stream from mobile RAM
+function optimizeCastleBackgrounds() {
+  const deskVid = document.getElementById('castle-video-desktop');
+  const mobVid = document.getElementById('castle-video-mobile');
+  const isDesktop = window.innerWidth >= 1024;
+
+  if (isDesktop) {
+    if(mobVid) { mobVid.pause(); mobVid.removeAttribute('src'); mobVid.load(); }
+    if(deskVid && !deskVid.src.includes('desktop.mp4')) {
+      deskVid.src = "Assets/infinity_castle_desktop.mp4";
+    }
+  } else {
+    if(deskVid) { deskVid.pause(); deskVid.removeAttribute('src'); deskVid.load(); }
+    if(mobVid && !mobVid.src.includes('mobile.mp4')) {
+      mobVid.src = "Assets/infinity_castle_mobile.mp4?v=2";
+    }
+  }
+}
+window.addEventListener('resize', () => {
+  clearTimeout(window.resizeTimer);
+  window.resizeTimer = setTimeout(optimizeCastleBackgrounds, 250);
+});
+
+
+function getActiveVideo() {
+  return window.innerWidth >= 1024 
+    ? document.getElementById('castle-video-desktop') 
+    : document.getElementById('castle-video-mobile');
+}
+
+function bindSeamlessLoop(vid) {
+  if (!vid) return;
+  vid.addEventListener('timeupdate', function() {
+    if (this.duration && this.currentTime >= (this.duration - 0.35)) {
+      this.currentTime = 0.04;
+      this.play().catch(()=>{});
+    }
+  });
+  vid.addEventListener('ended', function() {
+    this.currentTime = 0.04;
+    this.play().catch(()=>{});
+  });
+}
+
+// ==========================================================================
+// TELEMETRY LOGIC
+// ==========================================================================
 function getTodayDateStr() {
   const now = new Date();
   const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
@@ -56,18 +182,10 @@ function calculateMargin(attended, conducted) {
   const perc = (attended / conducted) * 100;
   if (perc >= 75) {
     const canBunk = Math.floor((attended - (0.75 * conducted)) / 0.75);
-    return { 
-      text: canBunk > 0 ? `+${canBunk} Safe Bunks` : `On the Edge (0)`, 
-      safe: true, 
-      bunks: canBunk 
-    };
+    return { text: canBunk > 0 ? `+${canBunk} Safe Bunks` : `On the Edge (0)`, safe: true, bunks: canBunk };
   } else {
     const mustAttend = Math.ceil(((0.75 * conducted) - attended) / 0.25);
-    return { 
-      text: `Deficit: Attend ${mustAttend}`, 
-      safe: false, 
-      bunks: 0 
-    };
+    return { text: `Deficit: Attend ${mustAttend}`, safe: false, bunks: 0 };
   }
 }
 
@@ -117,7 +235,6 @@ function renderSchedule() {
         ${actionUI}
       </div>`;
   }
-
   if (window.lucide) window.lucide.createIcons();
 }
 
@@ -133,7 +250,6 @@ function renderMatrix() {
   for (const [code, data] of Object.entries(attendanceData)) {
     totalAttended += data.attended;
     totalConducted += data.conducted;
-
     const perc = data.conducted === 0 ? 100 : ((data.attended / data.conducted) * 100);
     const margin = calculateMargin(data.attended, data.conducted);
     totalSafeBunks += margin.bunks;
@@ -163,46 +279,29 @@ function renderMatrix() {
         ${extraRowUI}
       </div>`;
   }
-
   updateSquidGameTally();
   if (window.lucide) window.lucide.createIcons();
 }
 
 function updateSquidGameTally() {
   clearancePercentage = totalConducted === 0 ? 100 : (totalAttended / totalConducted) * 100;
-  
   const digitsContainer = document.getElementById('squid-digits');
   if (digitsContainer) {
     const formatted = clearancePercentage.toFixed(1).padStart(4, '0');
-    digitsContainer.innerHTML = formatted.split('').map(char => {
-      return char === '.' 
-        ? `<span class="dot">.</span>` 
-        : `<span>${char}</span>`;
-    }).join('') + `<span class="percent">%</span>`;
-
+    digitsContainer.innerHTML = formatted.split('').map(char => char === '.' ? `<span class="dot">.</span>` : `<span>${char}</span>`).join('') + `<span class="percent">%</span>`;
     digitsContainer.style.color = clearancePercentage >= 75 ? 'var(--accent-amber)' : 'var(--accent-red)';
   }
 
   const rankEl = document.querySelector('.rank-indicator');
   if (rankEl) {
-    if (clearancePercentage >= 90) {
-      rankEl.textContent = 'S-RANK';
-      rankEl.style.color = 'var(--accent-purple)';
-    } else if (clearancePercentage >= 80) {
-      rankEl.textContent = 'A-RANK';
-      rankEl.style.color = 'var(--accent-cyan)';
-    } else if (clearancePercentage >= 75) {
-      rankEl.textContent = 'B-RANK';
-      rankEl.style.color = 'var(--accent-amber)';
-    } else {
-      rankEl.textContent = 'E-RANK';
-      rankEl.style.color = 'var(--accent-red)';
-    }
+    if (clearancePercentage >= 90) { rankEl.textContent = 'S-RANK'; rankEl.style.color = 'var(--accent-purple)'; }
+    else if (clearancePercentage >= 80) { rankEl.textContent = 'A-RANK'; rankEl.style.color = 'var(--accent-cyan)'; }
+    else if (clearancePercentage >= 75) { rankEl.textContent = 'B-RANK'; rankEl.style.color = 'var(--accent-amber)'; }
+    else { rankEl.textContent = 'E-RANK'; rankEl.style.color = 'var(--accent-red)'; }
   }
 }
 
-let countsRef = null;
-let logsRef = null;
+let countsRef = null; let logsRef = null;
 
 function initFirebase() {
   if (!window.firebase || window.firebase.apps.length > 0) return;
@@ -217,48 +316,72 @@ function initFirebase() {
       else countsRef.set(baselineAttendance);
       renderMatrix();
     });
-
     logsRef.on('value', (snap) => {
       loggedDailyActions = snap.exists() ? snap.val() : {};
       renderSchedule();
     });
   } catch (err) {
     console.warn("Using offline local attendance cache.", err);
-    renderMatrix();
-    renderSchedule();
+    renderMatrix(); renderSchedule();
   }
 }
 
 // ==========================================================================
-// SEAMLESS SINGLE-STREAM LOOP CONTROLLER
+// POINTER EVENTS (LONG PRESS FISHER-YATES VISION & CLICK)
 // ==========================================================================
-function getActiveVideo() {
-  return window.innerWidth >= 1024 
-    ? document.getElementById('castle-video-desktop') 
-    : document.getElementById('castle-video-mobile');
-}
+let holdTimer;
+let isHolding = false;
+const visionContainer = document.getElementById('vision-container');
+const visionVideo = document.getElementById('vision-video');
+const reticle = document.getElementById('hold-reticle');
 
-function bindSeamlessLoop(vid) {
-  if (!vid) return;
+window.addEventListener('pointerdown', (e) => {
+  if (e.target.closest('button, a, .tactical-menu, input, select')) return;
   
-  // Cut off blank tail frames and seek to frame 1 before EOF
-  vid.addEventListener('timeupdate', function() {
-    if (this.duration && this.currentTime >= (this.duration - 0.35)) {
-      this.currentTime = 0.04;
-      this.play().catch(()=>{});
+  if(reticle) {
+    reticle.style.left = e.clientX + 'px';
+    reticle.style.top = e.clientY + 'px';
+  }
+
+  holdTimer = setTimeout(() => {
+    isHolding = true;
+    triggerHaptic('success');
+    if(reticle) reticle.classList.add('holding');
+    
+    // Pick video from Fisher-Yates shuffled arrays
+    const isPortrait = window.innerHeight > window.innerWidth;
+    let vidSrc = '';
+    if(isPortrait && portraitVids.length > 0) {
+      vidSrc = portraitVids[portIdx];
+      portIdx = (portIdx + 1) % portraitVids.length;
+    } else {
+      vidSrc = landscapeVids[landIdx];
+      landIdx = (landIdx + 1) % landscapeVids.length;
     }
-  });
+    
+    // Mute BG audio if playing
+    if(!bgAudio.paused) { bgAudio.volume = 0.1; }
 
-  // Fallback safety if timeupdate skips on low battery mode
-  vid.addEventListener('ended', function() {
-    this.currentTime = 0.04;
-    this.play().catch(()=>{});
-  });
-}
+    visionContainer.classList.add('active');
+    visionVideo.src = vidSrc;
+    visionVideo.play().catch(()=>{});
+  }, 500); // 500ms TikTok-style long-press
+});
 
-// ==========================================================================
-// EVENT LISTENERS & TRIGGERS
-// ==========================================================================
+window.addEventListener('pointerup', () => {
+  clearTimeout(holdTimer);
+  if(reticle) reticle.classList.remove('holding');
+  if(isHolding) {
+    isHolding = false;
+    visionContainer.classList.remove('active');
+    visionVideo.pause();
+    visionVideo.removeAttribute('src'); // Strictly free memory
+    visionVideo.load();
+    if(!bgAudio.paused) { bgAudio.volume = 1.0; }
+  }
+});
+window.addEventListener('pointercancel', () => clearTimeout(holdTimer));
+
 document.addEventListener('click', (e) => {
   const trigger = e.target.closest('[data-trigger]');
   const logBtn = e.target.closest('[data-log-class]');
@@ -266,19 +389,17 @@ document.addEventListener('click', (e) => {
 
   if (trigger) {
     const action = trigger.dataset.trigger;
+    if (action !== 'audio-toggle' && action !== 'audio-next' && action !== 'audio-prev') { triggerHaptic('light'); }
 
-    if (action !== 'audio-toggle' && action !== 'audio-next' && action !== 'audio-prev') {
-      triggerHaptic('light');
-    }
+    if (action === 'audio-toggle') toggleAudio();
+    if (action === 'audio-next') { trackIdx = (trackIdx + 1) % audioPool.length; updateAudioTrack(); bgAudio.play(); audioPlayBtn.innerHTML = '<i data-lucide="pause"></i>'; visualizer?.classList.add('active'); }
+    if (action === 'audio-prev') { trackIdx = (trackIdx - 1 + audioPool.length) % audioPool.length; updateAudioTrack(); bgAudio.play(); audioPlayBtn.innerHTML = '<i data-lucide="pause"></i>'; visualizer?.classList.add('active'); }
 
-    if (action === 'open-telemetry') {
-      document.getElementById('telemetry-drawer')?.classList.add('active');
-      document.body.classList.add('drawer-open');
-    }
-    if (action === 'close-telemetry') {
-      document.getElementById('telemetry-drawer')?.classList.remove('active');
-      document.body.classList.remove('drawer-open');
-    }
+    if (action === 'emergency-contacts') { e.preventDefault(); document.getElementById('emergency-modal')?.classList.remove('hidden'); }
+    if (action === 'close-emergency') { document.getElementById('emergency-modal')?.classList.add('hidden'); }
+    if (action === 'open-telemetry') { document.getElementById('telemetry-drawer')?.classList.add('active'); document.body.classList.add('drawer-open'); }
+    if (action === 'close-telemetry') { document.getElementById('telemetry-drawer')?.classList.remove('active'); document.body.classList.remove('drawer-open'); }
+    
     if (action === 'license-modal') {
       const modal = document.getElementById('hunter-modal');
       document.getElementById('hunter-mana').textContent = totalAttended;
@@ -286,14 +407,10 @@ document.addEventListener('click', (e) => {
       document.getElementById('hunter-buffer').textContent = `${totalSafeBunks} Safe Bunks`;
       modal?.classList.remove('hidden');
     }
-    if (action === 'close-license') {
-      document.getElementById('hunter-modal')?.classList.add('hidden');
-    }
+    if (action === 'close-license') { document.getElementById('hunter-modal')?.classList.add('hidden'); }
     
-    // INFINITY CASTLE TRIGGER
     if (action === 'domain-expansion') {
       playAudioCue(biwaSfx);
-      
       const isCastleActive = document.body.classList.toggle('infinity-castle');
       const layer = document.getElementById('cinematic-layer');
       const banner = document.getElementById('domain-hud-banner');
@@ -302,10 +419,8 @@ document.addEventListener('click', (e) => {
       if (isCastleActive) {
         layer?.classList.add('active');
         banner?.classList.add('active');
-        if (activeVid) {
-          activeVid.currentTime = 0.04;
-          activeVid.play().catch(err => console.warn("Autoplay note:", err.message));
-        }
+        if(!bgAudio.paused) bgAudio.pause(); // Pause music for cinematic domain
+        if (activeVid) { activeVid.currentTime = 0.04; activeVid.play().catch(()=>{}); }
       } else {
         layer?.classList.remove('active');
         banner?.classList.remove('active');
@@ -315,50 +430,26 @@ document.addEventListener('click', (e) => {
   } 
 
   if (logBtn && isEditMode) {
-    triggerHaptic('success');
-    playAudioCue(cashSfx);
-
-    const code = logBtn.dataset.logClass;
-    const slotNum = logBtn.dataset.slot;
-    const status = logBtn.dataset.status;
+    triggerHaptic('success'); playAudioCue(cashSfx);
+    const code = logBtn.dataset.logClass; const slotNum = logBtn.dataset.slot; const status = logBtn.dataset.status;
     const logKey = `${getTodayDateStr()}_D${activeDayOrder}_S${slotNum}_${code}`;
-
     historyStack.push({ type: 'slot', code, slotNum, logKey, previousData: JSON.parse(JSON.stringify(attendanceData)) });
     document.getElementById('undoBtn')?.classList.remove('hidden');
 
     if (!attendanceData[code]) attendanceData[code] = { name: code, attended: 0, conducted: 0 };
-    if (status === 'attended') {
-      attendanceData[code].attended++;
-      attendanceData[code].conducted++;
-    } else {
-      attendanceData[code].conducted++;
-    }
-
-    loggedDailyActions[logKey] = status;
-    renderSchedule();
-    renderMatrix();
-
+    if (status === 'attended') { attendanceData[code].attended++; attendanceData[code].conducted++; } else { attendanceData[code].conducted++; }
+    loggedDailyActions[logKey] = status; renderSchedule(); renderMatrix();
     if (countsRef) countsRef.set(attendanceData);
     if (logsRef) logsRef.child(logKey).set(status);
   }
 
   if (surpriseBtn && isEditMode) {
-    triggerHaptic('success');
-    playAudioCue(cashSfx);
-
-    const code = surpriseBtn.dataset.surpriseClass;
-    const status = surpriseBtn.dataset.status;
-
+    triggerHaptic('success'); playAudioCue(cashSfx);
+    const code = surpriseBtn.dataset.surpriseClass; const status = surpriseBtn.dataset.status;
     historyStack.push({ type: 'surprise', code, previousData: JSON.parse(JSON.stringify(attendanceData)) });
     document.getElementById('undoBtn')?.classList.remove('hidden');
 
-    if (status === 'attended') {
-      attendanceData[code].attended++;
-      attendanceData[code].conducted++;
-    } else {
-      attendanceData[code].conducted++;
-    }
-
+    if (status === 'attended') { attendanceData[code].attended++; attendanceData[code].conducted++; } else { attendanceData[code].conducted++; }
     renderMatrix();
     if (countsRef) countsRef.set(attendanceData);
   }
@@ -367,21 +458,13 @@ document.addEventListener('click', (e) => {
 document.getElementById('lockToggleBtn')?.addEventListener('click', () => {
   const btn = document.getElementById('lockToggleBtn');
   if (isEditMode) {
-    isEditMode = false;
-    btn.innerHTML = '<i data-lucide="lock"></i> <span>View Only</span>';
-    btn.classList.remove('unlocked');
-    document.getElementById('undoBtn')?.classList.add('hidden');
-    renderSchedule();
-    renderMatrix();
+    isEditMode = false; btn.innerHTML = '<i data-lucide="lock"></i> <span>View Only</span>'; btn.classList.remove('unlocked');
+    document.getElementById('undoBtn')?.classList.add('hidden'); renderSchedule(); renderMatrix();
   } else {
     const pin = prompt("Enter PIN to unlock Edit Mode:");
     if (pin === SECRET_PIN) {
-      isEditMode = true;
-      btn.innerHTML = '<i data-lucide="unlock"></i> <span>Edit Mode</span>';
-      btn.classList.add('unlocked');
-      triggerHaptic('success');
-      renderSchedule();
-      renderMatrix();
+      isEditMode = true; btn.innerHTML = '<i data-lucide="unlock"></i> <span>Edit Mode</span>'; btn.classList.add('unlocked');
+      triggerHaptic('success'); renderSchedule(); renderMatrix();
     }
   }
   if (window.lucide) window.lucide.createIcons();
@@ -390,27 +473,14 @@ document.getElementById('lockToggleBtn')?.addEventListener('click', () => {
 document.getElementById('undoBtn')?.addEventListener('click', () => {
   if (historyStack.length === 0 || !isEditMode) return;
   triggerHaptic('undo');
-
-  const last = historyStack.pop();
-  attendanceData = last.previousData;
-
-  if (last.type === 'slot') {
-    delete loggedDailyActions[last.logKey];
-    if (logsRef) logsRef.child(last.logKey).remove();
-  }
-
-  if (countsRef) countsRef.set(attendanceData);
-  renderSchedule();
-  renderMatrix();
-
-  if (historyStack.length === 0) {
-    document.getElementById('undoBtn')?.classList.add('hidden');
-  }
+  const last = historyStack.pop(); attendanceData = last.previousData;
+  if (last.type === 'slot') { delete loggedDailyActions[last.logKey]; if (logsRef) logsRef.child(last.logKey).remove(); }
+  if (countsRef) countsRef.set(attendanceData); renderSchedule(); renderMatrix();
+  if (historyStack.length === 0) { document.getElementById('undoBtn')?.classList.add('hidden'); }
 });
 
 document.getElementById('daySelector')?.addEventListener('change', (e) => {
-  const val = e.target.value;
-  activeDayOrder = val === 'auto' ? getTodayDayOrder() : parseInt(val);
+  activeDayOrder = e.target.value === 'auto' ? getTodayDayOrder() : parseInt(e.target.value);
   renderSchedule();
 });
 
@@ -418,18 +488,12 @@ setInterval(() => {
   const now = new Date();
   const clockEl = document.getElementById('liveClock');
   if (clockEl) clockEl.textContent = now.toLocaleTimeString('en-US', { hour12: false });
-
   const currentMins = (now.getHours() * 60) + now.getMinutes();
   const banner = document.getElementById('slotStatusText');
   const timeRemaining = document.getElementById('slotTimeRemaining');
 
   if (!banner || !timeRemaining) return;
-
-  if (!activeDayOrder || !timetable[activeDayOrder]) {
-    banner.textContent = "No classes in session";
-    timeRemaining.textContent = "";
-    return;
-  }
+  if (!activeDayOrder || !timetable[activeDayOrder]) { banner.textContent = "No classes in session"; timeRemaining.textContent = ""; return; }
 
   let activeFound = false;
   for (const [slotNum, slotData] of Object.entries(slots)) {
@@ -437,11 +501,9 @@ setInterval(() => {
       const code = timetable[activeDayOrder][slotNum];
       banner.textContent = `Live: ${attendanceData[code]?.name || "Break"}`;
       timeRemaining.textContent = `${slotData.end - currentMins}m left`;
-      activeFound = true;
-      break;
+      activeFound = true; break;
     }
   }
-
   if (!activeFound) {
     banner.textContent = `Campus Day Order ${activeDayOrder}`;
     timeRemaining.textContent = "Outside Hours";
@@ -453,14 +515,15 @@ function bootTelemetry() {
   initFirebase();
   renderSchedule();
   renderMatrix();
+  updateAudioTrack(); // Prep first shuffled audio
+  optimizeCastleBackgrounds(); // Strictly map single video
 
-  // Attach precision loop listener to both streams
   bindSeamlessLoop(document.getElementById('castle-video-desktop'));
   bindSeamlessLoop(document.getElementById('castle-video-mobile'));
+  
+  document.getElementById('emergency-modal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'emergency-modal') { document.getElementById('emergency-modal').classList.add('hidden'); }
+  });
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', bootTelemetry);
-} else {
-  bootTelemetry();
-}
+if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', bootTelemetry); } else { bootTelemetry(); }
