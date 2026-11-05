@@ -1,222 +1,214 @@
-class ShuffleDeck {
-  constructor(items = []) {
-    this.source = [...items];
-    this.queue = [];
-    this.lastPlayed = null;
-    this.refill();
-  }
-  setItems(newItems) {
-    if (!newItems || newItems.length === 0) return;
-    this.source = [...newItems];
-    this.refill();
-  }
-  refill() {
-    this.queue = [...this.source];
-    for (let i = this.queue.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [this.queue[i], this.queue[j]] = [this.queue[j], this.queue[i]];
-    }
-    if (this.queue.length > 1 && this.queue[0] === this.lastPlayed) {
-      const first = this.queue.shift();
-      this.queue.push(first);
-    }
-  }
-  next() {
-    if (this.source.length === 0) return null;
-    if (this.queue.length === 0) this.refill();
-    const item = this.queue.shift();
-    this.lastPlayed = item;
-    return item;
-  }
-}
+// ==========================================================================
+// PHASE 4: TACTICAL MEDIA ENGINE
+// ==========================================================================
 
-export const landscapeDeck = new ShuffleDeck();
-export const portraitDeck = new ShuffleDeck();
-export const audioDeck = new ShuffleDeck([
-  { title: "Aalaporan Thamizhan", artist: "A.R. Rahman", src: "Audio/Aalaporan-Thamizhan-MassTamilan.com.mp3" },
-  { title: "Kannukulla", artist: "Indie OST", src: "Audio/Kannukulla.mp3" },
-  { title: "Pesamale", artist: "OST Mix", src: "Audio/Pesamale(KoshalWorld.Com).mp3" },
-  { title: "Under the Tree", artist: "SiM (Attack on Titan)", src: "Audio/SiM_-_Under_the_Tree_Attack_on_Titan_(mp3.pm).mp3" },
-  { title: "Thamarai Poovukum", artist: "Classic Tamil", src: "Audio/Thamarai Poovukum.mp3" }
-]);
+const bgAudio = document.getElementById('bg-audio');
+const trackNameLabel = document.getElementById('track-name');
+const playBtn = document.querySelector('.play-btn');
 
-export async function syncRepoMedia() {
-  const repoBase = "https://api.github.com/repos/Thiruvannan/Thiruvannan.github.io/contents";
-  const isMedia = (name, exts) => exts.some(ext => name.toLowerCase().endsWith(ext));
+// EXACT paths matching your GitHub repository structure
+const audioTracks = [
+  { title: "Aalaporan Thamizhan", src: "Audio/Aalaporan-Thamizhan.mp3" },
+  { title: "Kannukulla", src: "Audio/Kannukulla.mp3" },
+  { title: "Pesamale", src: "Audio/Pesamale.mp3" },
+  { title: "Under the Tree", src: "Audio/SiM_-_Under_the_Tree_Attack_on_Titan_(mp3.pm).mp3" },
+  { title: "Thamarai Poovukum", src: "Audio/Thamarai Poovukum.mp3" }
+];
 
-  try {
-    const resLand = await fetch(`${repoBase}/Videos/Landscape`);
-    if (resLand.ok) {
-      const files = await resLand.json();
-      const urls = files.filter(f => isMedia(f.name, ['.mp4', '.webm', '.mov', '.mkv'])).map(f => `Videos/Landscape/${encodeURIComponent(f.name)}`);
-      if (urls.length > 0) landscapeDeck.setItems(urls);
-    }
+let currentTrackIndex = 0;
 
-    const resPort = await fetch(`${repoBase}/Videos/Portrait`);
-    if (resPort.ok) {
-      const files = await resPort.json();
-      const urls = files.filter(f => isMedia(f.name, ['.mp4', '.webm', '.mov', '.mkv'])).map(f => `Videos/Portrait/${encodeURIComponent(f.name)}`);
-      if (urls.length > 0) portraitDeck.setItems(urls);
-    }
+// ==========================================================================
+// AUDIO CONTROLLER
+// ==========================================================================
 
-    const resAud = await fetch(`${repoBase}/Audio`);
-    if (resAud.ok) {
-      const files = await resAud.json();
-      const tracks = files.filter(f => isMedia(f.name, ['.mp3', '.wav', '.ogg', '.m4a'])).map(f => {
-        const cleanName = f.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-        return { title: cleanName, artist: "SRM Hub OST", src: `Audio/${encodeURIComponent(f.name)}` };
-      });
-      if (tracks.length > 0) audioDeck.setItems(tracks);
-    }
-  } catch (err) { console.log("Using cached media deck."); }
-}
-
-export function initMediaEngine(triggerHapticFn) {
-  const audioPlayer = document.getElementById('bg-audio');
-  const playBtn = document.getElementById('play-pause-btn');
-  const musicWidget = document.getElementById('floating-music-player');
-  const artProgress = document.querySelector('.art-progress');
-  const trackLabel = document.getElementById('track-name');
+function updateAudioUI(isPlaying) {
+  if (!playBtn) return;
   
-  let currentTrack = null;
-  let showRingTimer = null;
-  let pressTimer = null;
-  let holdStartCoords = { x: 0, y: 0 };
-  let wasMusicPlayingBeforeVision = false;
-
-  const initialTrack = audioDeck.source[0];
-  if (initialTrack) {
-    trackLabel.textContent = initialTrack.title;
+  if (isPlaying) {
+    playBtn.innerHTML = '<i data-lucide="pause"></i>';
+    document.getElementById('acoustic-dock')?.classList.add('playing');
+  } else {
+    playBtn.innerHTML = '<i data-lucide="play"></i>';
+    document.getElementById('acoustic-dock')?.classList.remove('playing');
   }
+  if (window.lucide) window.lucide.createIcons();
+}
 
-  function updatePlayerUI(isPlaying) {
-    if (isPlaying) {
-      playBtn.innerHTML = '<i data-lucide="pause"></i>';
-      musicWidget.classList.add('playing');
-    } else {
-      playBtn.innerHTML = '<i data-lucide="play"></i>';
-      musicWidget.classList.remove('playing');
+function loadTrack(index) {
+  if (!bgAudio || audioTracks.length === 0) return;
+  
+  // Wrap index to handle looping
+  if (index >= audioTracks.length) index = 0;
+  if (index < 0) index = audioTracks.length - 1;
+  
+  currentTrackIndex = index;
+  const track = audioTracks[currentTrackIndex];
+  
+  // Use encodeURI to safely handle spaces and special characters in filenames
+  bgAudio.src = encodeURI(track.src);
+  if (trackNameLabel) trackNameLabel.textContent = track.title;
+}
+
+function toggleAudio() {
+  if (!bgAudio) return;
+  
+  if (bgAudio.paused) {
+    if (!bgAudio.src) loadTrack(0);
+    bgAudio.play().then(() => updateAudioUI(true)).catch(() => {});
+  } else {
+    bgAudio.pause();
+    updateAudioUI(false);
+  }
+}
+
+function playNextTrack() {
+  loadTrack(currentTrackIndex + 1);
+  bgAudio.play().then(() => updateAudioUI(true)).catch(() => {});
+}
+
+function playPrevTrack() {
+  loadTrack(currentTrackIndex - 1);
+  bgAudio.play().then(() => updateAudioUI(true)).catch(() => {});
+}
+
+// Bind Audio Ended Event
+if (bgAudio) {
+  bgAudio.addEventListener('ended', playNextTrack);
+}
+
+// ==========================================================================
+// TACTICAL LONG-PRESS VISION (EREN)
+// ==========================================================================
+
+let pressTimer = null;
+let holdIndicatorTimer = null;
+let touchStartX = 0;
+let touchStartY = 0;
+let wasAudioPlaying = false;
+
+const holdReticle = document.getElementById('hold-reticle');
+const visionContainer = document.getElementById('vision-container');
+const visionVideo = document.getElementById('vision-video');
+
+function isInteractiveTarget(target) {
+  return target.closest('button') || 
+         target.closest('a') || 
+         target.closest('select') || 
+         target.closest('.tactical-menu') ||
+         target.closest('#telemetry-drawer') ||
+         target.closest('#acoustic-dock');
+}
+
+function startHold(x, y, target) {
+  if (isInteractiveTarget(target)) return;
+
+  touchStartX = x;
+  touchStartY = y;
+
+  holdIndicatorTimer = setTimeout(() => {
+    if (holdReticle) {
+      holdReticle.style.left = `${x}px`;
+      holdReticle.style.top = `${y}px`;
+      holdReticle.classList.add('holding');
     }
-    window.lucide.createIcons();
-  }
+  }, 300);
 
-  function loadNextShuffledTrack() {
-    currentTrack = audioDeck.next();
-    if (!currentTrack) return;
-    audioPlayer.src = currentTrack.src;
-    trackLabel.textContent = currentTrack.title; 
-    
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: currentTrack.title,
-        artist: "SRM Hub",
-        artwork: [{ src: "https://github.com/Thiruvannan.png", sizes: "512x512", type: "image/png" }]
-      });
-      navigator.mediaSession.setActionHandler('play', () => { audioPlayer.play(); updatePlayerUI(true); });
-      navigator.mediaSession.setActionHandler('pause', () => { audioPlayer.pause(); updatePlayerUI(false); });
-      navigator.mediaSession.setActionHandler('nexttrack', playNextTrack);
-      navigator.mediaSession.setActionHandler('previoustrack', playNextTrack);
-    }
-  }
+  pressTimer = setTimeout(() => {
+    if (holdReticle) holdReticle.classList.remove('holding');
+    triggerVision();
+  }, 1200);
+}
 
-  function toggleMusic() {
-    triggerHapticFn('light');
-    if (audioPlayer.paused) {
-      if (!audioPlayer.src || !currentTrack) loadNextShuffledTrack();
-      audioPlayer.play().then(() => updatePlayerUI(true)).catch(() => {});
-    } else {
-      audioPlayer.pause();
-      updatePlayerUI(false);
-    }
-  }
+function cancelHold() {
+  clearTimeout(holdIndicatorTimer);
+  clearTimeout(pressTimer);
+  if (holdReticle) holdReticle.classList.remove('holding');
+}
 
-  function playNextTrack() {
-    triggerHapticFn('light');
-    loadNextShuffledTrack();
-    audioPlayer.play().then(() => updatePlayerUI(true)).catch(() => {});
-  }
+function triggerVision() {
+  if (!visionContainer || !visionVideo) return;
+  
+  if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
 
-  audioPlayer.addEventListener('timeupdate', () => {
-    const perc = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0;
-    artProgress.style.setProperty('--progress', `${perc}%`);
-  });
-  audioPlayer.addEventListener('ended', playNextTrack);
+  wasAudioPlaying = bgAudio && !bgAudio.paused;
+  if (wasAudioPlaying) bgAudio.pause();
 
-  let musicTouchStartX = 0;
-  musicWidget.addEventListener('touchstart', e => musicTouchStartX = e.touches[0].clientX, {passive: true});
-  musicWidget.addEventListener('touchend', e => {
-    if (Math.abs(musicTouchStartX - e.changedTouches[0].clientX) > 40) playNextTrack();
-  }, {passive: true});
+  visionContainer.classList.add('active');
+  
+  // Directly load the Eren edit (bypassing the broken GitHub API logic)
+  visionVideo.src = encodeURI("Videos/Landscape/what eren really, REALLY saw [KCKfWNLSn_I].webm");
+  visionVideo.play().catch(() => {});
+}
 
-  function isInteractiveElement(target) {
-    return target.closest('a') || target.closest('select') || target.closest('#floating-music-player') || target.closest('#hunter-badge') || target.closest('.ios-row') || target.closest('button');
-  }
-
-  function startHold(x, y, target) {
-    if (isInteractiveElement(target)) return;
-    holdStartCoords = { x, y };
-    showRingTimer = setTimeout(() => {
-      holdIndicator.style.left = `${x}px`;
-      holdIndicator.style.top = `${y}px`;
-      holdIndicator.classList.add('holding');
-    }, 300);
-    pressTimer = setTimeout(() => {
-      holdIndicator.classList.remove('holding');
-      triggerVision();
-    }, 1500);
-  }
-
-  function cancelHold() {
-    clearTimeout(showRingTimer);
-    clearTimeout(pressTimer);
-    holdIndicator.classList.remove('holding');
-  }
-
-  function triggerVision() {
-    triggerHapticFn('success');
-    wasMusicPlayingBeforeVision = !audioPlayer.paused;
-    if (wasMusicPlayingBeforeVision) audioPlayer.pause();
-
-    const isMobileViewport = window.matchMedia("(max-width: 768px)").matches;
-    const activeDeck = isMobileViewport ? portraitDeck : landscapeDeck;
-    const chosenVideoSrc = activeDeck.next();
-    
-    if (!chosenVideoSrc) return;
-    visionVideo.src = chosenVideoSrc;
-    visionContainer.classList.add('active');
-    visionVideo.play().catch(() => {});
-  }
-
-  function closeVision() {
-    if (!visionContainer.classList.contains('active')) return;
-    visionContainer.classList.remove('active');
+function closeVision() {
+  if (!visionContainer) return;
+  
+  visionContainer.classList.remove('active');
+  if (visionVideo) {
     visionVideo.pause();
     visionVideo.removeAttribute('src');
     visionVideo.load();
-    if (wasMusicPlayingBeforeVision) audioPlayer.play().catch(() => {});
   }
-
-  // FIX: passive is false, e.preventDefault() added to override mobile scrolling
-  document.body.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 1) {
-      if(!isInteractiveElement(e.target)) e.preventDefault();
-      startHold(e.touches[0].clientX, e.touches[0].clientY, e.target);
-    } else cancelHold();
-  }, { passive: false });
-  document.body.addEventListener('touchmove', cancelHold, { passive: true });
-  document.body.addEventListener('touchend', cancelHold, { passive: true });
   
-  document.body.addEventListener('mousedown', (e) => {
-    if (e.button === 0) startHold(e.clientX, e.clientY, e.target);
-  });
-  document.body.addEventListener('mousemove', (e) => {
-    if (Math.hypot(e.clientX - holdStartCoords.x, e.clientY - holdStartCoords.y) > 15) cancelHold();
-  });
-  document.body.addEventListener('mouseup', cancelHold);
-  
-  visionContainer.addEventListener('click', closeVision);
-  visionVideo.addEventListener('ended', closeVision);
-
-  window.toggleMusic = toggleMusic;
-  window.playNextRandomTrack = playNextTrack;
+  if (wasAudioPlaying && bgAudio) {
+    bgAudio.play().catch(() => {});
+  }
 }
+
+// Bind Touch/Mouse Events for Long Press
+document.body.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 1) {
+    startHold(e.touches[0].clientX, e.touches[0].clientY, e.target);
+  }
+}, { passive: true });
+
+document.body.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 1) {
+    const dx = Math.abs(e.touches[0].clientX - touchStartX);
+    const dy = Math.abs(e.touches[0].clientY - touchStartY);
+    if (dx > 15 || dy > 15) cancelHold();
+  }
+}, { passive: true });
+
+document.body.addEventListener('touchend', cancelHold, { passive: true });
+document.body.addEventListener('mousedown', (e) => {
+  if (e.button === 0) startHold(e.clientX, e.clientY, e.target);
+});
+document.body.addEventListener('mousemove', (e) => {
+  const dx = Math.abs(e.clientX - touchStartX);
+  const dy = Math.abs(e.clientY - touchStartY);
+  if (dx > 15 || dy > 15) cancelHold();
+});
+document.body.addEventListener('mouseup', cancelHold);
+
+// Close Vision on Click/End
+if (visionContainer) visionContainer.addEventListener('click', closeVision);
+if (visionVideo) visionVideo.addEventListener('ended', closeVision);
+
+// ==========================================================================
+// EXPORT & BINDINGS
+// ==========================================================================
+
+// Attach audio controls to the global document listener we set up in main.js
+document.addEventListener('click', (e) => {
+  const trigger = e.target.closest('[data-trigger]');
+  if (trigger) {
+    const action = trigger.dataset.trigger;
+    
+    // Play audio haptic buzz
+    if (action === 'audio-toggle' || action === 'audio-next' || action === 'audio-prev') {
+      if (navigator.vibrate) navigator.vibrate(20);
+    }
+    
+    if (action === 'audio-toggle') toggleAudio();
+    if (action === 'audio-next') playNextTrack();
+    if (action === 'audio-prev') playPrevTrack();
+  }
+});
+
+// Initialize first track name on load
+document.addEventListener('DOMContentLoaded', () => {
+  if (audioTracks.length > 0 && trackNameLabel) {
+    trackNameLabel.textContent = audioTracks[0].title;
+  }
+});
