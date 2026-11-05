@@ -433,10 +433,16 @@ setInterval(() => {
   }
 }, 1000);
 
-// Boot
-document.addEventListener('DOMContentLoaded', () => {
+// Bulletproof Boot: runs immediately if DOM is already ready
+function bootTelemetry() {
   if (window.lucide) window.lucide.createIcons();
   initFirebase();
   renderSchedule();
   renderMatrix();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootTelemetry);
+} else {
+  bootTelemetry();
+}
