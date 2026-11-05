@@ -271,6 +271,19 @@ document.addEventListener('click', (e) => {
       triggerHaptic('light');
     }
 
+    // EMERGENCY CONTACTS PROTOCOL
+    if (action === 'emergency-contacts') {
+      if (window.innerWidth >= 1024) {
+        e.preventDefault(); // Stop mobile tel link on desktop
+        document.getElementById('emergency-modal')?.classList.remove('hidden');
+      }
+      // Mobile allows default tel: href to execute immediately
+    }
+
+    if (action === 'close-emergency') {
+      document.getElementById('emergency-modal')?.classList.add('hidden');
+    }
+
     if (action === 'open-telemetry') {
       document.getElementById('telemetry-drawer')?.classList.add('active');
       document.body.classList.add('drawer-open');
@@ -457,6 +470,13 @@ function bootTelemetry() {
   // Attach precision loop listener to both streams
   bindSeamlessLoop(document.getElementById('castle-video-desktop'));
   bindSeamlessLoop(document.getElementById('castle-video-mobile'));
+  
+  // Close emergency modal on backdrop click
+  document.getElementById('emergency-modal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'emergency-modal') {
+      document.getElementById('emergency-modal').classList.add('hidden');
+    }
+  });
 }
 
 if (document.readyState === 'loading') {
