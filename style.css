@@ -606,3 +606,160 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 .modal-card { padding: 28px; border-radius: var(--radius-lg); text-align: center; width: 88%; max-width: 320px; }
 .modal-stats { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; font-weight: 600; }
 .stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; }
+
+
+/* ==========================================================================
+   GITHUB ICON & EMERGENCY MODAL SPEC
+   ========================================================================== */
+
+/* 1. GitHub Icon normalization */
+.menu-row .menu-icon,
+.menu-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.github-icon {
+  filter: brightness(0) invert(1); /* Forces any SVG to pure #ffffff */
+  opacity: 0.85;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.menu-row:hover .github-icon,
+.menu-row:active .github-icon {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* 2. Tactical Emergency Directory Modal (Desktop) */
+.emergency-modal-card {
+  width: 94% !important;
+  max-width: 640px !important;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px !important;
+  text-align: left !important;
+  border-radius: 22px !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 30px rgba(239, 68, 68, 0.15) !important;
+}
+
+.emergency-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+
+.emergency-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--accent-red);
+  font-weight: 800;
+}
+
+.emergency-modal-header h2 {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-top: 2px;
+  color: #fff;
+}
+
+.emergency-scroll-zone {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 6px;
+  max-height: 56vh;
+}
+
+.emergency-group-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.emergency-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+@media (min-width: 600px) {
+  .emergency-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.emergency-tile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  padding: 10px 14px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 12px;
+}
+
+.emergency-tile:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+  transform: translateY(-2px);
+}
+
+.tile-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tile-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tile-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.25;
+}
+
+.tile-phone {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tile-phone.highlight {
+  color: var(--accent-red);
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+}
