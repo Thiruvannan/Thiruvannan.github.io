@@ -1,12 +1,9 @@
 /* ==========================================================================
-   TACTICAL OBSIDIAN ARCHITECTURE & MOBILE PHYSICS
+   OPTICAL OBSIDIAN ARCHITECTURE (REFLECT & MACOS SPEC)
    ========================================================================== */
 
 :root {
-  --bg-core: #07070a;
-  --bg-glass: rgba(19, 19, 26, 0.72);
-  --border-glass: rgba(255, 255, 255, 0.08);
-  
+  --bg-core: #050508;
   --text-primary: #f8fafc;
   --text-muted: #94a3b8;
   --accent-cyan: #38bdf8;
@@ -21,7 +18,6 @@
   --transition-drawer: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Base Reset */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -40,31 +36,77 @@ html, body {
 body {
   display: flex;
   justify-content: center;
-  padding: 20px 16px 120px 16px;
+  padding: 24px 16px 120px 16px;
   overflow-x: hidden;
-  transition: background 0.6s ease;
+  position: relative;
+  transition: background-color 0.8s ease;
 }
 
 button, .menu-row, .btn-icon {
   user-select: none;
 }
 
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
-
-/* Obsidian Glass Panels */
-.obsidian-glass {
-  background: var(--bg-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-glass);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  transition: border-color 0.4s ease, background 0.4s ease;
+/* ==========================================================================
+   REFLECT.APP OPTICAL AURA (LIGHT BLOOM BEHIND GLASS)
+   ========================================================================== */
+#ambient-glow-bloom {
+  position: fixed;
+  top: -140px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 720px;
+  height: 520px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(168, 85, 247, 0.12) 40%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 1;
+  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ==========================================================================
-   LAYOUT GRID
+   MACOS OPTICAL GLASS PANELS
+   ========================================================================== */
+.obsidian-glass {
+  background: rgba(14, 14, 20, 0.45); /* High transparency lets light/video through */
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.22); /* Specular top light bevel */
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   INFINITY CASTLE DIMENSION (DEMON SLAYER SHIFT)
+   ========================================================================== */
+body.infinity-castle #ambient-glow-bloom {
+  top: -80px;
+  width: 950px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, rgba(220, 38, 38, 0.25) 45%, transparent 75%);
+  filter: blur(90px);
+}
+
+body.infinity-castle .obsidian-glass {
+  background: rgba(22, 12, 8, 0.48) !important;
+  backdrop-filter: blur(32px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(220%) !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+  border-top: 1px solid rgba(245, 158, 11, 0.55) !important;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8), 
+              0 0 35px rgba(245, 158, 11, 0.15), 
+              inset 0 1px 0 rgba(245, 158, 11, 0.35) !important;
+}
+
+body.infinity-castle .btn-primary {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  color: #000 !important;
+  font-weight: 800;
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.35) !important;
+}
+
+/* ==========================================================================
+   LAYOUT STRUCTURE
    ========================================================================== */
 #app-wrapper {
   width: 100%;
@@ -81,14 +123,12 @@ button, .menu-row, .btn-icon {
     gap: 32px;
     align-items: start;
   }
-  #identity-core { position: sticky; top: 20px; }
+  #identity-core { position: sticky; top: 24px; }
   .telemetry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .scroll-zone { max-height: 58vh; overflow-y: auto; }
 }
 
-/* ==========================================================================
-   DEVELOPER IDENTITY CARD
-   ========================================================================== */
+/* DEVELOPER CARD */
 #identity-core {
   border-radius: var(--radius-lg);
   padding: 24px;
@@ -103,8 +143,8 @@ button, .menu-row, .btn-icon {
   align-items: center;
   gap: 6px;
   padding: 5px 10px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-sm);
   cursor: pointer;
 }
@@ -113,13 +153,13 @@ button, .menu-row, .btn-icon {
 
 .profile-block { text-align: center; }
 .avatar-wrap { margin: 0 auto 14px; width: 88px; height: 88px; }
-.avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(255,255,255,0.15); object-fit: cover; }
+.avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(255,255,255,0.18); object-fit: cover; }
 .dev-name { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
 .dev-title { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 
 .tactical-menu {
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid var(--border-glass);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
@@ -135,14 +175,14 @@ button, .menu-row, .btn-icon {
   cursor: pointer;
   transition: background var(--transition-fast);
 }
-.menu-row:active { background: rgba(255, 255, 255, 0.06); }
+.menu-row:active { background: rgba(255, 255, 255, 0.08); }
 .menu-row i, .menu-row svg { width: 18px; height: 18px; flex-shrink: 0; }
 .text-alert i { color: var(--accent-red); }
 .text-cyan i { color: var(--accent-cyan); }
 .text-purple i { color: var(--accent-purple); }
 .text-amber i { color: var(--accent-amber); }
 .text-neutral i { color: var(--text-muted); }
-.divider { height: 1px; background: var(--border-glass); margin-left: 48px; }
+.divider { height: 1px; background: rgba(255, 255, 255, 0.06); margin-left: 48px; }
 
 .btn-primary {
   background: var(--text-primary);
@@ -167,7 +207,7 @@ button, .menu-row, .btn-icon {
 }
 
 /* ==========================================================================
-   TELEMETRY DRAWER (MOBILE OFF-CANVAS / FIXED FLUID SHEET)
+   TELEMETRY DRAWER
    ========================================================================== */
 #telemetry-drawer {
   display: flex;
@@ -184,11 +224,11 @@ button, .menu-row, .btn-icon {
     right: 0;
     z-index: 100;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    padding: 20px 16px 120px 16px; /* Prevents acoustic dock overlap */
+    padding: 20px 16px 120px 16px;
     transform: translateY(100%);
     transition: transform var(--transition-drawer), visibility var(--transition-drawer);
     visibility: hidden;
-    overflow-y: auto; /* UNLOCKED FLUID MOBILE SCROLL */
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
   }
@@ -196,16 +236,8 @@ button, .menu-row, .btn-icon {
     transform: translateY(0);
     visibility: visible;
   }
-  .telemetry-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .scroll-zone {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+  .telemetry-grid { display: flex; flex-direction: column; gap: 16px; }
+  .scroll-zone { display: flex; flex-direction: column; gap: 10px; }
 }
 
 .drawer-header {
@@ -216,8 +248,8 @@ button, .menu-row, .btn-icon {
 }
 
 .btn-tactical {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-glass);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-primary);
   padding: 8px 12px;
   border-radius: var(--radius-sm);
@@ -229,9 +261,9 @@ button, .menu-row, .btn-icon {
   cursor: pointer;
 }
 .btn-tactical.unlocked {
-  background: rgba(251, 191, 36, 0.15);
+  background: rgba(251, 191, 36, 0.18);
   color: var(--accent-amber);
-  border-color: rgba(251, 191, 36, 0.35);
+  border-color: rgba(251, 191, 36, 0.4);
 }
 .hidden { display: none !important; }
 
@@ -243,8 +275,8 @@ button, .menu-row, .btn-icon {
 .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-cyan); box-shadow: 0 0 8px var(--accent-cyan); }
 
 .live-slot-banner {
-  background: rgba(56, 189, 248, 0.05);
-  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
   border-radius: var(--radius-md);
   padding: 12px 16px;
   font-size: 12px;
@@ -255,8 +287,8 @@ button, .menu-row, .btn-icon {
 }
 
 .telemetry-panel {
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid var(--border-glass);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-md);
   padding: 18px;
 }
@@ -274,7 +306,7 @@ button, .menu-row, .btn-icon {
 
 .tactical-select {
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border-glass);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #fff;
   border-radius: var(--radius-sm);
   padding: 4px 8px;
@@ -285,8 +317,8 @@ button, .menu-row, .btn-icon {
 .tactical-select option { background: #121218; color: #fff; }
 
 .squid-hud {
-  background: #040407;
-  border: 1px solid #1a1a24;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-sm);
   padding: 18px;
   text-align: center;
@@ -317,7 +349,7 @@ button, .menu-row, .btn-icon {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  z-index: 200; /* Stays accessible above the drawer */
+  z-index: 200;
 }
 .track-info { display: flex; align-items: center; gap: 10px; overflow: hidden; }
 .track-marquee { font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--text-muted); }
@@ -338,7 +370,7 @@ button, .menu-row, .btn-icon {
 .play-btn i { width: 15px; height: 15px; }
 
 /* ==========================================================================
-   INFINITY CASTLE: VERCEL/LINEAR OBSIDIAN SPEC
+   INFINITY CASTLE VIDEO & ATMOSPHERE
    ========================================================================== */
 #cinematic-layer {
   position: fixed;
@@ -347,35 +379,30 @@ button, .menu-row, .btn-icon {
   pointer-events: none;
   opacity: 0;
   transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
-  background: #000;
 }
 
 #cinematic-layer.active {
-  opacity: 1;
-}
-
-/* Crisp edge vignette melts the video edges into pure pitch black */
-.vignette-overlay {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.85) 90%),
-              linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 20%, transparent 80%, #000 100%);
-  pointer-events: none;
+  opacity: 0.9;
 }
 
 .castle-bg {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   object-fit: cover;
-  opacity: 0.55; /* Balances depth so UI stays high-contrast */
-  filter: contrast(1.1) saturate(1.15);
   display: none;
+  filter: contrast(1.15) saturate(1.2);
 }
 
 @media (min-width: 1024px) { #castle-video-desktop { display: block; } }
 @media (max-width: 1023px) { #castle-video-mobile { display: block; } }
 
-/* Animated Domain Entrance Typography */
+.vignette-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.7) 95%);
+  pointer-events: none;
+}
+
 #domain-hud-banner {
   position: fixed;
   top: 24px;
@@ -386,8 +413,8 @@ button, .menu-row, .btn-icon {
   align-items: center;
   gap: 12px;
   padding: 8px 18px;
-  background: rgba(15, 10, 8, 0.85);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: rgba(20, 10, 6, 0.85);
+  border: 1px solid rgba(245, 158, 11, 0.35);
   border-radius: 9999px;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -406,7 +433,7 @@ button, .menu-row, .btn-icon {
   color: #f59e0b;
   font-weight: 700;
   letter-spacing: 2px;
-  text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
 }
 
 .domain-label {
@@ -415,24 +442,6 @@ button, .menu-row, .btn-icon {
   letter-spacing: 2px;
   color: #fef3c7;
   text-transform: uppercase;
-}
-
-/* Linear-Grade Obsidian Cards during Castle Mode */
-body.infinity-castle .obsidian-glass {
-  background: rgba(10, 10, 14, 0.65) !important;
-  backdrop-filter: blur(28px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-  border-color: rgba(245, 158, 11, 0.22) !important;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8),
-              0 0 1px 1px rgba(245, 158, 11, 0.15),
-              inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-}
-
-body.infinity-castle .btn-primary {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-  color: #000 !important;
-  font-weight: 800;
-  box-shadow: 0 0 25px rgba(245, 158, 11, 0.3) !important;
 }
 
 /* ==========================================================================
@@ -491,4 +500,4 @@ body.infinity-castle .btn-primary {
 }
 .modal-card { padding: 28px; border-radius: var(--radius-lg); text-align: center; width: 88%; max-width: 320px; }
 .modal-stats { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; font-weight: 600; }
-.stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-glass); padding-bottom: 8px; }
+.stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; }
