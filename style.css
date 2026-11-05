@@ -81,7 +81,7 @@ button, .menu-row, .btn-icon { user-select: none; }
     border-radius: var(--radius-lg);
   }
 
-  /* 1. Eliminate sharp corners on desktop: organic 26px radius & specular bevel */
+  /* Eliminate sharp corners on desktop: organic 26px radius & specular bevel */
   #telemetry-drawer {
     border-radius: 26px !important;
     padding: 24px 28px !important;
@@ -90,7 +90,7 @@ button, .menu-row, .btn-icon { user-select: none; }
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
 
-  /* 2. Remove mobile down-arrow on desktop */
+  /* Remove mobile down-arrow on desktop */
   [data-trigger="close-telemetry"],
   .btn-icon[data-trigger="close-telemetry"],
   .drawer-header .btn-icon[data-trigger="close-telemetry"] { 
@@ -203,10 +203,12 @@ body.infinity-castle .telemetry-panel {
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
 }
 
-#schedule-container > div:hover,
-#matrix-container > div:hover {
-  transform: translateY(-2px);
-  border-color: rgba(245, 158, 11, 0.45) !important;
+@media (hover: hover) {
+  #schedule-container > div:hover,
+  #matrix-container > div:hover {
+    transform: translateY(-2px);
+    border-color: rgba(245, 158, 11, 0.45) !important;
+  }
 }
 
 .live-slot-banner {
@@ -224,7 +226,13 @@ body.infinity-castle .telemetry-panel {
 }
 
 body.infinity-castle .menu-row { color: #f1f5f9 !important; }
-body.infinity-castle .menu-row:hover,
+
+@media (hover: hover) {
+  body.infinity-castle .menu-row:hover {
+    background: rgba(245, 158, 11, 0.08) !important;
+  }
+}
+
 body.infinity-castle .menu-row:active {
   background: rgba(245, 158, 11, 0.08) !important;
 }
@@ -385,6 +393,11 @@ body.infinity-castle div[style*="var(--accent-red)"] {
   cursor: pointer;
   transition: background var(--transition-fast);
 }
+
+@media (hover: hover) {
+  .menu-row:hover { background: rgba(255, 255, 255, 0.05); }
+}
+
 .menu-row:active { background: rgba(255, 255, 255, 0.08); }
 .menu-row i, .menu-row svg { width: 18px; height: 18px; flex-shrink: 0; }
 .text-alert i { color: var(--accent-red); }
