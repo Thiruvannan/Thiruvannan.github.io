@@ -283,16 +283,28 @@ document.addEventListener('click', (e) => {
       document.body.classList.toggle('infinity-castle');
       const layer = document.getElementById('cinematic-layer');
       layer?.classList.toggle('active');
-      const video = window.innerWidth >= 1024 
+      
+      const isDesktop = window.innerWidth >= 1024;
+      const activeVideo = isDesktop 
         ? document.getElementById('castle-video-desktop') 
         : document.getElementById('castle-video-mobile');
+      const inactiveVideo = isDesktop 
+        ? document.getElementById('castle-video-mobile') 
+        : document.getElementById('castle-video-desktop');
+
       if (layer?.classList.contains('active')) {
-        video?.play().catch(() => {});
+        if (!activeVideo.getAttribute('src')) {
+          activeVideo.setAttribute('src', isDesktop ? 'Assets/infinity_castle_desktop.webm' : 'Assets/infinity_castle_mobile.webm');
+          activeVideo.load();
+        }
+        activeVideo.play().catch(e => console.warn("Video play blocked by browser:", e));
+        if (inactiveVideo) inactiveVideo.pause();
       } else {
-        video?.pause();
+        if (activeVideo) activeVideo.pause();
+        if (inactiveVideo) inactiveVideo.pause();
       }
     }
-  } // <-- Resolved missing closing brace for if (trigger)
+  }
 
   // Attendance Logging Action
   if (logBtn && isEditMode) {
