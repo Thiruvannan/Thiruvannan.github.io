@@ -25,31 +25,58 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* 1. ANTI-COLLISION ENGINE (Mobile First) */
 html, body {
-  min-height: 100%;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
   background-color: var(--bg-core);
   color: var(--text-primary);
   font-family: 'Inter', -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 body {
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* Natural top-down flow prevents vertical overlap */
-  padding: 64px 16px 120px 16px; /* 120px bottom clearance frees button from audio dock */
-  overflow-x: hidden;
+  align-items: flex-start; /* Prevents vertical crushing on mobile */
+  padding: 72px 16px 120px 16px; /* 72px top clears banner, 120px bottom clears dock */
   position: relative;
   transition: background-color 0.8s ease;
 }
 
-button, .menu-row, .btn-icon {
-  user-select: none;
-}
+button, .menu-row, .btn-icon { user-select: none; }
 
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
+
+/* ==========================================================================
+   LAYOUT STRUCTURE (DESKTOP GRID)
+   ========================================================================== */
+#app-wrapper {
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 10;
+}
+
+@media (min-width: 1024px) {
+  body {
+    align-items: center; /* Safe to center vertically on large screens */
+    padding: 40px 24px;
+  }
+  #app-wrapper {
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+  #identity-core { position: sticky; top: 20px; }
+  .telemetry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .scroll-zone { max-height: 60vh; overflow-y: auto; }
+}
 
 /* ==========================================================================
    REFLECT.APP OPTICAL AURA (LIGHT BLOOM BEHIND GLASS)
@@ -69,14 +96,14 @@ button, .menu-row, .btn-icon {
 }
 
 /* ==========================================================================
-   MACOS OPTICAL GLASS (NEUTRAL OBSIDIAN SMOKE)
+   MACOS OPTICAL GLASS (NEUTRAL SMOKE)
    ========================================================================== */
 .obsidian-glass {
-  background: rgba(12, 12, 18, 0.6); /* Neutral dark smoke lets video motion show through */
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  background: rgba(12, 12, 18, 0.6); 
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.22); /* Specular top light edge */
+  border-top: 1px solid rgba(255, 255, 255, 0.22); 
   box-shadow: 0 24px 50px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transition: border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
 }
@@ -92,16 +119,16 @@ body.infinity-castle #ambient-glow-bloom {
   filter: blur(90px);
 }
 
-/* Glass stays neutral dark so typography remains high-contrast */
+/* Glass stays NEUTRAL DARK so typography pops and motion shines through */
 body.infinity-castle .obsidian-glass {
-  background: rgba(8, 8, 12, 0.68) !important;
-  backdrop-filter: blur(28px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-  border-color: rgba(245, 158, 11, 0.3) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.35) !important;
+  background: rgba(12, 12, 16, 0.55) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.2) !important; /* Preserves crisp edge */
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 
               0 0 25px rgba(245, 158, 11, 0.12), 
-              inset 0 1px 0 rgba(245, 158, 11, 0.3) !important;
+              inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
 }
 
 body.infinity-castle .btn-primary {
@@ -132,34 +159,6 @@ body.infinity-castle #matrix-container > div {
 body.infinity-castle #schedule-container div,
 body.infinity-castle #matrix-container span {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
-}
-
-/* ==========================================================================
-   LAYOUT STRUCTURE (DESKTOP VS MOBILE ISOLATION)
-   ========================================================================== */
-#app-wrapper {
-  width: 100%;
-  max-width: 420px;
-  position: relative;
-  z-index: 10;
-}
-
-@media (min-width: 1024px) {
-  body {
-    align-items: center; /* Center vertically on desktop displays */
-    padding: 0 24px;
-    height: 100vh;
-  }
-  #app-wrapper {
-    max-width: 1200px;
-    display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 32px;
-    align-items: start;
-  }
-  #identity-core { position: sticky; top: 20px; }
-  .telemetry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .scroll-zone { max-height: 56vh; overflow-y: auto; }
 }
 
 /* ==========================================================================
@@ -243,7 +242,7 @@ body.infinity-castle #matrix-container span {
 }
 
 /* ==========================================================================
-   TELEMETRY DRAWER
+   TELEMETRY DRAWER (MOBILE SHEET)
    ========================================================================== */
 #telemetry-drawer {
   display: flex;
@@ -438,7 +437,7 @@ body.infinity-castle #matrix-container span {
   pointer-events: none;
 }
 
-/* Pinned to the top edge so it can never touch the avatar */
+/* Pinned to extreme top, non-wrapping to avoid avatar */
 #domain-hud-banner {
   position: fixed;
   top: 14px;
@@ -455,7 +454,7 @@ body.infinity-castle #matrix-container span {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 10px rgba(245, 158, 11, 0.2);
-  white-space: nowrap;
+  white-space: nowrap; /* Forces one single line */
   opacity: 0;
   pointer-events: none;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -485,7 +484,7 @@ body.infinity-castle #matrix-container span {
 }
 
 /* ==========================================================================
-   TACTICAL HOLD RETICLE & VISION MODAL
+   MODALS
    ========================================================================== */
 #hold-reticle {
   position: fixed;
@@ -516,6 +515,10 @@ body.infinity-castle #matrix-container span {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease;
+}
+#vision-container.active {
+  opacity: 1;
+  pointer-events: all;
 }
 #vision-video {
   width: 100vw;
