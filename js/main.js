@@ -278,20 +278,43 @@ document.addEventListener('click', (e) => {
     if (action === 'close-license') {
       document.getElementById('hunter-modal')?.classList.add('hidden');
     }
+    
+    // Infinity Castle Vercel Aesthetic Trigger
     if (action === 'domain-expansion') {
       playAudioCue(biwaSfx);
+      
+      const isCastleActive = document.body.classList.toggle('infinity-castle');
       const layer = document.getElementById('cinematic-layer');
-      layer?.classList.toggle('active');
-      const video = window.innerWidth >= 1024 
+      const banner = document.getElementById('domain-hud-banner');
+      
+      const isDesktop = window.innerWidth >= 1024;
+      const activeVideo = isDesktop 
         ? document.getElementById('castle-video-desktop') 
         : document.getElementById('castle-video-mobile');
-      if (layer?.classList.contains('active')) {
-        video?.play().catch(() => {});
+      const inactiveVideo = isDesktop 
+        ? document.getElementById('castle-video-mobile') 
+        : document.getElementById('castle-video-desktop');
+
+      if (isCastleActive) {
+        layer?.classList.add('active');
+        banner?.classList.add('active');
+
+        // Dynamically inject the newly compressed .mp4 file
+        const targetSrc = isDesktop ? 'Assets/infinity_castle_desktop.mp4' : 'Assets/infinity_castle_mobile.mp4';
+        if (activeVideo.getAttribute('src') !== targetSrc) {
+          activeVideo.src = targetSrc;
+        }
+        
+        activeVideo.play().catch(err => console.warn("Mobile autoplay policy:", err));
+        if (inactiveVideo) inactiveVideo.pause();
       } else {
-        video?.pause();
+        layer?.classList.remove('active');
+        banner?.classList.remove('active');
+        if (activeVideo) activeVideo.pause();
+        if (inactiveVideo) inactiveVideo.pause();
       }
     }
-  }
+  } 
 
   // Attendance Logging Action
   if (logBtn && isEditMode) {
@@ -433,10 +456,16 @@ setInterval(() => {
   }
 }, 1000);
 
-// Boot
-document.addEventListener('DOMContentLoaded', () => {
+// Bulletproof Boot: runs immediately if DOM is already ready
+function bootTelemetry() {
   if (window.lucide) window.lucide.createIcons();
   initFirebase();
   renderSchedule();
   renderMatrix();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootTelemetry);
+} else {
+  bootTelemetry();
+}

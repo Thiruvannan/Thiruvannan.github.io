@@ -1,15 +1,12 @@
 /* ==========================================================================
-   PHASE 2: TACTICAL OBSIDIAN ARCHITECTURE
+   TACTICAL OBSIDIAN ARCHITECTURE & MOBILE PHYSICS
    ========================================================================== */
 
 :root {
-  /* Tactical Palette */
   --bg-core: #07070a;
-  --bg-glass: rgba(19, 19, 26, 0.65);
-  --bg-glass-hover: rgba(30, 30, 40, 0.75);
+  --bg-glass: rgba(19, 19, 26, 0.72);
   --border-glass: rgba(255, 255, 255, 0.08);
   
-  /* Accent Colors */
   --text-primary: #f8fafc;
   --text-muted: #94a3b8;
   --accent-cyan: #38bdf8;
@@ -17,17 +14,14 @@
   --accent-red: #ef4444;
   --accent-purple: #a855f7;
 
-  /* Spacing & Curves */
   --radius-sm: 8px;
   --radius-md: 16px;
   --radius-lg: 24px;
   --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-drawer: 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-drawer: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ==========================================================================
-   RESET & FOUNDATION
-   ========================================================================== */
+/* Base Reset */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -35,41 +29,42 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Scroll is fully unlocked. Text is fully selectable except on buttons. */
-body {
+html, body {
+  min-height: 100%;
   background-color: var(--bg-core);
   color: var(--text-primary);
   font-family: 'Inter', -apple-system, sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-  display: flex;
-  justify-content: center;
-  padding: 24px 16px 120px; /* Bottom padding keeps content above the audio dock */
   -webkit-font-smoothing: antialiased;
 }
 
-button, .menu-row, .btn-icon {
-  user-select: none; /* Only disable selection on interactive controls */
+body {
+  display: flex;
+  justify-content: center;
+  padding: 20px 16px 120px 16px;
+  overflow-x: hidden;
+  transition: background 0.6s ease;
 }
 
-/* Custom Scrollbar for Desktop */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+button, .menu-row, .btn-icon {
+  user-select: none;
+}
 
-/* ==========================================================================
-   CORE COMPONENTS (THE OBSIDIAN GLASS)
-   ========================================================================== */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
+
+/* Obsidian Glass Panels */
 .obsidian-glass {
   background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-glass);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: border-color 0.4s ease, background 0.4s ease;
 }
 
 /* ==========================================================================
-   LAYOUT GRID (MOBILE VS DESKTOP)
+   LAYOUT GRID
    ========================================================================== */
 #app-wrapper {
   width: 100%;
@@ -86,67 +81,44 @@ button, .menu-row, .btn-icon {
     gap: 32px;
     align-items: start;
   }
-  #identity-core { position: sticky; top: 24px; }
+  #identity-core { position: sticky; top: 20px; }
+  .telemetry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .scroll-zone { max-height: 58vh; overflow-y: auto; }
 }
 
 /* ==========================================================================
-   IDENTITY CORE (PROFILE)
+   DEVELOPER IDENTITY CARD
    ========================================================================== */
 #identity-core {
   border-radius: var(--radius-lg);
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  position: relative;
-  overflow: hidden;
+  gap: 20px;
 }
 
-.tactical-header {
-  display: flex;
-  justify-content: flex-end;
-}
-
+.tactical-header { display: flex; justify-content: flex-end; }
 .hunter-status {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: var(--transition-fast);
 }
-.hunter-status:active { transform: scale(0.95); }
-
-.rank-indicator {
-  font-family: 'Share Tech Mono', monospace;
-  color: var(--accent-red); /* Changes via JS later */
-  font-weight: 800;
-  font-size: 13px;
-}
-.rank-label {
-  font-size: 10px;
-  color: var(--text-muted);
-  letter-spacing: 1px;
-}
+.rank-indicator { font-family: 'Share Tech Mono', monospace; font-weight: 800; font-size: 13px; }
+.rank-label { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; }
 
 .profile-block { text-align: center; }
-.avatar-wrap { margin: 0 auto 16px; width: 90px; height: 90px; }
-.avatar {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.1);
-  object-fit: cover;
-}
+.avatar-wrap { margin: 0 auto 14px; width: 88px; height: 88px; }
+.avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(255,255,255,0.15); object-fit: cover; }
 .dev-name { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-.dev-title { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+.dev-title { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 
-/* Tactical Menu (Bento List) */
 .tactical-menu {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.22);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -155,24 +127,21 @@ button, .menu-row, .btn-icon {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px;
+  padding: 15px 16px;
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
   color: var(--text-primary);
-  transition: background var(--transition-fast);
   cursor: pointer;
+  transition: background var(--transition-fast);
 }
-.menu-row:active { background: rgba(255, 255, 255, 0.05); }
-.menu-row i, .menu-row svg { width: 18px; height: 18px; }
-
-/* Subdued Accents */
+.menu-row:active { background: rgba(255, 255, 255, 0.06); }
+.menu-row i, .menu-row svg { width: 18px; height: 18px; flex-shrink: 0; }
 .text-alert i { color: var(--accent-red); }
 .text-cyan i { color: var(--accent-cyan); }
 .text-purple i { color: var(--accent-purple); }
 .text-amber i { color: var(--accent-amber); }
 .text-neutral i { color: var(--text-muted); }
-
 .divider { height: 1px; background: var(--border-glass); margin-left: 48px; }
 
 .btn-primary {
@@ -180,7 +149,7 @@ button, .menu-row, .btn-icon {
   color: var(--bg-core);
   border: none;
   width: 100%;
-  padding: 16px;
+  padding: 15px;
   border-radius: var(--radius-md);
   font-weight: 700;
   font-size: 14px;
@@ -193,38 +162,49 @@ button, .menu-row, .btn-icon {
 }
 .btn-primary:active { transform: scale(0.97); }
 
-/* Hide drawer trigger button on desktop */
 @media (min-width: 1024px) {
   [data-trigger="open-telemetry"] { display: none; }
 }
 
 /* ==========================================================================
-   TELEMETRY DRAWER (MOBILE OFF-CANVAS / DESKTOP GRID)
+   TELEMETRY DRAWER (MOBILE OFF-CANVAS / FIXED FLUID SHEET)
    ========================================================================== */
 #telemetry-drawer {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
-/* Mobile Slide-Up Logic */
 @media (max-width: 1023px) {
   #telemetry-drawer {
     position: fixed;
-    inset: 0;
-    top: 60px; /* Leaves a gap at the top */
+    top: 52px;
+    bottom: 0;
+    left: 0;
+    right: 0;
     z-index: 100;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    padding: 24px 16px;
+    padding: 20px 16px 120px 16px; /* Prevents acoustic dock overlap */
     transform: translateY(100%);
-    transition: transform var(--transition-drawer);
+    transition: transform var(--transition-drawer), visibility var(--transition-drawer);
     visibility: hidden;
-    background: #0a0a0e; /* Solid fallback for drawer */
+    overflow-y: auto; /* UNLOCKED FLUID MOBILE SCROLL */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
   }
   #telemetry-drawer.active {
     transform: translateY(0);
     visibility: visible;
-    box-shadow: 0 -20px 40px rgba(0,0,0,0.8);
+  }
+  .telemetry-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .scroll-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 }
 
@@ -232,7 +212,7 @@ button, .menu-row, .btn-icon {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 }
 
 .btn-tactical {
@@ -249,16 +229,14 @@ button, .menu-row, .btn-icon {
   cursor: pointer;
 }
 .btn-tactical.unlocked {
-  background: rgba(251, 191, 36, 0.1);
+  background: rgba(251, 191, 36, 0.15);
   color: var(--accent-amber);
-  border-color: rgba(251, 191, 36, 0.3);
+  border-color: rgba(251, 191, 36, 0.35);
 }
 .hidden { display: none !important; }
 
-/* Hide close button on desktop */
 @media (min-width: 1024px) {
   [data-trigger="close-telemetry"] { display: none; }
-  .telemetry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 }
 
 .sync-status { display: flex; align-items: center; gap: 8px; font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--text-muted); }
@@ -276,14 +254,11 @@ button, .menu-row, .btn-icon {
   justify-content: space-between;
 }
 
-/* ==========================================================================
-   SQUID HUD & MATRIX COMPONENTS
-   ========================================================================== */
 .telemetry-panel {
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.22);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
-  padding: 20px;
+  padding: 18px;
 }
 .panel-title {
   display: flex;
@@ -294,39 +269,37 @@ button, .menu-row, .btn-icon {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 800;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
+.tactical-select {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-glass);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  outline: none;
+}
+.tactical-select option { background: #121218; color: #fff; }
+
 .squid-hud {
-  background: #050508;
+  background: #040407;
   border: 1px solid #1a1a24;
   border-radius: var(--radius-sm);
-  padding: 20px;
+  padding: 18px;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
-.hud-label {
-  font-size: 10px;
-  color: var(--text-muted);
-  letter-spacing: 2px;
-  margin-bottom: 8px;
-}
+.hud-label { font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 6px; }
 .hud-digits {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 36px;
+  font-size: 34px;
   color: var(--accent-amber);
   display: flex;
   justify-content: center;
-  gap: 4px;
-}
-
-/* Scroll Zones inside Panels (Desktop fix) */
-.scroll-zone {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: 60vh;
-  overflow-y: auto;
+  gap: 3px;
 }
 
 /* ==========================================================================
@@ -334,46 +307,20 @@ button, .menu-row, .btn-icon {
    ========================================================================== */
 #acoustic-dock {
   position: fixed;
-  bottom: 24px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 90%;
+  width: calc(100% - 32px);
   max-width: 320px;
   border-radius: 40px;
-  padding: 8px 16px;
+  padding: 8px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  z-index: 90;
+  z-index: 200; /* Stays accessible above the drawer */
 }
-.track-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  overflow: hidden;
-}
-.music-wave {
-  display: flex;
-  gap: 2px;
-  height: 12px;
-  align-items: flex-end;
-}
-.music-wave .bar {
-  width: 3px;
-  background: var(--text-muted);
-  border-radius: 2px;
-  height: 20%;
-  transition: height 0.1s ease;
-}
-/* When playing, JS will add .playing to #acoustic-dock to animate these */
-
-.track-marquee {
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  color: var(--text-muted);
-}
-
+.track-info { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+.track-marquee { font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--text-muted); }
 .audio-controls { display: flex; align-items: center; gap: 4px; }
 .btn-icon {
   background: transparent;
@@ -386,44 +333,162 @@ button, .menu-row, .btn-icon {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: var(--transition-fast);
 }
-.btn-icon:active { background: rgba(255,255,255,0.1); }
 .play-btn { background: var(--text-primary); color: var(--bg-core); }
-.play-btn:active { transform: scale(0.9); background: var(--text-primary); }
-.play-btn i { width: 16px; height: 16px; }
+.play-btn i { width: 15px; height: 15px; }
 
 /* ==========================================================================
-   CINEMATIC ENVIRONMENT (INFINITY CASTLE & EREN)
+   INFINITY CASTLE: VERCEL/LINEAR OBSIDIAN SPEC
    ========================================================================== */
-#cinematic-layer, #vision-container {
+#cinematic-layer {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.8s ease;
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
+  background: #000;
 }
-#cinematic-layer.active, #vision-container.active {
+
+#cinematic-layer.active {
   opacity: 1;
 }
-.castle-bg, #vision-video {
+
+/* Crisp edge vignette melts the video edges into pure pitch black */
+.vignette-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.85) 90%),
+              linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 20%, transparent 80%, #000 100%);
+  pointer-events: none;
+}
+
+.castle-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.55; /* Balances depth so UI stays high-contrast */
+  filter: contrast(1.1) saturate(1.15);
+  display: none;
+}
+
+@media (min-width: 1024px) { #castle-video-desktop { display: block; } }
+@media (max-width: 1023px) { #castle-video-mobile { display: block; } }
+
+/* Animated Domain Entrance Typography */
+#domain-hud-banner {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translate(-50%, -20px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 18px;
+  background: rgba(15, 10, 8, 0.85);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 9999px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#domain-hud-banner.active {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.domain-kanji {
+  font-family: serif;
+  color: #f59e0b;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+.domain-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #fef3c7;
+  text-transform: uppercase;
+}
+
+/* Linear-Grade Obsidian Cards during Castle Mode */
+body.infinity-castle .obsidian-glass {
+  background: rgba(10, 10, 14, 0.65) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  border-color: rgba(245, 158, 11, 0.22) !important;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8),
+              0 0 1px 1px rgba(245, 158, 11, 0.15),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+body.infinity-castle .btn-primary {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  color: #000 !important;
+  font-weight: 800;
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.3) !important;
+}
+
+/* ==========================================================================
+   TACTICAL HOLD RETICLE & FULLSCREEN VISION
+   ========================================================================== */
+#hold-reticle {
+  position: fixed;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  z-index: 9990;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.6);
+  transition: opacity 0.2s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#hold-reticle.holding {
+  opacity: 1;
+  border-color: var(--accent-cyan);
+  transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
+}
+
+#vision-container {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+#vision-container.active {
+  opacity: 1;
+  pointer-events: all;
+}
+#vision-video {
   width: 100vw;
   height: 100vh;
   object-fit: cover;
 }
-.vignette-overlay {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, transparent 30%, var(--bg-core) 100%);
-}
 
-/* Elevate Z-index for vision so it covers the UI when triggered */
-#vision-container { z-index: 9999; background: #000; }
-
-/* Modals & Utils */
 .modal-backdrop {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000;
-  display: flex; align-items: center; justify-content: center;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.modal-card { padding: 32px; border-radius: var(--radius-lg); text-align: center; width: 90%; max-width: 320px; }
+.modal-card { padding: 28px; border-radius: var(--radius-lg); text-align: center; width: 88%; max-width: 320px; }
+.modal-stats { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; font-weight: 600; }
+.stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-glass); padding-bottom: 8px; }

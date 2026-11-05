@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- FIX: Restored native zoom and scaling for accessibility -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Thiruvannan | SRM Hub</title>
   
@@ -11,7 +10,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <!-- Fonts: Share Tech Mono for Telemetry, Inter for clean UI reading -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -20,11 +19,17 @@
 </head>
 <body>
 
-  <!-- LAYER 1: AMBIENT CINEMATIC ENVIRONMENT (Preload turned off to save mobile data) -->
+  <!-- LAYER 1: AMBIENT CINEMATIC ENVIRONMENT (Sources injected via JS) -->
   <div id="cinematic-layer">
-    <video id="castle-video-desktop" class="castle-bg" src="Assets/infinity_castle_desktop.webm" preload="none" muted loop playsinline disablePictureInPicture></video>
-    <video id="castle-video-mobile" class="castle-bg" src="Assets/infinity_castle_mobile.webm" preload="none" muted loop playsinline disablePictureInPicture></video>
+    <video id="castle-video-desktop" class="castle-bg" muted loop playsinline disablePictureInPicture></video>
+    <video id="castle-video-mobile" class="castle-bg" muted loop playsinline disablePictureInPicture></video>
     <div class="vignette-overlay"></div>
+  </div>
+
+  <!-- INFINITY CASTLE HUD BANNER -->
+  <div id="domain-hud-banner">
+    <span class="domain-kanji">無限城</span>
+    <span class="domain-label">Domain Expansion • Infinity Castle</span>
   </div>
 
   <!-- LAYER 2: HARDWARE-ISOLATED FULLSCREEN VISION -->
@@ -39,10 +44,9 @@
 
   <div id="app-wrapper">
     
-    <!-- MAIN: DEVELOPER IDENTITY (Always Visible) -->
+    <!-- MAIN: DEVELOPER IDENTITY -->
     <main id="identity-core" class="obsidian-glass">
       
-      <!-- Integrated Tactical Hunter Badge -->
       <header class="tactical-header">
         <div class="hunter-status" data-trigger="license-modal">
           <span class="rank-indicator">E-RANK</span>
@@ -58,7 +62,6 @@
         <p class="dev-title">Developer | SRMIST CSE</p>
       </div>
       
-      <!-- Clean, Tactical Bento Links -->
       <nav class="tactical-menu">
         <a class="menu-row text-alert" href="tel:105786">
           <i data-lucide="shield-alert"></i>
@@ -91,13 +94,12 @@
         </div>
       </nav>
 
-      <!-- Thumb-Zone Trigger for Attendance Drawer -->
       <button class="btn-primary" data-trigger="open-telemetry">
         <i data-lucide="cpu"></i> Initialize Survival Matrix
       </button>
     </main>
 
-    <!-- ASIDE: TELEMETRY DRAWER (Hidden slide-up panel on mobile, side-panel on desktop) -->
+    <!-- ASIDE: TELEMETRY DRAWER -->
     <aside id="telemetry-drawer" class="obsidian-glass off-canvas">
       <div class="drawer-header">
         <button class="btn-icon" data-trigger="close-telemetry"><i data-lucide="chevron-down"></i></button>
@@ -119,7 +121,6 @@
       </div>
 
       <div class="telemetry-grid">
-        <!-- Today's Schedule -->
         <section class="telemetry-panel">
           <div class="panel-title">
             <span>Today's Log</span>
@@ -135,17 +136,14 @@
           <div id="schedule-container" class="scroll-zone"></div>
         </section>
 
-        <!-- Overall Attendance & Squid Tally -->
         <section class="telemetry-panel">
           <div class="panel-title"><span>Survival Margin</span></div>
-          
           <div class="squid-hud" id="globalSquidBoard">
             <div class="hud-label">CLEARANCE RATE</div>
             <div class="hud-digits" id="squid-digits">
               <span>0</span><span>0</span><span class="dot">.</span><span>0</span><span class="percent">%</span>
             </div>
           </div>
-          
           <div id="matrix-container" class="scroll-zone"></div>
         </section>
       </div>
