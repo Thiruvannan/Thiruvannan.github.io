@@ -36,7 +36,7 @@ html, body {
 body {
   display: flex;
   justify-content: center;
-  padding: 56px 16px 120px 16px; /* Generous top clearance prevents banner collisions */
+  padding: 68px 16px 120px 16px; /* Generous clearance ensures banner never touches the avatar */
   overflow-x: hidden;
   position: relative;
   transition: background-color 0.8s ease;
@@ -68,38 +68,38 @@ button, .menu-row, .btn-icon {
 }
 
 /* ==========================================================================
-   MACOS OPTICAL GLASS PANELS
+   MACOS OPTICAL GLASS PANELS (TRUE TRANSLUCENCY)
    ========================================================================== */
 .obsidian-glass {
-  background: rgba(14, 14, 20, 0.45);
+  background: rgba(14, 14, 20, 0.35); /* Pure optical glass: lets video shine through */
   backdrop-filter: blur(28px) saturate(190%);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.22); /* Specular top light bevel */
+  border-top: 1px solid rgba(255, 255, 255, 0.25); /* Specular top light edge */
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ==========================================================================
-   INFINITY CASTLE DIMENSION (DEMON SLAYER SHIFT & CONTRAST BOOST)
+   INFINITY CASTLE DIMENSION (DEMON SLAYER SHIFT & SHARP CONTRAST)
    ========================================================================== */
 body.infinity-castle #ambient-glow-bloom {
   top: -80px;
   width: 950px;
   height: 650px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, rgba(220, 38, 38, 0.25) 45%, transparent 75%);
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.38) 0%, rgba(220, 38, 38, 0.2) 45%, transparent 75%);
   filter: blur(90px);
 }
 
 body.infinity-castle .obsidian-glass {
-  background: rgba(22, 12, 8, 0.62) !important;
-  backdrop-filter: blur(32px) saturate(220%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(220%) !important;
-  border-color: rgba(245, 158, 11, 0.28) !important;
-  border-top: 1px solid rgba(245, 158, 11, 0.6) !important;
+  background: rgba(18, 10, 6, 0.38) !important; /* Low opacity prevents muddy brown stacking */
+  backdrop-filter: blur(30px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+  border-top: 1px solid rgba(245, 158, 11, 0.65) !important;
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8), 
-              0 0 35px rgba(245, 158, 11, 0.15), 
-              inset 0 1px 0 rgba(245, 158, 11, 0.35) !important;
+              0 0 30px rgba(245, 158, 11, 0.12), 
+              inset 0 1px 0 rgba(245, 158, 11, 0.3) !important;
 }
 
 body.infinity-castle .btn-primary {
@@ -109,27 +109,48 @@ body.infinity-castle .btn-primary {
   box-shadow: 0 10px 30px rgba(245, 158, 11, 0.35) !important;
 }
 
-/* Contrast enhancement over intense backlights */
+/* High-Contrast Castle Mode Elements */
 body.infinity-castle .telemetry-panel {
-  background: rgba(12, 6, 3, 0.75) !important;
+  background: rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(245, 158, 11, 0.15) !important;
 }
 
 body.infinity-castle .live-slot-banner {
-  background: rgba(245, 158, 11, 0.14) !important;
-  border-color: rgba(245, 158, 11, 0.4) !important;
-  color: #fef3c7 !important;
+  background: rgba(245, 158, 11, 0.15) !important;
+  border-color: rgba(245, 158, 11, 0.45) !important;
+  color: #ffffff !important;
 }
 
 body.infinity-castle #schedule-container > div,
 body.infinity-castle #matrix-container > div {
-  background: rgba(24, 12, 7, 0.82) !important;
-  border-color: rgba(245, 158, 11, 0.3) !important;
-  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(245, 158, 11, 0.22) !important;
+  backdrop-filter: blur(8px);
 }
 
-body.infinity-castle #schedule-container div,
-body.infinity-castle #matrix-container span {
+body.infinity-castle #schedule-container div[style*="font-weight:700"],
+body.infinity-castle #matrix-container span[style*="font-weight:700"] {
+  color: #ffffff !important;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+}
+
+body.infinity-castle #schedule-container div[style*="font-family:'Share Tech Mono'"] {
+  color: #e2e8f0 !important;
+}
+
+/* Crisp Attended / Missed badges over amber video */
+body.infinity-castle [data-status="attended"],
+body.infinity-castle div[style*="var(--accent-cyan)"] {
+  background: rgba(56, 189, 248, 0.22) !important;
+  color: #bae6fd !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+}
+
+body.infinity-castle [data-status="missed"],
+body.infinity-castle div[style*="var(--accent-red)"] {
+  background: rgba(239, 68, 68, 0.25) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.45) !important;
 }
 
 /* ==========================================================================
@@ -150,7 +171,7 @@ body.infinity-castle #matrix-container span {
     gap: 32px;
     align-items: start;
   }
-  #identity-core { position: sticky; top: 56px; }
+  #identity-core { position: sticky; top: 68px; }
   .telemetry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .scroll-zone { max-height: 58vh; overflow-y: auto; }
 }
@@ -399,7 +420,7 @@ body.infinity-castle #matrix-container span {
 .play-btn i { width: 15px; height: 15px; }
 
 /* ==========================================================================
-   INFINITY CASTLE VIDEO & COLLISION-FREE HUD BANNER
+   INFINITY CASTLE VIDEO & COMPACT SINGLE-LINE HUD BANNER
    ========================================================================== */
 #cinematic-layer {
   position: fixed;
@@ -432,22 +453,25 @@ body.infinity-castle #matrix-container span {
   pointer-events: none;
 }
 
+/* Single-line sleek status pill (No wrapping, zero avatar overlap) */
 #domain-hud-banner {
   position: fixed;
-  top: 14px;
+  top: 12px;
   left: 50%;
   transform: translate(-50%, -20px);
-  z-index: 250; /* Floats safely above the drawer without overlapping panels */
+  z-index: 250;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 16px;
-  background: rgba(15, 8, 4, 0.92);
+  gap: 8px;
+  padding: 5px 14px;
+  background: rgba(15, 8, 4, 0.94);
   border: 1px solid rgba(245, 158, 11, 0.45);
   border-radius: 9999px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 12px rgba(245, 158, 11, 0.2);
+  white-space: nowrap; /* PREVENTS VERTICAL TEXT WRAPPING */
+  max-width: 90vw;
   opacity: 0;
   pointer-events: none;
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -462,16 +486,21 @@ body.infinity-castle #matrix-container span {
   font-family: serif;
   color: #f59e0b;
   font-weight: 700;
-  letter-spacing: 2px;
-  text-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  flex-shrink: 0;
 }
 
 .domain-label {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 2px;
+  font-size: 10px;
+  letter-spacing: 1.5px;
   color: #fef3c7;
   text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ==========================================================================
