@@ -25,7 +25,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ANTI-COLLISION ENGINE (Mobile First) */
+/* ANTI-COLLISION ENGINE (Mobile First Baseline) */
 html, body {
   min-height: 100vh;
   min-height: -webkit-fill-available;
@@ -52,7 +52,7 @@ button, .menu-row, .btn-icon { user-select: none; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
 
 /* ==========================================================================
-   LAYOUT STRUCTURE (DESKTOP GRID - PROTECTED & UNTOUCHED)
+   LAYOUT STRUCTURE (DESKTOP GRID & DESKTOP-SPECIFIC FIXES)
    ========================================================================== */
 #app-wrapper {
   width: 100%;
@@ -66,6 +66,7 @@ button, .menu-row, .btn-icon { user-select: none; }
     align-items: center;
     padding: 40px 24px;
   }
+
   #app-wrapper {
     max-width: 1200px;
     display: grid;
@@ -73,12 +74,51 @@ button, .menu-row, .btn-icon { user-select: none; }
     gap: 32px;
     align-items: start;
   }
-  #identity-core { position: sticky; top: 20px; }
-  .telemetry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .scroll-zone { max-height: 60vh; overflow-y: auto; }
+
+  #identity-core { 
+    position: sticky; 
+    top: 20px; 
+    border-radius: var(--radius-lg);
+  }
+
+  /* 1. Eliminate sharp corners on desktop: organic 26px radius & specular bevel */
+  #telemetry-drawer {
+    border-radius: 26px !important;
+    padding: 24px 28px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  /* 2. Remove mobile down-arrow on desktop */
+  [data-trigger="close-telemetry"],
+  .btn-icon[data-trigger="close-telemetry"],
+  .drawer-header .btn-icon[data-trigger="close-telemetry"] { 
+    display: none !important; 
+  }
+
+  /* Balance desktop header once arrow is hidden */
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .telemetry-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px; 
+  }
+
+  .scroll-zone { 
+    max-height: 58vh; 
+    overflow-y: auto; 
+    padding-right: 4px;
+  }
 }
 
-/* ANTI-GHOSTING ENGINE (Hides base card when drawer opens) */
+/* ANTI-GHOSTING ENGINE (Hides base card on mobile when drawer is active) */
 body.drawer-open #identity-core {
   opacity: 0 !important;
   pointer-events: none !important;
@@ -86,7 +126,9 @@ body.drawer-open #identity-core {
   transition: opacity 0.3s ease, transform 0.3s ease !important;
 }
 
-/* DEFAULT MODE: REFLECT.APP OPTICAL AURA */
+/* ==========================================================================
+   DEFAULT MODE: REFLECT.APP OPTICAL AURA
+   ========================================================================== */
 #ambient-glow-bloom {
   position: fixed;
   top: -100px;
@@ -112,7 +154,7 @@ body.drawer-open #identity-core {
 }
 
 /* ==========================================================================
-   INFINITY CASTLE: GLOBAL DESKTOP & SHARED THEME (PRESERVED)
+   INFINITY CASTLE: GLOBAL & DESKTOP SPEC
    ========================================================================== */
 body.infinity-castle #ambient-glow-bloom {
   display: none !important;
@@ -136,23 +178,55 @@ body.infinity-castle .obsidian-glass {
     0 0 25px rgba(245, 158, 11, 0.08) !important;
 }
 
-body.infinity-castle .tactical-menu,
+/* Soft, organic borders across sub-containers */
+.telemetry-panel {
+  border-radius: 18px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
+  background: rgba(0, 0, 0, 0.35) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
 body.infinity-castle .telemetry-panel {
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-color: rgba(245, 158, 11, 0.18) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.24) !important;
+}
+
+/* Individual Schedule & Attendance cards: soft pill geometry */
+#schedule-container > div,
+#matrix-container > div {
+  border-radius: 14px !important;
+  border: 1px solid rgba(245, 158, 11, 0.16) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background: rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: none !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+
+#schedule-container > div:hover,
+#matrix-container > div:hover {
+  transform: translateY(-2px);
+  border-color: rgba(245, 158, 11, 0.45) !important;
+}
+
+.live-slot-banner {
+  border-radius: 14px !important;
+  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #ffffff !important;
+}
+
+.squid-hud {
+  border-radius: 14px !important;
+  border: 1px solid rgba(245, 158, 11, 0.18) !important;
+  background: rgba(0, 0, 0, 0.35) !important;
 }
 
 body.infinity-castle .menu-row { color: #f1f5f9 !important; }
 body.infinity-castle .menu-row:hover,
 body.infinity-castle .menu-row:active {
   background: rgba(245, 158, 11, 0.08) !important;
-}
-
-body.infinity-castle #schedule-container > div,
-body.infinity-castle #matrix-container > div {
-  background: rgba(0, 0, 0, 0.3) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  backdrop-filter: none !important;
 }
 
 body.infinity-castle .dev-name,
@@ -184,23 +258,20 @@ body.infinity-castle .btn-primary {
     0 0 20px rgba(245, 158, 11, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
+
 body.infinity-castle .btn-primary i,
 body.infinity-castle .btn-primary svg {
   color: #fbbf24 !important;
   filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6));
 }
 
-body.infinity-castle .live-slot-banner {
-  background: rgba(245, 158, 11, 0.15) !important;
-  border: 1px solid rgba(245, 158, 11, 0.3) !important;
-  color: #ffffff !important;
-}
 body.infinity-castle [data-status="attended"],
 body.infinity-castle div[style*="var(--accent-cyan)"] {
   background: rgba(56, 189, 248, 0.22) !important;
   color: #bae6fd !important;
   border: 1px solid rgba(56, 189, 248, 0.4) !important;
 }
+
 body.infinity-castle [data-status="missed"],
 body.infinity-castle div[style*="var(--accent-red)"] {
   background: rgba(239, 68, 68, 0.25) !important;
@@ -212,7 +283,6 @@ body.infinity-castle div[style*="var(--accent-red)"] {
    MOBILE-ONLY DECONSTRUCTED HUD (CASTLE MODE)
    ========================================================================== */
 @media (max-width: 1023px) {
-  /* Dissolves the solid background box so the castle is completely visible */
   body.infinity-castle #identity-core {
     background: transparent !important;
     backdrop-filter: none !important;
@@ -228,7 +298,6 @@ body.infinity-castle div[style*="var(--accent-red)"] {
     box-shadow: 0 0 25px rgba(245, 158, 11, 0.35) !important;
   }
 
-  /* Deconstructs menu into floating tactical glass pills */
   body.infinity-castle .tactical-menu {
     background: transparent !important;
     border: none !important;
@@ -277,6 +346,7 @@ body.infinity-castle div[style*="var(--accent-red)"] {
   flex-direction: column;
   gap: 16px;
 }
+
 .tactical-header { display: flex; justify-content: flex-end; }
 .hunter-status {
   display: inline-flex;
@@ -347,7 +417,7 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 }
 
 /* ==========================================================================
-   TELEMETRY DRAWER (MOBILE SHEET)
+   TELEMETRY DRAWER (MOBILE OFF-CANVAS SHEET)
    ========================================================================== */
 #telemetry-drawer {
   display: flex;
@@ -401,30 +471,9 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 .btn-tactical.unlocked { background: rgba(251, 191, 36, 0.18); color: var(--accent-amber); border-color: rgba(251, 191, 36, 0.4); }
 .hidden { display: none !important; }
 
-@media (min-width: 1024px) {
-  [data-trigger="close-telemetry"] { display: none; }
-}
-
 .sync-status { display: flex; align-items: center; gap: 8px; font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--text-muted); }
 .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-cyan); box-shadow: 0 0 8px var(--accent-cyan); }
-.live-slot-banner {
-  background: rgba(56, 189, 248, 0.08);
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  border-radius: var(--radius-md);
-  padding: 12px 16px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent-cyan);
-  display: flex;
-  justify-content: space-between;
-}
 
-.telemetry-panel {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--radius-md);
-  padding: 18px;
-}
 .panel-title { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 14px; }
 .tactical-select {
   background: rgba(255, 255, 255, 0.08);
@@ -438,14 +487,6 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 }
 .tactical-select option { background: #121218; color: #fff; }
 
-.squid-hud {
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-sm);
-  padding: 18px;
-  text-align: center;
-  margin-bottom: 14px;
-}
 .hud-label { font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 6px; }
 .hud-digits {
   font-family: 'Share Tech Mono', monospace;
@@ -540,7 +581,9 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 .domain-kanji { font-family: serif; color: #f59e0b; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-shadow: 0 0 8px rgba(245, 158, 11, 0.6); flex-shrink: 0; }
 .domain-label { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 1.5px; color: #fef3c7; text-transform: uppercase; }
 
-/* MODALS */
+/* ==========================================================================
+   MODALS
+   ========================================================================== */
 #hold-reticle { position: fixed; width: 50px; height: 50px; border-radius: 50%; border: 2px dashed rgba(255, 255, 255, 0.4); pointer-events: none; z-index: 9990; opacity: 0; transform: translate(-50%, -50%) scale(0.6); transition: opacity 0.2s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1); }
 #hold-reticle.holding { opacity: 1; border-color: var(--accent-cyan); transform: translate(-50%, -50%) scale(1.2) rotate(180deg); }
 #vision-container { position: fixed; inset: 0; z-index: 10000; background: #000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
