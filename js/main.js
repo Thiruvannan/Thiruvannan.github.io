@@ -22,7 +22,7 @@ let totalConducted = 0;
 let totalSafeBunks = 0;
 let clearancePercentage = 100;
 
-// SOUND EFFECTS
+// SFX TRIGGERS
 const cashSfx = document.getElementById('cash-sfx');
 const biwaSfx = document.getElementById('biwa-sfx');
 
@@ -41,131 +41,169 @@ function triggerHaptic(type = 'light') {
 }
 
 // ==========================================================================
-// FISHER-YATES SHUFFLE ENGINE
-// Guarantees zero repeats until the entire folder has played
+// FISHER-YATES CRYPTOGRAPHIC SHUFFLE ENGINE
+// Guarantees zero repeats until the entire queue completes
 // ==========================================================================
 function shuffleArray(array) {
-  let curId = array.length;
-  while (0 !== curId) {
-    let randId = Math.floor(Math.random() * curId);
-    curId -= 1;
-    let tmp = array[curId];
-    array[curId] = array[randId];
-    array[randId] = tmp;
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-  return array;
+  return shuffled;
 }
 
-// 1. Audio Manifest
-const audioPool = shuffleArray([
+// 1. Audio Pool (encoded for web servers)
+const rawAudio = [
   "Assets/Audio/Aalaporan-Thamizhan.mp3",
   "Assets/Audio/Kannukulla.mp3",
   "Assets/Audio/Pesamale.mp3",
   "Assets/Audio/SiM_-_Under_the_Tree_Attack_on_Titan_(mp3.pm).mp3",
   "Assets/Audio/Thamarai Poovukum.mp3"
-]);
+];
+let audioPool = shuffleArray(rawAudio);
+let trackIdx = 0;
 
-// 2. Video Manifest (ensure filenames match your GH repo exactly)
-const landscapeVids = shuffleArray([
+// 2. Video Manifest (all edits in Assets/Videos/)
+const rawLandscapeVids = [
   "Assets/Videos/Landscape/Dhurandhar | Use Headphones 🎧 [xThj4X8CVDM].webm",
   "Assets/Videos/Landscape/Madara Uchiha Speech MV [zzalGC-MouU].webm",
-  "Assets/Videos/Landscape/The Best Naruto Edit You'll Ever See... 🔥 | Headlights [4K]! [AX...].webm",
-  "Assets/Videos/Landscape/This Infinity Castle EDIT Took Me 20+ Hours [3kjgSHA-bM0].webm",
   "Assets/Videos/Landscape/what eren really, REALLY saw [KCKfWNLSn_I].webm"
-]);
+];
 
-const portraitVids = shuffleArray([
-  "Assets/Videos/Portrait/Ruthless Character Identified 💀🔥! | Leo X Funk Na Mira Edit.webm"
-]);
+const rawPortraitVids = [
+  "Assets/Videos/Portrait/Ruthless Character Identified 💀🔥! | Leo X Funk Na Mira Edit ... .webm"
+];
 
-let trackIdx = 0;
+let landscapePool = shuffleArray(rawLandscapeVids);
+let portraitPool = shuffleArray(rawPortraitVids);
 let landIdx = 0;
 let portIdx = 0;
 
 // ==========================================================================
-// MEDIA & HARDWARE CONTROL
+// SINGLE HARDWARE-ACCELERATED CASTLE STREAM
+// ==========================================================================
+function syncCastleVideo() {
+  const vid = document.getElementById('castle-video');
+  if (!vid) return;
+
+  const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+  const targetSrc = isDesktop 
+    ? "Assets/infinity_castle_desktop.mp4" 
+    : "Assets/infinity_castle_mobile.mp4?v=2";
+
+  // Prevent re-downloading if already loaded
+  if (!vid.src.includes(isDesktop ? "desktop" : "mobile")) {
+    vid.src = targetSrc;
+    vid.load();
+  }
+}
+window.addEventListener('resize', syncCastleVideo);
+
+// ==========================================================================
+// AUDIO ENGINE (EVENT-DRIVEN SPOTIFY MODEL)
 // ==========================================================================
 const bgAudio = document.getElementById('bg-audio');
 const visualizer = document.getElementById('music-visualizer');
 const trackNameEl = document.getElementById('track-name');
 const audioPlayBtn = document.getElementById('audio-play-btn');
 
-function updateAudioTrack() {
-  if(!bgAudio) return;
+function loadCurrentTrack() {
+  if (!bgAudio) return;
   const rawPath = audioPool[trackIdx];
-  bgAudio.src = rawPath;
-  const niceName = rawPath.split('/').pop().replace('.mp3', '').replace(/_/g, ' ');
-  if(trackNameEl) trackNameEl.textContent = niceName;
+  bgAudio.src = encodeURI(rawPath);
+  
+  const niceName = rawPath.split('/').pop().replace(/\.[^/.]+$/, "").replace(/_/g, " ");
+  if (trackNameEl) trackNameEl.textContent = niceName;
 }
 
-function toggleAudio() {
-  if(!bgAudio.src || bgAudio.src === window.location.href) {
-    updateAudioTrack();
-  }
-  if (bgAudio.paused) {
-    bgAudio.play().catch(()=>{});
+function playTrack() {
+  if (!bgAudio.src) loadCurrentTrack();
+  bgAudio.play().then(() => {
     audioPlayBtn.innerHTML = '<i data-lucide="pause"></i>';
     visualizer?.classList.add('active');
-  } else {
-    bgAudio.pause();
-    audioPlayBtn.innerHTML = '<i data-lucide="play"></i>';
-    visualizer?.classList.remove('active');
-  }
-  if(window.lucide) window.lucide.createIcons();
+    if (window.lucide) window.lucide.createIcons();
+  }).catch(err => console.warn("Playback awaiting click token:", err.message));
 }
 
-bgAudio?.addEventListener('ended', () => {
+function pauseTrack() {
+  bgAudio.pause();
+  audioPlayBtn.innerHTML = '<i data-lucide="play"></i>';
+  visualizer?.classList.remove('active');
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function nextTrack() {
   trackIdx = (trackIdx + 1) % audioPool.length;
-  updateAudioTrack();
-  bgAudio.play().catch(()=>{});
+  loadCurrentTrack();
+  playTrack();
+}
+
+function prevTrack() {
+  trackIdx = (trackIdx - 1 + audioPool.length) % audioPool.length;
+  loadCurrentTrack();
+  playTrack();
+}
+
+bgAudio?.addEventListener('ended', nextTrack);
+bgAudio?.addEventListener('error', () => {
+  console.warn("Track load error, advancing to next song...");
+  nextTrack();
 });
-
-// STRICT HARDWARE EVICTION: Unloads unused 1080p stream from mobile RAM
-function optimizeCastleBackgrounds() {
-  const deskVid = document.getElementById('castle-video-desktop');
-  const mobVid = document.getElementById('castle-video-mobile');
-  const isDesktop = window.innerWidth >= 1024;
-
-  if (isDesktop) {
-    if(mobVid) { mobVid.pause(); mobVid.removeAttribute('src'); mobVid.load(); }
-    if(deskVid && !deskVid.src.includes('desktop.mp4')) {
-      deskVid.src = "Assets/infinity_castle_desktop.mp4";
-    }
-  } else {
-    if(deskVid) { deskVid.pause(); deskVid.removeAttribute('src'); deskVid.load(); }
-    if(mobVid && !mobVid.src.includes('mobile.mp4')) {
-      mobVid.src = "Assets/infinity_castle_mobile.mp4?v=2";
-    }
-  }
-}
-window.addEventListener('resize', () => {
-  clearTimeout(window.resizeTimer);
-  window.resizeTimer = setTimeout(optimizeCastleBackgrounds, 250);
-});
-
-
-function getActiveVideo() {
-  return window.innerWidth >= 1024 
-    ? document.getElementById('castle-video-desktop') 
-    : document.getElementById('castle-video-mobile');
-}
-
-function bindSeamlessLoop(vid) {
-  if (!vid) return;
-  vid.addEventListener('timeupdate', function() {
-    if (this.duration && this.currentTime >= (this.duration - 0.35)) {
-      this.currentTime = 0.04;
-      this.play().catch(()=>{});
-    }
-  });
-  vid.addEventListener('ended', function() {
-    this.currentTime = 0.04;
-    this.play().catch(()=>{});
-  });
-}
 
 // ==========================================================================
-// TELEMETRY LOGIC
+// CINEMA VISION REEL THEATER (STEAM DECK SPEC)
+// ==========================================================================
+const visionModal = document.getElementById('vision-modal');
+const visionVideo = document.getElementById('vision-theater-video');
+const visionTitle = document.getElementById('vision-title');
+const visionMuteBtn = document.getElementById('visionMuteBtn');
+
+function openVisionTheater() {
+  const isPortrait = window.innerHeight > window.innerWidth;
+  let targetPath = '';
+
+  if (isPortrait && portraitPool.length > 0) {
+    targetPath = portraitPool[portIdx];
+    portIdx = (portIdx + 1) % portraitPool.length;
+  } else {
+    targetPath = landscapePool[landIdx];
+    landIdx = (landIdx + 1) % landscapePool.length;
+  }
+
+  // Duck background audio while watching video
+  if (!bgAudio.paused) bgAudio.volume = 0.1;
+
+  const title = targetPath.split('/').pop().replace(/\.[^/.]+$/, "");
+  if (visionTitle) visionTitle.textContent = title;
+
+  visionModal?.classList.remove('hidden');
+  visionVideo.src = encodeURI(targetPath);
+  visionVideo.muted = false;
+  visionVideo.play().catch(() => {
+    // Fallback if browser blocks unmuted playback
+    visionVideo.muted = true;
+    visionMuteBtn.innerHTML = '<i data-lucide="volume-x"></i>';
+    if (window.lucide) window.lucide.createIcons();
+    visionVideo.play().catch(e => console.warn("Video blocked:", e));
+  });
+}
+
+function closeVisionTheater() {
+  visionModal?.classList.add('hidden');
+  visionVideo.pause();
+  visionVideo.removeAttribute('src'); // Evict from GPU RAM
+  visionVideo.load();
+  if (!bgAudio.paused) bgAudio.volume = 1.0;
+}
+
+visionVideo?.addEventListener('error', () => {
+  console.warn("Video clip load error, attempting next edit...");
+  openVisionTheater();
+});
+
+// ==========================================================================
+// TELEMETRY & ATTENDANCE CORE
 // ==========================================================================
 function getTodayDateStr() {
   const now = new Date();
@@ -301,7 +339,8 @@ function updateSquidGameTally() {
   }
 }
 
-let countsRef = null; let logsRef = null;
+let countsRef = null; 
+let logsRef = null;
 
 function initFirebase() {
   if (!window.firebase || window.firebase.apps.length > 0) return;
@@ -321,67 +360,15 @@ function initFirebase() {
       renderSchedule();
     });
   } catch (err) {
-    console.warn("Using offline local attendance cache.", err);
-    renderMatrix(); renderSchedule();
+    console.warn("Operating on local attendance cache.", err);
+    renderMatrix(); 
+    renderSchedule();
   }
 }
 
 // ==========================================================================
-// POINTER EVENTS (LONG PRESS FISHER-YATES VISION & CLICK)
+// EVENT LISTENERS & DELEGATION
 // ==========================================================================
-let holdTimer;
-let isHolding = false;
-const visionContainer = document.getElementById('vision-container');
-const visionVideo = document.getElementById('vision-video');
-const reticle = document.getElementById('hold-reticle');
-
-window.addEventListener('pointerdown', (e) => {
-  if (e.target.closest('button, a, .tactical-menu, input, select')) return;
-  
-  if(reticle) {
-    reticle.style.left = e.clientX + 'px';
-    reticle.style.top = e.clientY + 'px';
-  }
-
-  holdTimer = setTimeout(() => {
-    isHolding = true;
-    triggerHaptic('success');
-    if(reticle) reticle.classList.add('holding');
-    
-    // Pick video from Fisher-Yates shuffled arrays
-    const isPortrait = window.innerHeight > window.innerWidth;
-    let vidSrc = '';
-    if(isPortrait && portraitVids.length > 0) {
-      vidSrc = portraitVids[portIdx];
-      portIdx = (portIdx + 1) % portraitVids.length;
-    } else {
-      vidSrc = landscapeVids[landIdx];
-      landIdx = (landIdx + 1) % landscapeVids.length;
-    }
-    
-    // Mute BG audio if playing
-    if(!bgAudio.paused) { bgAudio.volume = 0.1; }
-
-    visionContainer.classList.add('active');
-    visionVideo.src = vidSrc;
-    visionVideo.play().catch(()=>{});
-  }, 500); // 500ms TikTok-style long-press
-});
-
-window.addEventListener('pointerup', () => {
-  clearTimeout(holdTimer);
-  if(reticle) reticle.classList.remove('holding');
-  if(isHolding) {
-    isHolding = false;
-    visionContainer.classList.remove('active');
-    visionVideo.pause();
-    visionVideo.removeAttribute('src'); // Strictly free memory
-    visionVideo.load();
-    if(!bgAudio.paused) { bgAudio.volume = 1.0; }
-  }
-});
-window.addEventListener('pointercancel', () => clearTimeout(holdTimer));
-
 document.addEventListener('click', (e) => {
   const trigger = e.target.closest('[data-trigger]');
   const logBtn = e.target.closest('[data-log-class]');
@@ -389,16 +376,42 @@ document.addEventListener('click', (e) => {
 
   if (trigger) {
     const action = trigger.dataset.trigger;
-    if (action !== 'audio-toggle' && action !== 'audio-next' && action !== 'audio-prev') { triggerHaptic('light'); }
+    if (!action.startsWith('audio-')) triggerHaptic('light');
 
-    if (action === 'audio-toggle') toggleAudio();
-    if (action === 'audio-next') { trackIdx = (trackIdx + 1) % audioPool.length; updateAudioTrack(); bgAudio.play(); audioPlayBtn.innerHTML = '<i data-lucide="pause"></i>'; visualizer?.classList.add('active'); }
-    if (action === 'audio-prev') { trackIdx = (trackIdx - 1 + audioPool.length) % audioPool.length; updateAudioTrack(); bgAudio.play(); audioPlayBtn.innerHTML = '<i data-lucide="pause"></i>'; visualizer?.classList.add('active'); }
+    if (action === 'audio-toggle') {
+      if (bgAudio.paused) playTrack();
+      else pauseTrack();
+    }
+    if (action === 'audio-next') nextTrack();
+    if (action === 'audio-prev') prevTrack();
 
-    if (action === 'emergency-contacts') { e.preventDefault(); document.getElementById('emergency-modal')?.classList.remove('hidden'); }
-    if (action === 'close-emergency') { document.getElementById('emergency-modal')?.classList.add('hidden'); }
-    if (action === 'open-telemetry') { document.getElementById('telemetry-drawer')?.classList.add('active'); document.body.classList.add('drawer-open'); }
-    if (action === 'close-telemetry') { document.getElementById('telemetry-drawer')?.classList.remove('active'); document.body.classList.remove('drawer-open'); }
+    if (action === 'open-vision') openVisionTheater();
+    if (action === 'close-vision') closeVisionTheater();
+    if (action === 'vision-next') openVisionTheater();
+    if (action === 'vision-mute') {
+      visionVideo.muted = !visionVideo.muted;
+      visionMuteBtn.innerHTML = visionVideo.muted 
+        ? '<i data-lucide="volume-x"></i>' 
+        : '<i data-lucide="volume-2"></i>';
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    if (action === 'emergency-contacts') { 
+      e.preventDefault(); 
+      document.getElementById('emergency-modal')?.classList.remove('hidden'); 
+    }
+    if (action === 'close-emergency') { 
+      document.getElementById('emergency-modal')?.classList.add('hidden'); 
+    }
+
+    if (action === 'open-telemetry') { 
+      document.getElementById('telemetry-drawer')?.classList.add('active'); 
+      document.body.classList.add('drawer-open'); 
+    }
+    if (action === 'close-telemetry') { 
+      document.getElementById('telemetry-drawer')?.classList.remove('active'); 
+      document.body.classList.remove('drawer-open'); 
+    }
     
     if (action === 'license-modal') {
       const modal = document.getElementById('hunter-modal');
@@ -407,49 +420,73 @@ document.addEventListener('click', (e) => {
       document.getElementById('hunter-buffer').textContent = `${totalSafeBunks} Safe Bunks`;
       modal?.classList.remove('hidden');
     }
-    if (action === 'close-license') { document.getElementById('hunter-modal')?.classList.add('hidden'); }
+    if (action === 'close-license') { 
+      document.getElementById('hunter-modal')?.classList.add('hidden'); 
+    }
     
+    // INFINITY CASTLE
     if (action === 'domain-expansion') {
       playAudioCue(biwaSfx);
       const isCastleActive = document.body.classList.toggle('infinity-castle');
       const layer = document.getElementById('cinematic-layer');
       const banner = document.getElementById('domain-hud-banner');
-      const activeVid = getActiveVideo();
+      const castleVid = document.getElementById('castle-video');
 
       if (isCastleActive) {
         layer?.classList.add('active');
         banner?.classList.add('active');
-        if(!bgAudio.paused) bgAudio.pause(); // Pause music for cinematic domain
-        if (activeVid) { activeVid.currentTime = 0.04; activeVid.play().catch(()=>{}); }
+        if (!bgAudio.paused) pauseTrack();
+        if (castleVid) castleVid.play().catch(e => console.warn("Video blocked:", e));
       } else {
         layer?.classList.remove('active');
         banner?.classList.remove('active');
-        if (activeVid) activeVid.pause();
+        if (castleVid) castleVid.pause();
       }
     }
   } 
 
   if (logBtn && isEditMode) {
-    triggerHaptic('success'); playAudioCue(cashSfx);
-    const code = logBtn.dataset.logClass; const slotNum = logBtn.dataset.slot; const status = logBtn.dataset.status;
+    triggerHaptic('success'); 
+    playAudioCue(cashSfx);
+    const code = logBtn.dataset.logClass; 
+    const slotNum = logBtn.dataset.slot; 
+    const status = logBtn.dataset.status;
     const logKey = `${getTodayDateStr()}_D${activeDayOrder}_S${slotNum}_${code}`;
+
     historyStack.push({ type: 'slot', code, slotNum, logKey, previousData: JSON.parse(JSON.stringify(attendanceData)) });
     document.getElementById('undoBtn')?.classList.remove('hidden');
 
     if (!attendanceData[code]) attendanceData[code] = { name: code, attended: 0, conducted: 0 };
-    if (status === 'attended') { attendanceData[code].attended++; attendanceData[code].conducted++; } else { attendanceData[code].conducted++; }
-    loggedDailyActions[logKey] = status; renderSchedule(); renderMatrix();
+    if (status === 'attended') { 
+      attendanceData[code].attended++; 
+      attendanceData[code].conducted++; 
+    } else { 
+      attendanceData[code].conducted++; 
+    }
+
+    loggedDailyActions[logKey] = status; 
+    renderSchedule(); 
+    renderMatrix();
     if (countsRef) countsRef.set(attendanceData);
     if (logsRef) logsRef.child(logKey).set(status);
   }
 
   if (surpriseBtn && isEditMode) {
-    triggerHaptic('success'); playAudioCue(cashSfx);
-    const code = surpriseBtn.dataset.surpriseClass; const status = surpriseBtn.dataset.status;
+    triggerHaptic('success'); 
+    playAudioCue(cashSfx);
+    const code = surpriseBtn.dataset.surpriseClass; 
+    const status = surpriseBtn.dataset.status;
+
     historyStack.push({ type: 'surprise', code, previousData: JSON.parse(JSON.stringify(attendanceData)) });
     document.getElementById('undoBtn')?.classList.remove('hidden');
 
-    if (status === 'attended') { attendanceData[code].attended++; attendanceData[code].conducted++; } else { attendanceData[code].conducted++; }
+    if (status === 'attended') { 
+      attendanceData[code].attended++; 
+      attendanceData[code].conducted++; 
+    } else { 
+      attendanceData[code].conducted++; 
+    }
+
     renderMatrix();
     if (countsRef) countsRef.set(attendanceData);
   }
@@ -458,13 +495,21 @@ document.addEventListener('click', (e) => {
 document.getElementById('lockToggleBtn')?.addEventListener('click', () => {
   const btn = document.getElementById('lockToggleBtn');
   if (isEditMode) {
-    isEditMode = false; btn.innerHTML = '<i data-lucide="lock"></i> <span>View Only</span>'; btn.classList.remove('unlocked');
-    document.getElementById('undoBtn')?.classList.add('hidden'); renderSchedule(); renderMatrix();
+    isEditMode = false; 
+    btn.innerHTML = '<i data-lucide="lock"></i> <span>View Only</span>'; 
+    btn.classList.remove('unlocked');
+    document.getElementById('undoBtn')?.classList.add('hidden'); 
+    renderSchedule(); 
+    renderMatrix();
   } else {
     const pin = prompt("Enter PIN to unlock Edit Mode:");
     if (pin === SECRET_PIN) {
-      isEditMode = true; btn.innerHTML = '<i data-lucide="unlock"></i> <span>Edit Mode</span>'; btn.classList.add('unlocked');
-      triggerHaptic('success'); renderSchedule(); renderMatrix();
+      isEditMode = true; 
+      btn.innerHTML = '<i data-lucide="unlock"></i> <span>Edit Mode</span>'; 
+      btn.classList.add('unlocked');
+      triggerHaptic('success'); 
+      renderSchedule(); 
+      renderMatrix();
     }
   }
   if (window.lucide) window.lucide.createIcons();
@@ -473,10 +518,18 @@ document.getElementById('lockToggleBtn')?.addEventListener('click', () => {
 document.getElementById('undoBtn')?.addEventListener('click', () => {
   if (historyStack.length === 0 || !isEditMode) return;
   triggerHaptic('undo');
-  const last = historyStack.pop(); attendanceData = last.previousData;
-  if (last.type === 'slot') { delete loggedDailyActions[last.logKey]; if (logsRef) logsRef.child(last.logKey).remove(); }
-  if (countsRef) countsRef.set(attendanceData); renderSchedule(); renderMatrix();
-  if (historyStack.length === 0) { document.getElementById('undoBtn')?.classList.add('hidden'); }
+  const last = historyStack.pop(); 
+  attendanceData = last.previousData;
+  if (last.type === 'slot') { 
+    delete loggedDailyActions[last.logKey]; 
+    if (logsRef) logsRef.child(last.logKey).remove(); 
+  }
+  if (countsRef) countsRef.set(attendanceData); 
+  renderSchedule(); 
+  renderMatrix();
+  if (historyStack.length === 0) { 
+    document.getElementById('undoBtn')?.classList.add('hidden'); 
+  }
 });
 
 document.getElementById('daySelector')?.addEventListener('change', (e) => {
@@ -484,6 +537,7 @@ document.getElementById('daySelector')?.addEventListener('change', (e) => {
   renderSchedule();
 });
 
+// TICKER & CLOCK
 setInterval(() => {
   const now = new Date();
   const clockEl = document.getElementById('liveClock');
@@ -493,7 +547,11 @@ setInterval(() => {
   const timeRemaining = document.getElementById('slotTimeRemaining');
 
   if (!banner || !timeRemaining) return;
-  if (!activeDayOrder || !timetable[activeDayOrder]) { banner.textContent = "No classes in session"; timeRemaining.textContent = ""; return; }
+  if (!activeDayOrder || !timetable[activeDayOrder]) { 
+    banner.textContent = "No classes in session"; 
+    timeRemaining.textContent = ""; 
+    return; 
+  }
 
   let activeFound = false;
   for (const [slotNum, slotData] of Object.entries(slots)) {
@@ -501,7 +559,8 @@ setInterval(() => {
       const code = timetable[activeDayOrder][slotNum];
       banner.textContent = `Live: ${attendanceData[code]?.name || "Break"}`;
       timeRemaining.textContent = `${slotData.end - currentMins}m left`;
-      activeFound = true; break;
+      activeFound = true; 
+      break;
     }
   }
   if (!activeFound) {
@@ -510,20 +569,50 @@ setInterval(() => {
   }
 }, 1000);
 
+// OPTIONAL LONG PRESS PREVIEW
+let holdTimer;
+const reticle = document.getElementById('hold-reticle');
+window.addEventListener('pointerdown', (e) => {
+  if (e.target.closest('button, a, .tactical-menu, input, select, .modal-backdrop')) return;
+  if (reticle) {
+    reticle.style.left = e.clientX + 'px';
+    reticle.style.top = e.clientY + 'px';
+    reticle.classList.add('holding');
+  }
+  holdTimer = setTimeout(() => {
+    triggerHaptic('success');
+    if (reticle) reticle.classList.remove('holding');
+    openVisionTheater();
+  }, 450);
+});
+window.addEventListener('pointerup', () => {
+  clearTimeout(holdTimer);
+  if (reticle) reticle.classList.remove('holding');
+});
+window.addEventListener('pointercancel', () => {
+  clearTimeout(holdTimer);
+  if (reticle) reticle.classList.remove('holding');
+});
+
+// CLOSE MODALS ON BACKDROP CLICK
+window.addEventListener('click', (e) => {
+  if (e.target.id === 'emergency-modal') document.getElementById('emergency-modal').classList.add('hidden');
+  if (e.target.id === 'hunter-modal') document.getElementById('hunter-modal').classList.add('hidden');
+  if (e.target.id === 'vision-modal') closeVisionTheater();
+});
+
+// BOOT ENGINE
 function bootTelemetry() {
   if (window.lucide) window.lucide.createIcons();
   initFirebase();
   renderSchedule();
   renderMatrix();
-  updateAudioTrack(); // Prep first shuffled audio
-  optimizeCastleBackgrounds(); // Strictly map single video
-
-  bindSeamlessLoop(document.getElementById('castle-video-desktop'));
-  bindSeamlessLoop(document.getElementById('castle-video-mobile'));
-  
-  document.getElementById('emergency-modal')?.addEventListener('click', (e) => {
-    if (e.target.id === 'emergency-modal') { document.getElementById('emergency-modal').classList.add('hidden'); }
-  });
+  loadCurrentTrack();
+  syncCastleVideo();
 }
 
-if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', bootTelemetry); } else { bootTelemetry(); }
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootTelemetry);
+} else {
+  bootTelemetry();
+}
