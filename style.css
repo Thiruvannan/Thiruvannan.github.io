@@ -36,7 +36,7 @@ html, body {
 body {
   display: flex;
   justify-content: center;
-  padding: 24px 16px 120px 16px;
+  padding: 56px 16px 120px 16px; /* Generous top clearance prevents banner collisions */
   overflow-x: hidden;
   position: relative;
   transition: background-color 0.8s ease;
@@ -45,6 +45,10 @@ body {
 button, .menu-row, .btn-icon {
   user-select: none;
 }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
 
 /* ==========================================================================
    REFLECT.APP OPTICAL AURA (LIGHT BLOOM BEHIND GLASS)
@@ -67,7 +71,7 @@ button, .menu-row, .btn-icon {
    MACOS OPTICAL GLASS PANELS
    ========================================================================== */
 .obsidian-glass {
-  background: rgba(14, 14, 20, 0.45); /* High transparency lets light/video through */
+  background: rgba(14, 14, 20, 0.45);
   backdrop-filter: blur(28px) saturate(190%);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -77,7 +81,7 @@ button, .menu-row, .btn-icon {
 }
 
 /* ==========================================================================
-   INFINITY CASTLE DIMENSION (DEMON SLAYER SHIFT)
+   INFINITY CASTLE DIMENSION (DEMON SLAYER SHIFT & CONTRAST BOOST)
    ========================================================================== */
 body.infinity-castle #ambient-glow-bloom {
   top: -80px;
@@ -88,11 +92,11 @@ body.infinity-castle #ambient-glow-bloom {
 }
 
 body.infinity-castle .obsidian-glass {
-  background: rgba(22, 12, 8, 0.48) !important;
+  background: rgba(22, 12, 8, 0.62) !important;
   backdrop-filter: blur(32px) saturate(220%) !important;
   -webkit-backdrop-filter: blur(32px) saturate(220%) !important;
-  border-color: rgba(245, 158, 11, 0.25) !important;
-  border-top: 1px solid rgba(245, 158, 11, 0.55) !important;
+  border-color: rgba(245, 158, 11, 0.28) !important;
+  border-top: 1px solid rgba(245, 158, 11, 0.6) !important;
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8), 
               0 0 35px rgba(245, 158, 11, 0.15), 
               inset 0 1px 0 rgba(245, 158, 11, 0.35) !important;
@@ -103,6 +107,29 @@ body.infinity-castle .btn-primary {
   color: #000 !important;
   font-weight: 800;
   box-shadow: 0 10px 30px rgba(245, 158, 11, 0.35) !important;
+}
+
+/* Contrast enhancement over intense backlights */
+body.infinity-castle .telemetry-panel {
+  background: rgba(12, 6, 3, 0.75) !important;
+}
+
+body.infinity-castle .live-slot-banner {
+  background: rgba(245, 158, 11, 0.14) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  color: #fef3c7 !important;
+}
+
+body.infinity-castle #schedule-container > div,
+body.infinity-castle #matrix-container > div {
+  background: rgba(24, 12, 7, 0.82) !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+  backdrop-filter: blur(14px);
+}
+
+body.infinity-castle #schedule-container div,
+body.infinity-castle #matrix-container span {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
 }
 
 /* ==========================================================================
@@ -123,12 +150,14 @@ body.infinity-castle .btn-primary {
     gap: 32px;
     align-items: start;
   }
-  #identity-core { position: sticky; top: 24px; }
+  #identity-core { position: sticky; top: 56px; }
   .telemetry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .scroll-zone { max-height: 58vh; overflow-y: auto; }
 }
 
-/* DEVELOPER CARD */
+/* ==========================================================================
+   DEVELOPER CARD
+   ========================================================================== */
 #identity-core {
   border-radius: var(--radius-lg);
   padding: 24px;
@@ -207,7 +236,7 @@ body.infinity-castle .btn-primary {
 }
 
 /* ==========================================================================
-   TELEMETRY DRAWER
+   TELEMETRY DRAWER (MOBILE OFF-CANVAS / FIXED FLUID SHEET)
    ========================================================================== */
 #telemetry-drawer {
   display: flex;
@@ -370,7 +399,7 @@ body.infinity-castle .btn-primary {
 .play-btn i { width: 15px; height: 15px; }
 
 /* ==========================================================================
-   INFINITY CASTLE VIDEO & ATMOSPHERE
+   INFINITY CASTLE VIDEO & COLLISION-FREE HUD BANNER
    ========================================================================== */
 #cinematic-layer {
   position: fixed;
@@ -405,22 +434,23 @@ body.infinity-castle .btn-primary {
 
 #domain-hud-banner {
   position: fixed;
-  top: 24px;
+  top: 14px;
   left: 50%;
   transform: translate(-50%, -20px);
-  z-index: 500;
+  z-index: 250; /* Floats safely above the drawer without overlapping panels */
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 18px;
-  background: rgba(20, 10, 6, 0.85);
-  border: 1px solid rgba(245, 158, 11, 0.35);
+  gap: 10px;
+  padding: 6px 16px;
+  background: rgba(15, 8, 4, 0.92);
+  border: 1px solid rgba(245, 158, 11, 0.45);
   border-radius: 9999px;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(245, 158, 11, 0.2);
   opacity: 0;
   pointer-events: none;
-  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 #domain-hud-banner.active {
