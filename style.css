@@ -79,7 +79,7 @@ button, .menu-row, .btn-icon { user-select: none; }
 }
 
 /* ==========================================================================
-   REFLECT.APP OPTICAL AURA (LIGHT BLOOM BEHIND GLASS)
+   REFLECT.APP OPTICAL AURA (LIGHT BLOOM BEHIND DEFAULT GLASS)
    ========================================================================== */
 #ambient-glow-bloom {
   position: fixed;
@@ -109,57 +109,84 @@ button, .menu-row, .btn-icon { user-select: none; }
 }
 
 /* ==========================================================================
-   INFINITY CASTLE DIMENSION (DEMON SLAYER SPEC)
+   INFINITY CASTLE: TRUE TRANSLUCENT OPTICAL SPEC
    ========================================================================== */
+
+/* 1. Kill the artificial orange light ball that was blinding the glass */
 body.infinity-castle #ambient-glow-bloom {
-  top: -60px;
-  width: 850px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, rgba(220, 38, 38, 0.18) 45%, transparent 75%);
-  filter: blur(90px);
+  display: none !important;
 }
 
-/* Glass stays NEUTRAL DARK so typography pops and motion shines through */
+/* 2. True Glass: 78% transparent, low-radius blur preserves video architecture */
 body.infinity-castle .obsidian-glass {
-  background: rgba(12, 12, 16, 0.55) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-  border-color: rgba(245, 158, 11, 0.25) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.2) !important; /* Preserves crisp edge */
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 
-              0 0 25px rgba(245, 158, 11, 0.12), 
-              inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  background: rgba(0, 0, 0, 0.22) !important;
+  backdrop-filter: blur(4px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(4px) saturate(160%) !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(245, 158, 11, 0.15) !important;
 }
 
-body.infinity-castle .btn-primary {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-  color: #000000 !important;
-  font-weight: 800;
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.35) !important;
-}
-
+/* 3. Strip inner container backgrounds so layers don't compound opacity */
+body.infinity-castle .tactical-menu,
 body.infinity-castle .telemetry-panel {
-  background: rgba(0, 0, 0, 0.4) !important;
-  border: 1px solid rgba(245, 158, 11, 0.15) !important;
-}
-
-body.infinity-castle .live-slot-banner {
-  background: rgba(245, 158, 11, 0.12) !important;
-  border-color: rgba(245, 158, 11, 0.4) !important;
-  color: #ffffff !important;
+  background: rgba(0, 0, 0, 0.25) !important;
+  border-color: rgba(245, 158, 11, 0.2) !important;
 }
 
 body.infinity-castle #schedule-container > div,
 body.infinity-castle #matrix-container > div {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(245, 158, 11, 0.2) !important;
-  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(245, 158, 11, 0.2) !important;
+  backdrop-filter: none !important; /* Prevents double-blurring */
 }
 
+/* 4. Deep text shadows guarantee legibility directly over bright moving fire */
+body.infinity-castle .dev-name,
+body.infinity-castle .dev-title,
+body.infinity-castle .menu-row,
+body.infinity-castle .menu-row span,
+body.infinity-castle .panel-title,
+body.infinity-castle .rank-label,
+body.infinity-castle .rank-indicator,
 body.infinity-castle #schedule-container div,
 body.infinity-castle #matrix-container span {
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 1), 0 0 4px rgba(0, 0, 0, 1) !important;
 }
+
+body.infinity-castle svg {
+  filter: drop-shadow(0px 2px 4px rgba(0,0,0,1));
+}
+
+/* 5. Gold Domain Button */
+body.infinity-castle .btn-primary {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  color: #000000 !important;
+  font-weight: 800;
+  text-shadow: none !important;
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4) !important;
+}
+
+body.infinity-castle .live-slot-banner {
+  background: rgba(245, 158, 11, 0.15) !important;
+  border-color: rgba(245, 158, 11, 0.45) !important;
+  color: #ffffff !important;
+}
+
+body.infinity-castle [data-status="attended"],
+body.infinity-castle div[style*="var(--accent-cyan)"] {
+  background: rgba(56, 189, 248, 0.22) !important;
+  color: #bae6fd !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+}
+
+body.infinity-castle [data-status="missed"],
+body.infinity-castle div[style*="var(--accent-red)"] {
+  background: rgba(239, 68, 68, 0.25) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.45) !important;
+}
+
 
 /* ==========================================================================
    DEVELOPER IDENTITY CARD
