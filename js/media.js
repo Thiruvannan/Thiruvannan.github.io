@@ -206,9 +206,14 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Initialize first track name on load
-document.addEventListener('DOMContentLoaded', () => {
+function bootMedia() {
   if (audioTracks.length > 0 && trackNameLabel) {
     trackNameLabel.textContent = audioTracks[0].title;
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootMedia);
+} else {
+  bootMedia();
+}
