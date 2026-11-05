@@ -2,90 +2,115 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- FIX: Restored native zoom and scaling for accessibility -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Thiruvannan | SRM Hub</title>
   
+  <!-- Firebase & Lucide Icons -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <!-- Fonts: Share Tech Mono for Telemetry, Inter for clean UI reading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="style.css">
-
-  <style>
-    .neon-shape { font-size: 15px; margin-right: 5px; display: inline-block; font-weight: 900; }
-    .shape-circle { color: #38bdf8; text-shadow: 0 0 10px #38bdf8; }
-    .shape-triangle { color: #fbbf24; text-shadow: 0 0 10px #fbbf24; }
-    .shape-square { color: #ef4444; text-shadow: 0 0 10px #ef4444; }
-  </style>
 </head>
 <body>
 
-  <!-- INFINITY CASTLE BACKGROUNDS -->
-  <video id="castle-video-desktop" class="castle-bg" src="Assets/infinity_castle_desktop.webm" muted loop playsinline disablePictureInPicture controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"></video>
-  <video id="castle-video-mobile" class="castle-bg" src="Assets/infinity_castle_mobile.webm" muted loop playsinline disablePictureInPicture controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"></video>
-
-  <!-- HIDDEN AUDIO TRIGGERS -->
-  <audio id="biwa-sfx" src="Assets/biwa.mp3" preload="auto"></audio>
-  <audio id="cash-sfx" src="Assets/cash_tick.mp3" preload="auto"></audio>
-
-  <!-- DELAYED LONG-PRESS RING -->
-  <div id="hold-indicator"></div>
-
-  <!-- SOLO LEVELING HUNTER BADGE -->
-  <div id="hunter-badge" class="rank-e" onclick="toggleHunterLicense(true)">
-    <img src="Assets/hunter_crest.png" alt="Hunter Crest">
+  <!-- LAYER 1: AMBIENT CINEMATIC ENVIRONMENT (Preload turned off to save mobile data) -->
+  <div id="cinematic-layer">
+    <video id="castle-video-desktop" class="castle-bg" src="Assets/infinity_castle_desktop.webm" preload="none" muted loop playsinline disablePictureInPicture></video>
+    <video id="castle-video-mobile" class="castle-bg" src="Assets/infinity_castle_mobile.webm" preload="none" muted loop playsinline disablePictureInPicture></video>
+    <div class="vignette-overlay"></div>
   </div>
 
+  <!-- LAYER 2: HARDWARE-ISOLATED FULLSCREEN VISION -->
+  <div id="vision-container">
+    <video id="vision-video" playsinline preload="none" disablePictureInPicture></video>
+  </div>
+
+  <!-- AUDIO ENGINE TRIGGERS -->
+  <audio id="biwa-sfx" src="Assets/biwa.mp3" preload="auto"></audio>
+  <audio id="cash-sfx" src="Assets/cash_tick.mp3" preload="auto"></audio>
+  <audio id="bg-audio" preload="none"></audio>
+
   <div id="app-wrapper">
-    <div id="id-view" class="glass-panel id-card">
-      <div class="avatar-wrap">
-        <img class="avatar" src="https://github.com/Thiruvannan.png" alt="Avatar">
-      </div>
-      <h1>Thiruvannan</h1>
-      <p>Developer | SRMIST CSE</p>
+    
+    <!-- MAIN: DEVELOPER IDENTITY (Always Visible) -->
+    <main id="identity-core" class="obsidian-glass">
       
-      <div class="ios-list">
-        <a class="ios-row" href="tel:105786">
-          <i data-lucide="shield-alert" style="color: #fb7185;"></i><span>Emergency Contacts</span><i data-lucide="chevron-right" class="chevron"></i>
-        </a>
-        <div class="ios-divider"></div>
-        <a class="ios-row" href="https://github.com/Thiruvannan" target="_blank">
-          <img src="Assets/github.svg" class="icon" alt="GitHub"><span>GitHub Profile</span><i data-lucide="chevron-right" class="chevron"></i>
-        </a>
-        <div class="ios-divider"></div>
-        <a class="ios-row" href="contact.vcf">
-          <i data-lucide="user-plus" style="color: #38bdf8;"></i><span>Save Contact</span><i data-lucide="chevron-right" class="chevron"></i>
-        </a>
-        <div class="ios-divider"></div>
-        <a class="ios-row" href="https://wa.me/919080792117?text=Hey!" target="_blank">
-          <i data-lucide="message-circle" style="color: #4ade80;"></i><span>WhatsApp</span><i data-lucide="chevron-right" class="chevron"></i>
-        </a>
-        <div class="ios-divider"></div>
-        <a class="ios-row" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR">
-          <i data-lucide="wallet" style="color: #a78bfa;"></i><span>Pay via UPI</span><i data-lucide="chevron-right" class="chevron"></i>
-        </a>
-        <div class="ios-divider"></div>
-        <div class="ios-row" onclick="triggerInfinityCastle()">
-          <i data-lucide="castle" style="color: #f59e0b;"></i><span>Infinity Castle</span><i data-lucide="chevron-right" class="chevron"></i>
+      <!-- Integrated Tactical Hunter Badge -->
+      <header class="tactical-header">
+        <div class="hunter-status" data-trigger="license-modal">
+          <span class="rank-indicator">E-RANK</span>
+          <span class="rank-label">HUNTER</span>
         </div>
+      </header>
+
+      <div class="profile-block">
+        <div class="avatar-wrap">
+          <img class="avatar" src="https://github.com/Thiruvannan.png" alt="Thiruvannan">
+        </div>
+        <h1 class="dev-name">Thiruvannan</h1>
+        <p class="dev-title">Developer | SRMIST CSE</p>
       </div>
+      
+      <!-- Clean, Tactical Bento Links -->
+      <nav class="tactical-menu">
+        <a class="menu-row text-alert" href="tel:105786">
+          <i data-lucide="shield-alert"></i>
+          <span>Emergency Contacts</span>
+        </a>
+        <div class="divider"></div>
+        <a class="menu-row text-neutral" href="https://github.com/Thiruvannan" target="_blank">
+          <i data-lucide="github"></i>
+          <span>GitHub Profile</span>
+        </a>
+        <div class="divider"></div>
+        <a class="menu-row text-cyan" href="contact.vcf">
+          <i data-lucide="user-plus"></i>
+          <span>Save Contact</span>
+        </a>
+        <div class="divider"></div>
+        <a class="menu-row text-cyan" href="https://wa.me/919080792117?text=Hey!" target="_blank">
+          <i data-lucide="message-circle"></i>
+          <span>WhatsApp</span>
+        </a>
+        <div class="divider"></div>
+        <a class="menu-row text-purple" href="upi://pay?pa=9080792117@okaxis&pn=Thiruvannan&cu=INR">
+          <i data-lucide="wallet"></i>
+          <span>Pay via UPI</span>
+        </a>
+        <div class="divider"></div>
+        <div class="menu-row text-amber" data-trigger="domain-expansion">
+          <i data-lucide="castle"></i>
+          <span>Infinity Castle</span>
+        </div>
+      </nav>
 
-      <button class="btn-tracker desktop-hide" onclick="toggleView('tracker-view')">
-        <i data-lucide="swords"></i> View Survival Matrix
+      <!-- Thumb-Zone Trigger for Attendance Drawer -->
+      <button class="btn-primary" data-trigger="open-telemetry">
+        <i data-lucide="cpu"></i> Initialize Survival Matrix
       </button>
-    </div>
+    </main>
 
-    <div id="tracker-view">
-      <div class="top-nav">
-        <button class="back-btn desktop-hide" onclick="toggleView('id-view')"><i data-lucide="arrow-left" style="width:15px;"></i> ID Card</button>
-        <button class="lock-btn" id="lockToggleBtn" onclick="toggleEditMode()"><i data-lucide="lock" style="width:14px;"></i> View Only</button>
-        <button class="undo-btn" id="undoBtn" onclick="undoLastAction()"><i data-lucide="rotate-ccw" style="width:14px;"></i> Undo</button>
-        
+    <!-- ASIDE: TELEMETRY DRAWER (Hidden slide-up panel on mobile, side-panel on desktop) -->
+    <aside id="telemetry-drawer" class="obsidian-glass off-canvas">
+      <div class="drawer-header">
+        <button class="btn-icon" data-trigger="close-telemetry"><i data-lucide="chevron-down"></i></button>
         <div class="sync-status">
           <span class="sync-dot"></span>
           <span class="live-clock" id="liveClock">00:00:00</span>
         </div>
+        <button class="btn-tactical lock-toggle" id="lockToggleBtn">
+          <i data-lucide="lock"></i> <span>View Only</span>
+        </button>
+        <button class="btn-tactical undo-btn hidden" id="undoBtn">
+          <i data-lucide="rotate-ccw"></i>
+        </button>
       </div>
 
       <div class="live-slot-banner" id="liveSlotBanner">
@@ -93,12 +118,13 @@
         <span id="slotTimeRemaining"></span>
       </div>
 
-      <div class="tracker-grid">
-        <div class="glass-panel" style="padding: 24px;">
-          <div class="section-title">
-            <span>Today's Classes</span>
-            <select id="daySelector" onchange="forceDayOrder()">
-              <option value="auto">Auto</option>
+      <div class="telemetry-grid">
+        <!-- Today's Schedule -->
+        <section class="telemetry-panel">
+          <div class="panel-title">
+            <span>Today's Log</span>
+            <select id="daySelector" class="tactical-select">
+              <option value="auto">Auto Sync</option>
               <option value="1">Day 1</option>
               <option value="2">Day 2</option>
               <option value="3">Day 3</option>
@@ -106,60 +132,59 @@
               <option value="5">Day 5</option>
             </select>
           </div>
-          <div id="schedule-container"></div>
-        </div>
+          <div id="schedule-container" class="scroll-zone"></div>
+        </section>
 
-        <div class="glass-panel" style="padding: 24px;">
-          <div class="section-title">
-            <span>Overall Attendance</span>
-          </div>
+        <!-- Overall Attendance & Squid Tally -->
+        <section class="telemetry-panel">
+          <div class="panel-title"><span>Survival Margin</span></div>
           
-          <div class="squid-board" id="globalSquidBoard">
-            <div class="squid-title">○ △ □ VAULT TALLY</div>
-            <div class="squid-numbers" id="squid-digits">
-              <span class="squid-digit">0</span>
-              <span class="squid-digit">0</span>
-              <span class="squid-digit">.</span>
-              <span class="squid-digit">0</span>
-              <span class="squid-digit">%</span>
+          <div class="squid-hud" id="globalSquidBoard">
+            <div class="hud-label">CLEARANCE RATE</div>
+            <div class="hud-digits" id="squid-digits">
+              <span>0</span><span>0</span><span class="dot">.</span><span>0</span><span class="percent">%</span>
             </div>
           </div>
-          <div class="matrix-grid" id="matrix-container"></div>
-        </div>
+          
+          <div id="matrix-container" class="scroll-zone"></div>
+        </section>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- LAYER 3: DOCKED ACOUSTIC CONSOLE -->
+  <div id="acoustic-dock" class="obsidian-glass">
+    <div class="track-info">
+      <div class="music-wave">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </div>
+      <div class="track-marquee">
+        <span id="track-name">Deck offline</span>
       </div>
     </div>
-  </div>
-
-  <div id="hunter-modal">
-    <div class="hunter-card">
-      <h2 id="hunter-rank-title" style="color: #fbbf24;">E-RANK HUNTER</h2>
-      <p>Thiruvannan | SRMIST CSE</p>
-      <div class="hunter-stat"><span>Mana (Classes Attended)</span> <span id="hunter-mana">0</span></div>
-      <div class="hunter-stat"><span>Clearance Rate</span> <span id="hunter-rate">0%</span></div>
-      <div class="hunter-stat"><span>Quest Buffer</span> <span id="hunter-buffer">0 Bunks Left</span></div>
-      <button class="btn-dismiss" onclick="toggleHunterLicense(false)">Dismiss License</button>
+    <div class="audio-controls">
+      <button class="btn-icon" data-trigger="audio-prev"><i data-lucide="skip-back"></i></button>
+      <button class="btn-icon play-btn" data-trigger="audio-toggle"><i data-lucide="play"></i></button>
+      <button class="btn-icon" data-trigger="audio-next"><i data-lucide="skip-forward"></i></button>
     </div>
   </div>
 
-  <div id="vision-container">
-    <video id="vision-video" playsinline preload="metadata" disablePictureInPicture controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"></video>
-    <div class="vision-vignette"></div>
+  <!-- MODALS -->
+  <div id="hunter-modal" class="modal-backdrop hidden">
+    <div class="modal-card obsidian-glass">
+      <h2 id="hunter-rank-title">E-RANK CLEARANCE</h2>
+      <div class="modal-stats">
+        <div class="stat-row"><span>Mana Processed</span> <span id="hunter-mana">0</span></div>
+        <div class="stat-row"><span>Survival Rate</span> <span id="hunter-rate">0%</span></div>
+        <div class="stat-row"><span>Quest Buffer</span> <span id="hunter-buffer">0 Bunks Left</span></div>
+      </div>
+      <button class="btn-primary" data-trigger="close-license">Dismiss</button>
+    </div>
   </div>
 
-  <div id="floating-music-player">
-    <div class="art-wrap">
-      <div class="art-progress" style="--progress: 0%;"></div>
-      <svg class="art-disc" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5">
-        <circle cx="12" cy="12" r="10" fill="#111"></circle>
-        <circle cx="12" cy="12" r="3" stroke="rgba(255,255,255,0.4)"></circle>
-        <circle cx="12" cy="12" r="1" fill="#fff"></circle>
-      </svg>
-    </div>
-    <div class="marquee-container"><span id="track-name">Loading OST Deck...</span></div>
-    <button class="music-ctrl-btn" id="play-pause-btn" onclick="toggleMusic()" title="Play/Pause"><i data-lucide="play"></i></button>
-    <button class="music-ctrl-btn" onclick="playNextRandomTrack()" title="Next Random Track"><i data-lucide="skip-forward"></i></button>
-    <audio id="bg-audio" preload="metadata"></audio>
-  </div>
+  <!-- Haptic Hold Indicator -->
+  <div id="hold-reticle"></div>
 
   <script type="module" src="js/main.js"></script>
 </body>
