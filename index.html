@@ -15,18 +15,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   
-  <!-- CACHE BUSTER v13.0 -->
-  <link rel="stylesheet" href="style.css?v=13.0">
+  <!-- CACHE BUSTER v14.0 -->
+  <link rel="stylesheet" href="style.css?v=14.0">
 </head>
 <body>
 
   <!-- AMBIENT OPTICAL LIGHT SOURCE -->
   <div id="ambient-glow-bloom"></div>
 
-  <!-- LAYER 1: CINEMATIC ENVIRONMENT (Direct Native Preload) -->
+  <!-- LAYER 1: CINEMATIC ENVIRONMENT -->
   <div id="cinematic-layer">
-    <video id="castle-video-desktop" class="castle-bg" muted playsinline preload="auto" src="Assets/infinity_castle_desktop.mp4" disablePictureInPicture></video>
-    <video id="castle-video-mobile" class="castle-bg" muted playsinline preload="auto" src="Assets/infinity_castle_mobile.mp4?v=2" disablePictureInPicture></video>
+    <!-- src is explicitly left blank; JS will strictly inject the correct one based on device -->
+    <video id="castle-video-desktop" class="castle-bg" muted playsinline disablePictureInPicture></video>
+    <video id="castle-video-mobile" class="castle-bg" muted playsinline disablePictureInPicture></video>
     <div class="vignette-overlay"></div>
   </div>
 
@@ -120,8 +121,8 @@
       </div>
 
       <div class="live-slot-banner" id="liveSlotBanner">
-        <span id="slotStatusText">Syncing Schedule...</span>
-        <span id="slotTimeRemaining"></span>
+        <span id="slotStatusText" class="banner-text-left">Syncing...</span>
+        <span id="slotTimeRemaining" class="banner-text-right"></span>
       </div>
 
       <div class="telemetry-grid">
@@ -152,22 +153,21 @@
         </section>
       </div>
     </aside>
-
   </div>
 
   <!-- LAYER 3: DOCKED ACOUSTIC CONSOLE -->
   <div id="acoustic-dock" class="obsidian-glass">
     <div class="track-info">
-      <div class="music-wave">
+      <div class="music-wave" id="music-visualizer">
         <span class="bar"></span><span class="bar"></span><span class="bar"></span>
       </div>
       <div class="track-marquee">
-        <span id="track-name">Deck offline</span>
+        <span id="track-name">Audio Deck Ready</span>
       </div>
     </div>
     <div class="audio-controls">
       <button class="btn-icon" data-trigger="audio-prev"><i data-lucide="skip-back"></i></button>
-      <button class="btn-icon play-btn" data-trigger="audio-toggle"><i data-lucide="play"></i></button>
+      <button class="btn-icon play-btn" data-trigger="audio-toggle" id="audio-play-btn"><i data-lucide="play"></i></button>
       <button class="btn-icon" data-trigger="audio-next"><i data-lucide="skip-forward"></i></button>
     </div>
   </div>
@@ -197,7 +197,6 @@
       </div>
 
       <div class="emergency-scroll-zone">
-        <!-- SRM KTR Campus Protocol -->
         <div class="emergency-group-title">SRMIST KTR Campus Direct Lines</div>
         <div class="emergency-grid">
           <a class="emergency-tile" href="tel:105786">
@@ -230,7 +229,6 @@
           </a>
         </div>
 
-        <!-- National Strategic Lifelines -->
         <div class="emergency-group-title">National Strategic Lifelines</div>
         <div class="emergency-grid">
           <a class="emergency-tile" href="tel:112">
@@ -263,10 +261,7 @@
           </a>
         </div>
       </div>
-
-      <button class="btn-primary" data-trigger="close-emergency" style="margin-top: 14px;">
-        Dismiss Protocol
-      </button>
+      <button class="btn-primary" data-trigger="close-emergency" style="margin-top: 14px;">Dismiss Protocol</button>
     </div>
   </div>
 
