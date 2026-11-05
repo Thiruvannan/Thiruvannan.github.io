@@ -243,9 +243,11 @@ document.addEventListener('click', (e) => {
 
     if (action === 'open-telemetry') {
       document.getElementById('telemetry-drawer')?.classList.add('active');
+      document.body.classList.add('drawer-open'); // Triggers ghosting fix
     }
     if (action === 'close-telemetry') {
       document.getElementById('telemetry-drawer')?.classList.remove('active');
+      document.body.classList.remove('drawer-open'); // Reverts ghosting fix
     }
     if (action === 'license-modal') {
       const modal = document.getElementById('hunter-modal');
@@ -283,9 +285,7 @@ document.addEventListener('click', (e) => {
           activeVideo.src = targetSrc;
         }
         
-        activeVideo.play().catch(err => {
-          console.warn("Autoplay note:", err.message);
-        });
+        activeVideo.play().catch(err => console.warn("Autoplay note:", err.message));
         if (inactiveVideo) inactiveVideo.pause();
       } else {
         layer?.classList.remove('active');
@@ -435,6 +435,20 @@ function bootTelemetry() {
   initFirebase();
   renderSchedule();
   renderMatrix();
+
+  // SEAMLESS LOOP ENGINE (Eliminates the Black Blink)
+  ['castle-video-desktop', 'castle-video-mobile'].forEach(id => {
+    const vid = document.getElementById(id);
+    if (vid) {
+      vid.addEventListener('timeupdate', function() {
+        // Trigger the wrap exactly 0.25s before hardware EOF to prevent black decodes
+        if (this.duration && this.currentTime >= this.duration - 0.25) {
+          this.currentTime = 0.05; // Skips frame 0 which can sometimes render black
+          this.play().catch(()=>{});
+        }
+      });
+    }
+  });
 }
 
 if (document.readyState === 'loading') {
