@@ -15,19 +15,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   
-  <!-- CACHE BUSTER v14.0 -->
-  <link rel="stylesheet" href="style.css?v=14.0">
+  <!-- CACHE BUSTER v15.0 -->
+  <link rel="stylesheet" href="style.css?v=15.0">
 </head>
 <body>
 
   <!-- AMBIENT OPTICAL LIGHT SOURCE -->
   <div id="ambient-glow-bloom"></div>
 
-  <!-- LAYER 1: CINEMATIC ENVIRONMENT -->
+  <!-- LAYER 1: CINEMATIC ENVIRONMENT (Single Hardware Pipeline) -->
   <div id="cinematic-layer">
-    <!-- src is explicitly left blank; JS will strictly inject the correct one based on device -->
-    <video id="castle-video-desktop" class="castle-bg" muted playsinline disablePictureInPicture></video>
-    <video id="castle-video-mobile" class="castle-bg" muted playsinline disablePictureInPicture></video>
+    <video id="castle-video" class="castle-bg" muted playsinline loop preload="auto" disablePictureInPicture></video>
     <div class="vignette-overlay"></div>
   </div>
 
@@ -35,11 +33,6 @@
   <div id="domain-hud-banner">
     <span class="domain-kanji">無限城</span>
     <span class="domain-label">Domain Expansion • Infinity Castle</span>
-  </div>
-
-  <!-- LAYER 2: HARDWARE-ISOLATED FULLSCREEN VISION -->
-  <div id="vision-container">
-    <video id="vision-video" playsinline preload="none" disablePictureInPicture></video>
   </div>
 
   <!-- AUDIO ENGINE TRIGGERS -->
@@ -77,6 +70,11 @@
           <img class="menu-icon github-icon" src="Assets/github.svg" alt="GitHub">
           <span>GitHub Profile</span>
         </a>
+        <div class="divider"></div>
+        <div class="menu-row text-purple" data-trigger="open-vision">
+          <i data-lucide="clapperboard"></i>
+          <span>Anime Vision Reel</span>
+        </div>
         <div class="divider"></div>
         <a class="menu-row text-cyan" href="contact.vcf">
           <i data-lucide="user-plus"></i>
@@ -162,7 +160,7 @@
         <span class="bar"></span><span class="bar"></span><span class="bar"></span>
       </div>
       <div class="track-marquee">
-        <span id="track-name">Audio Deck Ready</span>
+        <span id="track-name">Deck Standby</span>
       </div>
     </div>
     <div class="audio-controls">
@@ -172,7 +170,27 @@
     </div>
   </div>
 
-  <!-- MODALS -->
+  <!-- CINEMATIC VISION REEL MODAL -->
+  <div id="vision-modal" class="modal-backdrop hidden">
+    <div class="modal-card obsidian-glass vision-theater-card">
+      <div class="vision-header">
+        <div class="vision-meta">
+          <span class="vision-tag">ARCHIVAL REEL</span>
+          <span id="vision-title" class="vision-title">Loading Edit...</span>
+        </div>
+        <div class="vision-header-actions">
+          <button class="btn-icon" data-trigger="vision-mute" id="visionMuteBtn"><i data-lucide="volume-2"></i></button>
+          <button class="btn-icon" data-trigger="vision-next"><i data-lucide="skip-forward"></i></button>
+          <button class="btn-icon" data-trigger="close-vision"><i data-lucide="x"></i></button>
+        </div>
+      </div>
+      <div class="vision-screen-wrapper">
+        <video id="vision-theater-video" playsinline preload="auto" disablePictureInPicture></video>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUNTER LICENSE MODAL -->
   <div id="hunter-modal" class="modal-backdrop hidden">
     <div class="modal-card obsidian-glass">
       <h2 id="hunter-rank-title">E-RANK CLEARANCE</h2>
@@ -221,10 +239,8 @@
             <span class="tile-phone">044-27456730</span>
           </a>
           <a class="emergency-tile" href="tel:18001805522">
-            <div class="tile-meta">
-              <span class="tile-title">National Anti-Ragging Cell</span>
-              <span class="tile-desc">UGC Anti-Ragging 24x7 Helpline</span>
-            </div>
+            <span class="tile-title">National Anti-Ragging Cell</span>
+            <span class="tile-desc">UGC Anti-Ragging 24x7 Helpline</span>
             <span class="tile-phone">1800-180-5522</span>
           </a>
         </div>
@@ -265,7 +281,7 @@
     </div>
   </div>
 
-  <!-- Haptic Hold Indicator -->
+  <!-- Haptic Hold Reticle (Mobile/Desktop Touch) -->
   <div id="hold-reticle"></div>
 
   <script type="module" src="js/main.js"></script>
