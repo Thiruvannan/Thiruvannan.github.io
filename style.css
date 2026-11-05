@@ -52,7 +52,7 @@ button, .menu-row, .btn-icon { user-select: none; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
 
 /* ==========================================================================
-   LAYOUT STRUCTURE (DESKTOP GRID & DESKTOP-SPECIFIC FIXES)
+   LAYOUT STRUCTURE (DESKTOP GRID & SPECIFIC FIXES)
    ========================================================================== */
 #app-wrapper {
   width: 100%;
@@ -192,7 +192,6 @@ body.infinity-castle .telemetry-panel {
   border-top: 1px solid rgba(255, 255, 255, 0.24) !important;
 }
 
-/* Individual Schedule & Attendance cards: soft pill geometry */
 #schedule-container > div,
 #matrix-container > div {
   border-radius: 14px !important;
@@ -607,7 +606,6 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 .modal-stats { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; font-weight: 600; }
 .stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; }
 
-
 /* ==========================================================================
    GITHUB ICON & EMERGENCY MODAL SPEC
    ========================================================================== */
@@ -623,7 +621,7 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 }
 
 .github-icon {
-  filter: brightness(0) invert(1); /* Forces any SVG to pure #ffffff */
+  filter: brightness(0) invert(1);
   opacity: 0.85;
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
@@ -634,17 +632,18 @@ body.infinity-castle div[style*="var(--accent-red)"] {
   transform: scale(1.05);
 }
 
-/* 2. Tactical Emergency Directory Modal (Desktop) */
+/* 2. Tactical Emergency Directory Modal (Responsive for Mobile & Desktop) */
 .emergency-modal-card {
-  width: 94% !important;
-  max-width: 640px !important;
-  max-height: 88vh;
+  width: calc(100% - 32px) !important;
+  max-width: 600px !important;
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
-  padding: 24px !important;
+  padding: 20px !important;
   text-align: left !important;
-  border-radius: 22px !important;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 30px rgba(239, 68, 68, 0.15) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 25px rgba(239, 68, 68, 0.12) !important;
+  overflow-x: hidden !important;
 }
 
 .emergency-modal-header {
@@ -665,7 +664,7 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 }
 
 .emergency-modal-header h2 {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 800;
   letter-spacing: -0.5px;
   margin-top: 2px;
@@ -674,31 +673,44 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 
 .emergency-scroll-zone {
   overflow-y: auto;
+  overflow-x: hidden !important;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-right: 6px;
+  padding-right: 4px;
   max-height: 56vh;
 }
 
+.emergency-scroll-zone::-webkit-scrollbar {
+  width: 4px;
+}
+.emergency-scroll-zone::-webkit-scrollbar-track {
+  background: transparent;
+}
+.emergency-scroll-zone::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
 .emergency-group-title {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .emergency-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 8px;
+  width: 100%;
 }
 
 @media (min-width: 600px) {
   .emergency-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 
@@ -710,28 +722,31 @@ body.infinity-castle div[style*="var(--accent-red)"] {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-top: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 12px;
-  padding: 10px 14px;
+  padding: 10px 12px;
   text-decoration: none;
   color: var(--text-primary);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  gap: 12px;
+  gap: 10px;
+  min-width: 0 !important;
 }
 
-.emergency-tile:hover {
+.emergency-tile:hover,
+.emergency-tile:active {
   background: rgba(239, 68, 68, 0.12);
   border-color: rgba(239, 68, 68, 0.4);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .tile-meta {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  min-width: 0;
+  min-width: 0 !important;
+  flex: 1;
 }
 
 .tile-title {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
   color: #fff;
   white-space: nowrap;
@@ -740,19 +755,22 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 }
 
 .tile-desc {
-  font-size: 10px;
+  font-size: 9.5px;
   color: var(--text-muted);
   line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tile-phone {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 800;
   color: var(--accent-cyan);
   background: rgba(56, 189, 248, 0.1);
   border: 1px solid rgba(56, 189, 248, 0.25);
-  padding: 4px 8px;
+  padding: 3px 7px;
   border-radius: 6px;
   white-space: nowrap;
   flex-shrink: 0;
