@@ -15,8 +15,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   
-  <!-- CACHE BUSTER v9.0 -->
-  <link rel="stylesheet" href="style.css?v=11.0">
+  <!-- CACHE BUSTER v12.0 -->
+  <link rel="stylesheet" href="style.css?v=12.0">
 </head>
 <body>
 
@@ -67,13 +67,13 @@
       </div>
       
       <nav class="tactical-menu">
-        <a class="menu-row text-alert" href="tel:105786">
+        <a class="menu-row text-alert" href="tel:105786" data-trigger="emergency-contacts">
           <i data-lucide="shield-alert"></i>
           <span>Emergency Contacts</span>
         </a>
         <div class="divider"></div>
         <a class="menu-row text-neutral" href="https://github.com/Thiruvannan" target="_blank">
-          <i data-lucide="github"></i>
+          <img class="menu-icon github-icon" src="Assets/github.svg" alt="GitHub">
           <span>GitHub Profile</span>
         </a>
         <div class="divider"></div>
@@ -182,6 +182,112 @@
         <div class="stat-row"><span>Quest Buffer</span> <span id="hunter-buffer">0 Bunks Left</span></div>
       </div>
       <button class="btn-primary" data-trigger="close-license">Dismiss</button>
+    </div>
+  </div>
+
+  <!-- TACTICAL SOS DIRECTORY MODAL (DESKTOP) -->
+  <div id="emergency-modal" class="modal-backdrop hidden">
+    <div class="modal-card obsidian-glass emergency-modal-card">
+      <div class="emergency-modal-header">
+        <div>
+          <span class="emergency-tag">TACTICAL SOS DIRECTORY</span>
+          <h2>Emergency Protocols</h2>
+        </div>
+        <button class="btn-icon" data-trigger="close-emergency"><i data-lucide="x"></i></button>
+      </div>
+
+      <div class="emergency-scroll-zone">
+        <!-- SRM KTR Campus Protocol -->
+        <div class="emergency-group-title">SRMIST KTR Campus Direct Lines</div>
+        <div class="emergency-grid">
+          <a class="emergency-tile" href="tel:105786">
+            <div class="tile-meta">
+              <span class="tile-title">SRM Campus Ambulance / SOS</span>
+              <span class="tile-desc">SRM Global Hospital Trauma Care (24x7)</span>
+            </div>
+            <span class="tile-phone highlight">105786</span>
+          </a>
+          <a class="emergency-tile" href="tel:04427452270">
+            <div class="tile-meta">
+              <span class="tile-title">SRM Security Control Room</span>
+              <span class="tile-desc">Main Gate & Campus Patrol HQ</span>
+            </div>
+            <span class="tile-phone">044-27452270</span>
+          </a>
+          <a class="emergency-tile" href="tel:04447432345">
+            <div class="tile-meta">
+              <span class="tile-title">SRM Hospital Emergency Board</span>
+              <span class="tile-desc">Casualty & Critical Care Hotline</span>
+            </div>
+            <span class="tile-phone">044-47432345</span>
+          </a>
+          <a class="emergency-tile" href="tel:04427456730">
+            <div class="tile-meta">
+              <span class="tile-title">SRM Student Wellness & Counselling</span>
+              <span class="tile-desc">Confidential Psychological Support</span>
+            </div>
+            <span class="tile-phone">044-27456730</span>
+          </a>
+          <a class="emergency-tile" href="tel:18001805522">
+            <div class="tile-meta">
+              <span class="tile-title">National Anti-Ragging Cell</span>
+              <span class="tile-desc">UGC Anti-Ragging Direct Monitoring</span>
+            </div>
+            <span class="tile-phone">1800-180-5522</span>
+          </a>
+        </div>
+
+        <!-- Indian National Strategic Lifelines -->
+        <div class="emergency-group-title">National Strategic & Critical Lifelines</div>
+        <div class="emergency-grid">
+          <a class="emergency-tile" href="tel:1930">
+            <div class="tile-meta">
+              <span class="tile-title">Cyber Financial Fraud SOS</span>
+              <span class="tile-desc">Instant freeze of unauthorized UPI/bank transfers</span>
+            </div>
+            <span class="tile-phone highlight">1930</span>
+          </a>
+          <a class="emergency-tile" href="tel:14416">
+            <div class="tile-meta">
+              <span class="tile-title">Tele-MANAS Mental Health SOS</span>
+              <span class="tile-desc">24x7 Free Govt Crisis & Psychological Help</span>
+            </div>
+            <span class="tile-phone highlight">14416</span>
+          </a>
+          <a class="emergency-tile" href="tel:112">
+            <div class="tile-meta">
+              <span class="tile-title">National Emergency (All-in-One)</span>
+              <span class="tile-desc">Police (100), Fire (101), Ambulance (108)</span>
+            </div>
+            <span class="tile-phone">112</span>
+          </a>
+          <a class="emergency-tile" href="tel:1091">
+            <div class="tile-meta">
+              <span class="tile-title">Women Safety & Transit SOS</span>
+              <span class="tile-desc">National Commission for Women / Transit</span>
+            </div>
+            <span class="tile-phone">1091</span>
+          </a>
+          <a class="emergency-tile" href="tel:139">
+            <div class="tile-meta">
+              <span class="tile-title">RailMadad & Railway Police (RPF)</span>
+              <span class="tile-desc">Security, harassment & medical aboard trains</span>
+            </div>
+            <span class="tile-phone">139</span>
+          </a>
+          <a class="emergency-tile" href="tel:04425305130">
+            <div class="tile-meta">
+              <span class="tile-title">Poison Control Centre (South India)</span>
+              <span class="tile-desc">Chennai Toxic Exposure & Antivenom Unit</span>
+            </div>
+            <span class="tile-phone">044-25305130</span>
+          </a>
+        </div>
+      </div>
+
+      <button class="btn-primary" data-trigger="close-emergency" style="margin-top: 14px;">
+        Dismiss Protocol
+      </button>
     </div>
   </div>
 
