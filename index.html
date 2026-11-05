@@ -15,14 +15,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css">
+  <!-- CACHE BUSTER v9.0 -->
+  <link rel="stylesheet" href="style.css?v=9.0">
 </head>
 <body>
 
-  <!-- LAYER 1: AMBIENT CINEMATIC ENVIRONMENT (Sources injected via JS) -->
+  <!-- AMBIENT OPTICAL LIGHT SOURCE -->
+  <div id="ambient-glow-bloom"></div>
+
+  <!-- LAYER 1: CINEMATIC ENVIRONMENT (Direct Native Preload) -->
   <div id="cinematic-layer">
-    <video id="castle-video-desktop" class="castle-bg" muted loop playsinline disablePictureInPicture></video>
-    <video id="castle-video-mobile" class="castle-bg" muted loop playsinline disablePictureInPicture></video>
+    <video id="castle-video-desktop" class="castle-bg" muted playsinline preload="auto" src="Assets/infinity_castle_desktop.mp4" disablePictureInPicture></video>
+    <video id="castle-video-mobile" class="castle-bg" muted playsinline preload="auto" src="Assets/infinity_castle_mobile.mp4" disablePictureInPicture></video>
     <div class="vignette-overlay"></div>
   </div>
 
