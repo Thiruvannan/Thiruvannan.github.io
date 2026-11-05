@@ -292,6 +292,7 @@ document.addEventListener('click', (e) => {
         video?.pause();
       }
     }
+  } // <-- Resolved missing closing brace for if (trigger)
 
   // Attendance Logging Action
   if (logBtn && isEditMode) {
