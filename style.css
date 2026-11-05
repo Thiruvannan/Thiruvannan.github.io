@@ -79,7 +79,7 @@ button, .menu-row, .btn-icon { user-select: none; }
 }
 
 /* ==========================================================================
-   REFLECT.APP OPTICAL AURA (LIGHT BLOOM BEHIND DEFAULT GLASS)
+   DEFAULT MODE: REFLECT.APP OPTICAL AURA
    ========================================================================== */
 #ambient-glow-bloom {
   position: fixed;
@@ -95,9 +95,6 @@ button, .menu-row, .btn-icon { user-select: none; }
   transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ==========================================================================
-   MACOS OPTICAL GLASS (NEUTRAL SMOKE)
-   ========================================================================== */
 .obsidian-glass {
   background: rgba(12, 12, 18, 0.6); 
   backdrop-filter: blur(24px) saturate(190%);
@@ -109,42 +106,59 @@ button, .menu-row, .btn-icon { user-select: none; }
 }
 
 /* ==========================================================================
-   INFINITY CASTLE: TRUE TRANSLUCENT OPTICAL SPEC
+   INFINITY CASTLE: TRUE TRANSLUCENT OPTICAL SPEC (LINEAR / VERCEL STYLE)
    ========================================================================== */
 
-/* 1. Kill the artificial orange light ball that was blinding the glass */
+/* 1. Kill the artificial orange light ball; let the video do the lighting */
 body.infinity-castle #ambient-glow-bloom {
   display: none !important;
 }
 
-/* 2. True Glass: 78% transparent, low-radius blur preserves video architecture */
+/* 2. Synthetic Refraction Glass: Apple macOS dual-bevel technique */
 body.infinity-castle .obsidian-glass {
-  background: rgba(0, 0, 0, 0.22) !important;
-  backdrop-filter: blur(4px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(4px) saturate(160%) !important;
-  border: 1px solid rgba(245, 158, 11, 0.3) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.4) !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(245, 158, 11, 0.15) !important;
+  background: linear-gradient(
+    180deg, 
+    rgba(255, 255, 255, 0.04) 0%, 
+    rgba(14, 10, 8, 0.35) 25%, 
+    rgba(6, 4, 3, 0.6) 100%
+  ) !important;
+  backdrop-filter: blur(8px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(160%) !important;
+  border: 1px solid rgba(245, 158, 11, 0.22) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.35) !important; /* White specular rim */
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.25),   /* Inner top bounce light */
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.6),         /* Inner bottom depth shelf */
+    0 0 25px rgba(245, 158, 11, 0.08) !important;
 }
 
-/* 3. Strip inner container backgrounds so layers don't compound opacity */
+/* 3. Strip inner container backgrounds (keep them neutral gray/black) */
 body.infinity-castle .tactical-menu,
 body.infinity-castle .telemetry-panel {
-  background: rgba(0, 0, 0, 0.25) !important;
-  border-color: rgba(245, 158, 11, 0.2) !important;
+  background: rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+body.infinity-castle .menu-row {
+  color: #f1f5f9 !important;
+}
+
+body.infinity-castle .menu-row:hover,
+body.infinity-castle .menu-row:active {
+  background: rgba(245, 158, 11, 0.08) !important;
 }
 
 body.infinity-castle #schedule-container > div,
 body.infinity-castle #matrix-container > div {
   background: rgba(0, 0, 0, 0.3) !important;
-  border-color: rgba(245, 158, 11, 0.2) !important;
-  backdrop-filter: none !important; /* Prevents double-blurring */
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: none !important;
 }
 
 /* 4. Deep text shadows guarantee legibility directly over bright moving fire */
 body.infinity-castle .dev-name,
 body.infinity-castle .dev-title,
-body.infinity-castle .menu-row,
 body.infinity-castle .menu-row span,
 body.infinity-castle .panel-title,
 body.infinity-castle .rank-label,
@@ -158,18 +172,30 @@ body.infinity-castle svg {
   filter: drop-shadow(0px 2px 4px rgba(0,0,0,1));
 }
 
-/* 5. Gold Domain Button */
+/* 5. Smoked Gold Domain Button (Linear.app aesthetic) */
 body.infinity-castle .btn-primary {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-  color: #000000 !important;
-  font-weight: 800;
-  text-shadow: none !important;
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4) !important;
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.22) 0%, rgba(245, 158, 11, 0.08) 100%) !important;
+  color: #fef3c7 !important;
+  border: 1px solid rgba(245, 158, 11, 0.5) !important;
+  border-top: 1px solid rgba(255, 225, 160, 0.7) !important; /* High-specular top rim */
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  box-shadow: 
+    0 8px 20px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(245, 158, 11, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+body.infinity-castle .btn-primary i,
+body.infinity-castle .btn-primary svg {
+  color: #fbbf24 !important;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6));
 }
 
 body.infinity-castle .live-slot-banner {
   background: rgba(245, 158, 11, 0.15) !important;
-  border-color: rgba(245, 158, 11, 0.45) !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
   color: #ffffff !important;
 }
 
@@ -186,7 +212,6 @@ body.infinity-castle div[style*="var(--accent-red)"] {
   color: #fca5a5 !important;
   border: 1px solid rgba(239, 68, 68, 0.45) !important;
 }
-
 
 /* ==========================================================================
    DEVELOPER IDENTITY CARD
@@ -447,20 +472,25 @@ body.infinity-castle div[style*="var(--accent-red)"] {
   opacity: 1;
 }
 
+/* Re-frames the 16:9 video on mobile so architecture stays visible */
 .castle-bg {
   width: 100vw;
   height: 100vh;
   object-fit: cover;
+  object-position: center 75%; 
+  transform: scale(1.04);
   display: none;
 }
 
 @media (min-width: 1024px) { #castle-video-desktop { display: block; } }
 @media (max-width: 1023px) { #castle-video-mobile { display: block; } }
 
+/* Lightens the dark shadow so the video cuts through */
 .vignette-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, transparent 25%, rgba(0, 0, 0, 0.75) 95%);
+  background: radial-gradient(circle at center, transparent 40%, rgba(5, 3, 2, 0.6) 100%),
+              linear-gradient(to bottom, rgba(5, 3, 2, 0.4) 0%, transparent 30%, transparent 70%, #050302 100%);
   pointer-events: none;
 }
 
