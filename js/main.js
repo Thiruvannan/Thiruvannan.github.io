@@ -280,6 +280,7 @@ document.addEventListener('click', (e) => {
     }
     if (action === 'domain-expansion') {
       playAudioCue(biwaSfx);
+      document.body.classList.toggle('infinity-castle');
       const layer = document.getElementById('cinematic-layer');
       layer?.classList.toggle('active');
       const video = window.innerWidth >= 1024 
@@ -291,7 +292,6 @@ document.addEventListener('click', (e) => {
         video?.pause();
       }
     }
-  }
 
   // Attendance Logging Action
   if (logBtn && isEditMode) {
