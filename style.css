@@ -39,8 +39,8 @@ html, body {
 body {
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* Prevents vertical crushing on mobile */
-  padding: 72px 16px 120px 16px; /* 72px top clears banner, 120px bottom clears dock */
+  align-items: flex-start;
+  padding: 72px 16px 120px 16px;
   position: relative;
   transition: background-color 0.8s ease;
 }
@@ -63,7 +63,7 @@ button, .menu-row, .btn-icon { user-select: none; }
 
 @media (min-width: 1024px) {
   body {
-    align-items: center; /* Safe to center vertically on large screens */
+    align-items: center;
     padding: 40px 24px;
   }
   #app-wrapper {
@@ -214,7 +214,7 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 
 /* ==========================================================================
    DEVELOPER IDENTITY CARD
-   ========================================================================== */
+   ========================================================================= */
 #identity-core {
   border-radius: var(--radius-lg);
   padding: 22px 20px;
@@ -321,8 +321,8 @@ body.infinity-castle div[style*="var(--accent-red)"] {
   #telemetry-drawer.active {
     transform: translateY(0);
     visibility: visible;
-    background: rgba(8, 8, 12, 0.95) !important; /* Fully blocks the ghosting profile beneath */
-    padding-bottom: 140px; /* Leaves clear space above the audio dock */
+    background: rgba(8, 8, 12, 0.95) !important;
+    padding-bottom: 140px;
   }
   
   .telemetry-grid { display: flex; flex-direction: column; gap: 16px; }
@@ -426,21 +426,33 @@ body.infinity-castle div[style*="var(--accent-red)"] {
 .play-btn i { width: 15px; height: 15px; }
 
 /* ==========================================================================
-   INFINITY CASTLE VIDEO & FIXED TOP HUD BANNER
+   A/B SEAMLESS VIDEO BUFFERS & PING-PONG ENGINE
    ========================================================================== */
-#cinematic-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1); }
+#cinematic-layer { 
+  position: fixed; 
+  inset: 0; 
+  z-index: 0; 
+  pointer-events: none; 
+  opacity: 0; 
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1); 
+}
 #cinematic-layer.active { opacity: 1; }
 
 .castle-bg {
+  position: absolute;
+  inset: 0;
   width: 100vw;
   height: 100vh;
   object-fit: cover;
   object-position: center 75%; 
   transform: scale(1.04);
-  display: none;
+  opacity: 0;
+  transition: opacity 0.35s ease-in-out;
+  pointer-events: none;
 }
-@media (min-width: 1024px) { #castle-video-desktop { display: block; } }
-@media (max-width: 1023px) { #castle-video-mobile { display: block; } }
+.castle-bg.visible {
+  opacity: 1;
+}
 
 .vignette-overlay {
   position: absolute;
